@@ -23,6 +23,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
   const sendCode = useCallback(async (email: string) => email.length > 0, []);
 
   const verifyCode = useCallback(async (email: string, code: string) => {
+    // opts.disableSignup is irrelevant here: the preview has no real accounts.
     if (code.length !== 6) return null;
     const previewUser: AuthUser = {
       id: 'preview-user',

@@ -42,9 +42,17 @@ export function useAuth(): Auth {
   );
 
   const verifyCode = useCallback(
-    async (email: string, code: string): Promise<AuthUser | null> => {
+    async (
+      email: string,
+      code: string,
+      opts?: { disableSignup?: boolean },
+    ): Promise<AuthUser | null> => {
       try {
-        const loggedIn = await loginWithCode({ code, email });
+        const loggedIn = await loginWithCode({
+          code,
+          email,
+          disableSignup: opts?.disableSignup,
+        });
         if (!loggedIn) return null;
 
         // The PRD requires every student to get a wallet automatically.

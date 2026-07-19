@@ -12,7 +12,6 @@ import {
 import {
   AccountType,
   Checkbox,
-  LockIcon,
   MailIcon,
   PhoneIcon,
   PrimaryButton,
@@ -23,9 +22,18 @@ import { useScreenInsets } from '../hooks/useScreenInsets';
 import { colors, palette } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
+const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
+
+export type RegistrationDetails = {
+  fullName: string;
+  email: string;
+  phone: string;
+};
+
 type Props = {
   accountType: AccountType;
-  onSubmit: (email: string) => void;
+  /** Called with the form details; the app then emails a verification code. */
+  onSubmit: (details: RegistrationDetails) => void | Promise<void>;
   onLogin: () => void;
 };
 
@@ -34,11 +42,22 @@ export default function RegistrationScreen({ accountType, onSubmit, onLogin }: P
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const roleLabel = accountType === 'student' ? 'Student' : 'Client';
+  const canSubmit =
+    fullName.trim().length > 0 && EMAIL_PATTERN.test(email.trim()) && agreed;
+
+  const handleSubmit = async () => {
+    if (!canSubmit || submitting) return;
+    setSubmitting(true);
+    try {
+      await onSubmit({ fullName: fullName.trim(), email: email.trim(), phone: phone.trim() });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -78,21 +97,12 @@ export default function RegistrationScreen({ accountType, onSubmit, onLogin }: P
             onChangeText={setPhone}
             keyboardType="phone-pad"
           />
-          <TextField
-            icon={<LockIcon />}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secure
-          />
-          <TextField
-            icon={<LockIcon />}
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secure
-          />
         </View>
+
+        <Text style={styles.passwordless}>
+          No password needed — we’ll email you a 6-digit code to verify your
+          account.
+        </Text>
 
         <View style={styles.consentRow}>
           <Checkbox checked={agreed} onToggle={() => setAgreed((a) => !a)} />
@@ -107,7 +117,9 @@ export default function RegistrationScreen({ accountType, onSubmit, onLogin }: P
             label="Create Account"
             showIcon={false}
             fullWidth
-            onPress={() => onSubmit(email)}
+            disabled={!canSubmit}
+            loading={submitting}
+            onPress={handleSubmit}
           />
         </View>
 
@@ -147,6 +159,13 @@ const styles = StyleSheet.create({
   form: {
     marginTop: 26,
     gap: 12,
+  },
+  passwordless: {
+    marginTop: 16,
+    color: colors.bodyGrey,
+    fontFamily: fonts.regular,
+    fontSize: 14,
+    lineHeight: 21,
   },
   consentRow: {
     marginTop: 16,

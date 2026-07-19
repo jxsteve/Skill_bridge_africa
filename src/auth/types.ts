@@ -14,7 +14,13 @@ export type Auth = {
   /**
    * Confirms the emailed code. On success the user is logged in (creating the
    * account and an embedded wallet on first login) and returned; null otherwise.
+   * Pass disableSignup for login-only flows so unknown emails are rejected
+   * instead of silently creating an account.
    */
-  verifyCode: (email: string, code: string) => Promise<AuthUser | null>;
+  verifyCode: (
+    email: string,
+    code: string,
+    opts?: { disableSignup?: boolean },
+  ) => Promise<AuthUser | null>;
   logout: () => Promise<void>;
 };

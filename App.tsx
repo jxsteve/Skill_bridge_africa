@@ -8,8 +8,11 @@ import { AuthProvider, useAuth } from './src/auth';
 import PhoneFrame from './src/components/PhoneFrame';
 import { AccountType } from './src/components/ui';
 import AccountTypeScreen from './src/screens/AccountTypeScreen';
+import LoginScreen from './src/screens/LoginScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
-import RegistrationScreen from './src/screens/RegistrationScreen';
+import RegistrationScreen, {
+  RegistrationDetails,
+} from './src/screens/RegistrationScreen';
 import SplashScreen from './src/screens/SplashScreen';
 import VerifyEmailScreen from './src/screens/VerifyEmailScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
@@ -20,8 +23,11 @@ type Phase =
   | 'onboarding'
   | 'accountType'
   | 'registration'
+  | 'login'
   | 'verifyEmail'
   | 'welcome';
+
+type AuthIntent = 'signup' | 'login';
 
 export default function App() {
   const [fontsLoaded] = useFonts(fontSources);
@@ -46,6 +52,7 @@ function Flow() {
   const auth = useAuth();
   const [phase, setPhase] = useState<Phase>('splash');
   const [accountType, setAccountType] = useState<AccountType>('student');
+  const [intent, setIntent] = useState<AuthIntent>('signup');
   const [email, setEmail] = useState('');
   const opacity = useRef(new Animated.Value(1)).current;
 
@@ -60,7 +67,7 @@ function Flow() {
 
   const goToOnboarding = useCallback(() => setPhase('onboarding'), []);
   const goToAccountType = useCallback(() => setPhase('accountType'), []);
-  const goToWelcome = useCallback(() => setPhase('welcome'), []);
+  const goToLogin = useCallback(() => setPhase('login'), []);
 
   const handleAccountType = useCallback((type: AccountType) => {
     setAccountType(type);
@@ -68,12 +75,20 @@ function Flow() {
   }, []);
 
   const handleRegister = useCallback(
-    (enteredEmail: string) => {
-      const address = enteredEmail.trim();
-      setEmail(address);
-      if (address) {
-        void auth.sendCode(address);
-      }
+    async (details: RegistrationDetails) => {
+      setIntent('signup');
+      setEmail(details.email);
+      await auth.sendCode(details.email);
+      setPhase('verifyEmail');
+    },
+    [auth],
+  );
+
+  const handleLogin = useCallback(
+    async (enteredEmail: string) => {
+      setIntent('login');
+      setEmail(enteredEmail);
+      await auth.sendCode(enteredEmail);
       setPhase('verifyEmail');
     },
     [auth],
@@ -81,15 +96,16 @@ function Flow() {
 
   const handleVerify = useCallback(
     async (code: string) => {
-      const target = email || 'JohnDoe@gmail.com';
-      const user = await auth.verifyCode(target, code);
+      const user = await auth.verifyCode(email, code, {
+        disableSignup: intent === 'login',
+      });
       if (user) {
         setPhase('welcome');
         return true;
       }
       return false;
     },
-    [auth, email],
+    [auth, email, intent],
   );
 
   const handleResend = useCallback(() => {
@@ -98,7 +114,10 @@ function Flow() {
     }
   }, [auth, email]);
 
-  const handleChangeEmail = useCallback(() => setPhase('registration'), []);
+  const handleChangeEmail = useCallback(
+    () => setPhase(intent === 'login' ? 'login' : 'registration'),
+    [intent],
+  );
 
   return (
     <Animated.View style={[styles.root, { opacity }]}>
@@ -111,12 +130,15 @@ function Flow() {
         <RegistrationScreen
           accountType={accountType}
           onSubmit={handleRegister}
-          onLogin={goToWelcome}
+          onLogin={goToLogin}
         />
+      )}
+      {phase === 'login' && (
+        <LoginScreen onSubmit={handleLogin} onSignUp={goToAccountType} />
       )}
       {phase === 'verifyEmail' && (
         <VerifyEmailScreen
-          email={email || 'JohnDoe@gmail.com'}
+          email={email}
           onVerify={handleVerify}
           onResend={handleResend}
           onChangeEmail={handleChangeEmail}
