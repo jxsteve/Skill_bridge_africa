@@ -62,6 +62,52 @@ export function EyeOffIcon({ size = 16, color = '#374151', strokeWidth = 2 }: Ic
   );
 }
 
+export function UserIcon({ size = 20, color = '#6B7280', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" {...strokeProps(color, strokeWidth)} />
+      <Circle cx={12} cy={7} r={4} {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function MailIcon({ size = 20, color = '#6B7280', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Rect x={2} y={4} width={20} height={16} rx={2} {...strokeProps(color, strokeWidth)} />
+      <Path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function PhoneIcon({ size = 20, color = '#6B7280', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+        {...strokeProps(color, strokeWidth)}
+      />
+    </Svg>
+  );
+}
+
+export function LockIcon({ size = 20, color = '#6B7280', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Rect x={3} y={11} width={18} height={11} rx={2} {...strokeProps(color, strokeWidth)} />
+      <Path d="M7 11V7a5 5 0 0 1 10 0v4" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function CheckIcon({ size = 16, color = '#FFFFFF', strokeWidth = 3 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M20 6 9 17l-5-5" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
 export function GraduationCapIcon({ size = 56, color = '#0E3A9A', strokeWidth = 2 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">

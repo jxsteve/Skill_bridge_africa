@@ -4,4 +4,7 @@ export { default as TextButton } from './TextButton';
 export { default as IconButton } from './IconButton';
 export { default as AccountTypeCard } from './AccountTypeCard';
 export type { AccountType } from './AccountTypeCard';
+export { default as TextField } from './TextField';
+export { default as Checkbox } from './Checkbox';
+export { default as OtpInput } from './OtpInput';
 export * from './icons';

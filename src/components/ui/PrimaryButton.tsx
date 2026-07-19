@@ -11,6 +11,7 @@ type Props = {
   disabled?: boolean;
   loading?: boolean;
   showIcon?: boolean;
+  fullWidth?: boolean;
 };
 
 /** Primary action button: solid blue with a chevron, per the design system. */
@@ -20,6 +21,7 @@ export default function PrimaryButton({
   disabled = false,
   loading = false,
   showIcon = true,
+  fullWidth = false,
 }: Props) {
   const inactive = disabled || loading;
   return (
@@ -28,6 +30,7 @@ export default function PrimaryButton({
       disabled={inactive}
       style={({ pressed }) => [
         styles.base,
+        fullWidth && styles.fullWidth,
         disabled
           ? styles.disabled
           : pressed
@@ -60,6 +63,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  fullWidth: {
+    alignSelf: 'stretch',
   },
   default: {
     backgroundColor: palette.blue500,
