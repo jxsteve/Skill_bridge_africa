@@ -14,36 +14,31 @@ SkillBridge Africa is a mobile marketplace that connects skilled African talent 
 
 ## Tech stack
 
-- [Flutter](https://flutter.dev) (Dart)
+- [React Native](https://reactnative.dev) via [Expo](https://expo.dev)
+- TypeScript
 - Custom Manrope typography, bundled offline
-- Targets iOS and Android
+- Targets iOS, Android, and web
 
 ## Getting started
 
 ```bash
-flutter pub get
-flutter run
+npm install
+npm start        # Expo dev server (press i for iOS, a for Android, w for web)
 ```
 
 ## Project structure
 
 ```
-lib/
-  main.dart                  # App entry point and theme
-  theme/app_colors.dart      # Brand palette
+App.tsx                      # App entry: font loading and phase switching
+src/
+  theme/
+    colors.ts                # Brand palette
+    fonts.ts                 # Manrope font registration
   screens/
-    splash_screen.dart       # Splash / brand screen
-    onboarding_screen.dart   # 3-page onboarding flow
-    welcome_screen.dart      # Post-onboarding landing stub
+    SplashScreen.tsx         # Splash / brand screen
+    OnboardingScreen.tsx     # 3-page onboarding pager
+    WelcomeScreen.tsx        # Post-onboarding landing stub
 assets/
   images/                    # Logo and onboarding illustrations
   fonts/                     # Manrope font family
-```
-
-## Tests
-
-Golden screenshot tests cover the splash and onboarding screens:
-
-```bash
-flutter test
 ```
