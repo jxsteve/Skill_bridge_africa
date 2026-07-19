@@ -9,16 +9,31 @@ export const FRAME_WIDTH = 390;
 export const FRAME_HEIGHT = 844;
 export const WEB_STATUS_BAR_HEIGHT = 47;
 
+/** Viewports narrower than this are treated as real phones: no fake frame. */
+const FRAMELESS_MAX_WIDTH = 520;
+
+/** True when the web build should draw the desktop phone frame. */
+export function useWebFrame() {
+  const { width } = useWindowDimensions();
+  return Platform.OS === 'web' && width >= FRAMELESS_MAX_WIDTH;
+}
+
 /**
- * On web, presents the app inside a fixed phone-sized frame with an
- * iOS-style status bar, so it looks like the design screens.
- * On native, renders children as-is (the device provides the frame).
+ * On desktop web, presents the app inside a fixed phone-sized frame with an
+ * iOS-style status bar, so it looks like the design screens. On phone-sized
+ * browsers the app fills the viewport, and on native the device itself
+ * provides the frame.
  */
 export default function PhoneFrame({ children }: PropsWithChildren) {
   const { width, height } = useWindowDimensions();
+  const framed = useWebFrame();
 
   if (Platform.OS !== 'web') {
     return <>{children}</>;
+  }
+
+  if (!framed) {
+    return <View style={styles.fullBleed}>{children}</View>;
   }
 
   const scale = Math.min(
@@ -87,6 +102,10 @@ function StatusBarMock() {
 }
 
 const styles = StyleSheet.create({
+  fullBleed: {
+    flex: 1,
+    backgroundColor: colors.surface,
+  },
   backdrop: {
     flex: 1,
     backgroundColor: '#EDF0F3',

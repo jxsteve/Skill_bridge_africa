@@ -9,8 +9,15 @@ export type Auth = {
   /** False until the auth SDK has finished initializing. */
   isReady: boolean;
   user: AuthUser | null;
-  /** Sends a 6-digit one-time code to the address. Resolves false on failure. */
-  sendCode: (email: string) => Promise<boolean>;
+  /**
+   * Sends a 6-digit one-time code to the address. Resolves false on failure.
+   * disableSignup makes login-only flows reject unknown emails (enforced at
+   * send time on web, at verify time on native).
+   */
+  sendCode: (
+    email: string,
+    opts?: { disableSignup?: boolean },
+  ) => Promise<boolean>;
   /**
    * Confirms the emailed code. On success the user is logged in (creating the
    * account and an embedded wallet on first login) and returned; null otherwise.

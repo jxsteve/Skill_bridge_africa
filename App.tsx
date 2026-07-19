@@ -88,7 +88,7 @@ function Flow() {
     async (enteredEmail: string) => {
       setIntent('login');
       setEmail(enteredEmail);
-      await auth.sendCode(enteredEmail);
+      await auth.sendCode(enteredEmail, { disableSignup: true });
       setPhase('verifyEmail');
     },
     [auth],
