@@ -6,5 +6,7 @@
  */
 export const privyConfig = {
   appId: process.env.EXPO_PUBLIC_PRIVY_APP_ID ?? 'cmqy53hyi00mm0clerka9busw',
-  clientId: process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID ?? '',
+  clientId:
+    process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID ??
+    'client-WY6aVHNxiVPo1nSnAraZWpPUPdcovfGV7NMx9kdHfYi8Z',
 };

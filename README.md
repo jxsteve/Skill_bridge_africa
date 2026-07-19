@@ -10,7 +10,6 @@ Built with React Native (Expo) and TypeScript. Authentication and embedded walle
 
 ```bash
 npm install
-cp .env.example .env   # then fill in the Privy client ID
 npm start
 ```
 
