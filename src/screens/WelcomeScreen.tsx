@@ -4,8 +4,12 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
+type Props = {
+  walletAddress?: string;
+};
+
 /** Landing stub shown after onboarding. Auth and home flows plug in here. */
-export default function WelcomeScreen() {
+export default function WelcomeScreen({ walletAddress }: Props) {
   return (
     <View style={styles.container}>
       <Image
@@ -18,6 +22,9 @@ export default function WelcomeScreen() {
         <Text style={{ color: colors.brandGreen }}>Bridge</Text>
       </Text>
       <Text style={styles.message}>Welcome! Your journey starts here.</Text>
+      {walletAddress && (
+        <Text style={styles.wallet}>Wallet: {walletAddress}</Text>
+      )}
     </View>
   );
 }
@@ -43,5 +50,11 @@ const styles = StyleSheet.create({
     color: colors.bodyGrey,
     fontFamily: fonts.medium,
     fontSize: 16,
+  },
+  wallet: {
+    marginTop: 10,
+    color: colors.bodyGrey,
+    fontFamily: fonts.regular,
+    fontSize: 13,
   },
 });

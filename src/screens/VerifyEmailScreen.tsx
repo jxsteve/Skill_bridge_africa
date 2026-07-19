@@ -10,14 +10,41 @@ const RESEND_SECONDS = 45;
 
 type Props = {
   email: string;
-  onVerify: (code: string) => void;
+  /** Returns true when the code was accepted; false shows an error. */
+  onVerify: (code: string) => Promise<boolean>;
+  onResend?: () => void;
   onChangeEmail: () => void;
 };
 
-export default function VerifyEmailScreen({ email, onVerify, onChangeEmail }: Props) {
+export default function VerifyEmailScreen({
+  email,
+  onVerify,
+  onResend,
+  onChangeEmail,
+}: Props) {
   const insets = useScreenInsets();
   const [code, setCode] = useState('');
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
+  const [verifying, setVerifying] = useState(false);
+  const [error, setError] = useState(false);
+
+  const handleVerify = async () => {
+    if (verifying) return;
+    setVerifying(true);
+    setError(false);
+    const ok = await onVerify(code);
+    setVerifying(false);
+    if (!ok) {
+      setError(true);
+      setCode('');
+    }
+  };
+
+  const handleResend = () => {
+    setSecondsLeft(RESEND_SECONDS);
+    setError(false);
+    onResend?.();
+  };
 
   useEffect(() => {
     if (secondsLeft <= 0) return;
@@ -43,11 +70,9 @@ export default function VerifyEmailScreen({ email, onVerify, onChangeEmail }: Pr
       <View style={styles.otp}>
         <OtpInput value={code} onChange={setCode} />
       </View>
+      {error && <Text style={styles.error}>Invalid code. Please try again.</Text>}
       <Text style={styles.hint}>Didnt receive the code?</Text>
-      <Pressable
-        onPress={secondsLeft <= 0 ? () => setSecondsLeft(RESEND_SECONDS) : undefined}
-        hitSlop={8}
-      >
+      <Pressable onPress={secondsLeft <= 0 ? handleResend : undefined} hitSlop={8}>
         <Text style={styles.resend}>
           Resend Code{secondsLeft > 0 ? ` (${countdown})` : ''}
         </Text>
@@ -59,7 +84,8 @@ export default function VerifyEmailScreen({ email, onVerify, onChangeEmail }: Pr
         label="Verify Code"
         showIcon={false}
         fullWidth
-        onPress={() => onVerify(code)}
+        loading={verifying}
+        onPress={handleVerify}
       />
       <Pressable onPress={onChangeEmail} hitSlop={8} style={styles.changeEmail}>
         <Text style={styles.changeEmailText}>Change Email</Text>
@@ -95,6 +121,13 @@ const styles = StyleSheet.create({
   },
   otp: {
     marginTop: 46,
+  },
+  error: {
+    marginTop: 14,
+    textAlign: 'center',
+    color: '#DC2626',
+    fontFamily: fonts.regular,
+    fontSize: 14,
   },
   hint: {
     marginTop: 16,

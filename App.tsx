@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { AuthProvider, useAuth } from './src/auth';
 import PhoneFrame from './src/components/PhoneFrame';
 import { AccountType } from './src/components/ui';
 import AccountTypeScreen from './src/screens/AccountTypeScreen';
@@ -24,6 +25,25 @@ type Phase =
 
 export default function App() {
   const [fontsLoaded] = useFonts(fontSources);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  return (
+    <SafeAreaProvider>
+      <AuthProvider>
+        <StatusBar style="dark" />
+        <PhoneFrame>
+          <Flow />
+        </PhoneFrame>
+      </AuthProvider>
+    </SafeAreaProvider>
+  );
+}
+
+function Flow() {
+  const auth = useAuth();
   const [phase, setPhase] = useState<Phase>('splash');
   const [accountType, setAccountType] = useState<AccountType>('student');
   const [email, setEmail] = useState('');
@@ -47,47 +67,63 @@ export default function App() {
     setPhase('registration');
   }, []);
 
-  const handleRegister = useCallback((enteredEmail: string) => {
-    setEmail(enteredEmail.trim());
-    setPhase('verifyEmail');
-  }, []);
+  const handleRegister = useCallback(
+    (enteredEmail: string) => {
+      const address = enteredEmail.trim();
+      setEmail(address);
+      if (address) {
+        void auth.sendCode(address);
+      }
+      setPhase('verifyEmail');
+    },
+    [auth],
+  );
+
+  const handleVerify = useCallback(
+    async (code: string) => {
+      const target = email || 'JohnDoe@gmail.com';
+      const user = await auth.verifyCode(target, code);
+      if (user) {
+        setPhase('welcome');
+        return true;
+      }
+      return false;
+    },
+    [auth, email],
+  );
+
+  const handleResend = useCallback(() => {
+    if (email) {
+      void auth.sendCode(email);
+    }
+  }, [auth, email]);
 
   const handleChangeEmail = useCallback(() => setPhase('registration'), []);
 
-  if (!fontsLoaded) {
-    return null;
-  }
-
   return (
-    <SafeAreaProvider>
-      <StatusBar style="dark" />
-      <PhoneFrame>
-        <Animated.View style={[styles.root, { opacity }]}>
-          {phase === 'splash' && <SplashScreen onDone={goToOnboarding} />}
-          {phase === 'onboarding' && (
-            <OnboardingScreen onFinish={goToAccountType} />
-          )}
-          {phase === 'accountType' && (
-            <AccountTypeScreen onSelect={handleAccountType} />
-          )}
-          {phase === 'registration' && (
-            <RegistrationScreen
-              accountType={accountType}
-              onSubmit={handleRegister}
-              onLogin={goToWelcome}
-            />
-          )}
-          {phase === 'verifyEmail' && (
-            <VerifyEmailScreen
-              email={email || 'JohnDoe@gmail.com'}
-              onVerify={goToWelcome}
-              onChangeEmail={handleChangeEmail}
-            />
-          )}
-          {phase === 'welcome' && <WelcomeScreen />}
-        </Animated.View>
-      </PhoneFrame>
-    </SafeAreaProvider>
+    <Animated.View style={[styles.root, { opacity }]}>
+      {phase === 'splash' && <SplashScreen onDone={goToOnboarding} />}
+      {phase === 'onboarding' && <OnboardingScreen onFinish={goToAccountType} />}
+      {phase === 'accountType' && (
+        <AccountTypeScreen onSelect={handleAccountType} />
+      )}
+      {phase === 'registration' && (
+        <RegistrationScreen
+          accountType={accountType}
+          onSubmit={handleRegister}
+          onLogin={goToWelcome}
+        />
+      )}
+      {phase === 'verifyEmail' && (
+        <VerifyEmailScreen
+          email={email || 'JohnDoe@gmail.com'}
+          onVerify={handleVerify}
+          onResend={handleResend}
+          onChangeEmail={handleChangeEmail}
+        />
+      )}
+      {phase === 'welcome' && <WelcomeScreen walletAddress={auth.user?.walletAddress} />}
+    </Animated.View>
   );
 }
 
