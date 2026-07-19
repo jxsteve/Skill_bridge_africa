@@ -1,0 +1,38 @@
+name: skillbridge_africa
+description: "SkillBridge Africa - Your Skills. Our Bridge."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+
+  fonts:
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/manrope-v20-latin-regular.ttf
+          weight: 400
+        - asset: assets/fonts/manrope-v20-latin-500.ttf
+          weight: 500
+        - asset: assets/fonts/manrope-v20-latin-600.ttf
+          weight: 600
+        - asset: assets/fonts/manrope-v20-latin-700.ttf
+          weight: 700
+        - asset: assets/fonts/manrope-v20-latin-800.ttf
+          weight: 800
