@@ -107,7 +107,7 @@ export default function RegistrationScreen({ accountType, onSubmit, onLogin }: P
         <View style={styles.consentRow}>
           <Checkbox checked={agreed} onToggle={() => setAgreed((a) => !a)} />
           <Text style={styles.consentText}>
-            I agree to the{'  '}
+            I agree to the{' '}
             <Text style={styles.consentLink}>Terms & Privacy Policy</Text>
           </Text>
         </View>

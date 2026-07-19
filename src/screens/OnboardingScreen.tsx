@@ -196,7 +196,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   description: {
-    height: 64,
+    minHeight: 64,
+    paddingHorizontal: 16,
     textAlign: 'center',
     color: colors.bodyGrey,
     fontFamily: fonts.medium,

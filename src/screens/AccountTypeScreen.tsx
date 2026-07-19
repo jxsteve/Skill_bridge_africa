@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { AccountType, AccountTypeCard } from '../components/ui';
 import { useScreenInsets } from '../hooks/useScreenInsets';
@@ -13,7 +13,13 @@ type Props = {
 export default function AccountTypeScreen({ onSelect }: Props) {
   const insets = useScreenInsets();
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top, paddingBottom: insets.bottom + 24 },
+      ]}
+    >
       <Text style={styles.title}>Choose Your{'\n'}Account Type</Text>
       <Text style={styles.subtitle}>
         Select how you want to use{'\n'}SkillBridge Africa
@@ -22,7 +28,7 @@ export default function AccountTypeScreen({ onSelect }: Props) {
         <AccountTypeCard type="student" onPress={() => onSelect('student')} />
         <AccountTypeCard type="client" onPress={() => onSelect('client')} />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -30,6 +36,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.splashBase,
+  },
+  content: {
     paddingHorizontal: 24,
   },
   title: {

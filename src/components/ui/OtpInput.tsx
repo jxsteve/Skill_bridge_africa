@@ -45,7 +45,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   box: {
-    width: 44,
+    flex: 1,
+    maxWidth: 44,
     height: 56,
     borderRadius: 10,
     borderWidth: 1,

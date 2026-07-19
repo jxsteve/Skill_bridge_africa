@@ -23,7 +23,9 @@ export default function WelcomeScreen({ walletAddress }: Props) {
       </Text>
       <Text style={styles.message}>Welcome! Your journey starts here.</Text>
       {walletAddress && (
-        <Text style={styles.wallet}>Wallet: {walletAddress}</Text>
+        <Text style={styles.wallet} selectable>
+          Wallet: {walletAddress}
+        </Text>
       )}
     </View>
   );
@@ -53,6 +55,8 @@ const styles = StyleSheet.create({
   },
   wallet: {
     marginTop: 10,
+    paddingHorizontal: 24,
+    textAlign: 'center',
     color: colors.bodyGrey,
     fontFamily: fonts.regular,
     fontSize: 13,
