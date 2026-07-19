@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import PhoneFrame from './src/components/PhoneFrame';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import SplashScreen from './src/screens/SplashScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
@@ -35,11 +36,13 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
-      <Animated.View style={[styles.root, { opacity }]}>
-        {phase === 'splash' && <SplashScreen onDone={goToOnboarding} />}
-        {phase === 'onboarding' && <OnboardingScreen onFinish={goToWelcome} />}
-        {phase === 'welcome' && <WelcomeScreen />}
-      </Animated.View>
+      <PhoneFrame>
+        <Animated.View style={[styles.root, { opacity }]}>
+          {phase === 'splash' && <SplashScreen onDone={goToOnboarding} />}
+          {phase === 'onboarding' && <OnboardingScreen onFinish={goToWelcome} />}
+          {phase === 'welcome' && <WelcomeScreen />}
+        </Animated.View>
+      </PhoneFrame>
     </SafeAreaProvider>
   );
 }

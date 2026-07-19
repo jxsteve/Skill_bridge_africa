@@ -9,10 +9,9 @@ import {
   StyleSheet,
   Text,
   View,
-  useWindowDimensions,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useScreenInsets } from '../hooks/useScreenInsets';
 import { colors } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 
@@ -60,10 +59,10 @@ type Props = {
 };
 
 export default function OnboardingScreen({ onFinish }: Props) {
-  const { width } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
+  const insets = useScreenInsets();
   const listRef = useRef<FlatList<PageData>>(null);
   const [pageIndex, setPageIndex] = useState(0);
+  const [width, setWidth] = useState(0);
   const [pagerHeight, setPagerHeight] = useState(0);
 
   const isLastPage = pageIndex === PAGES.length - 1;
@@ -94,11 +93,15 @@ export default function OnboardingScreen({ onFinish }: Props) {
   }, [goToPage]);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View
+      style={[styles.container, { paddingTop: insets.top }]}
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+    >
       <View
         style={styles.pagerArea}
         onLayout={(e) => setPagerHeight(e.nativeEvent.layout.height)}
       >
+        {width > 0 && (
         <FlatList
           ref={listRef}
           data={PAGES}
@@ -112,6 +115,7 @@ export default function OnboardingScreen({ onFinish }: Props) {
           )}
           keyExtractor={(item) => item.key}
         />
+        )}
       </View>
 
       <View style={styles.dotsRow}>

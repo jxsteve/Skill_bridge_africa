@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Image, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 
 import { colors } from '../theme/colors';
@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default function SplashScreen({ onDone }: Props) {
-  const { width, height } = useWindowDimensions();
+  const [{ width, height }, setSize] = useState({ width: 390, height: 844 });
 
   useEffect(() => {
     const timer = setTimeout(onDone, SPLASH_DURATION_MS);
@@ -20,7 +20,10 @@ export default function SplashScreen({ onDone }: Props) {
   }, [onDone]);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={styles.container}
+      onLayout={(e) => setSize(e.nativeEvent.layout)}
+    >
       <Svg style={StyleSheet.absoluteFill} width={width} height={height}>
         <Defs>
           <RadialGradient id="blob" cx="50%" cy="50%" r="50%">
