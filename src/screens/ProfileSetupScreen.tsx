@@ -19,6 +19,7 @@ import {
   GraduationCapIcon,
   PlusIcon,
   PrimaryButton,
+  SelectField,
   StepProgress,
   TextButton,
   TextField,
@@ -29,9 +30,11 @@ import { colors, palette } from '../theme/colors';
 import { fonts } from '../theme/fonts';
 import {
   ACADEMIC_LEVELS,
+  COURSES,
   MAX_SKILLS,
   SKILL_OPTIONS,
   StudentProfile,
+  UNIVERSITIES,
 } from '../types/profile';
 
 const TOTAL_STEPS = 4;
@@ -57,7 +60,7 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
 
   const canContinue =
     step === 1
-      ? university.trim().length > 1 && course.trim().length > 1 && level !== ''
+      ? university !== '' && course !== '' && level !== ''
       : step === 2
         ? skills.length > 0
         : true;
@@ -95,8 +98,8 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
       setStep(step + 1);
     } else {
       onComplete({
-        university: university.trim(),
-        course: course.trim(),
+        university,
+        course,
         level,
         skills,
         portfolio,
@@ -135,19 +138,19 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
               Tell us where you study — this is how{'\n'}you get verified
             </Text>
             <View style={styles.form}>
-              <TextField
+              <SelectField
                 icon={<GraduationCapIcon size={20} color={palette.gray400} />}
                 placeholder="University"
                 value={university}
-                onChangeText={setUniversity}
-                autoCapitalize="words"
+                options={UNIVERSITIES}
+                onSelect={setUniversity}
               />
-              <TextField
+              <SelectField
                 icon={<UserIcon />}
                 placeholder="Course of Study"
                 value={course}
-                onChangeText={setCourse}
-                autoCapitalize="words"
+                options={COURSES}
+                onSelect={setCourse}
               />
               <Text style={styles.fieldLabel}>Current level</Text>
               <View style={styles.chipWrap}>

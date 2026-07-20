@@ -9,4 +9,5 @@ export { default as Checkbox } from './Checkbox';
 export { default as OtpInput } from './OtpInput';
 export { default as Chip } from './Chip';
 export { default as StepProgress } from './StepProgress';
+export { default as SelectField } from './SelectField';
 export * from './icons';

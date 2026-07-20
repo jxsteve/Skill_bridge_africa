@@ -10,6 +10,7 @@ import { AccountType } from './src/components/ui';
 import AccountTypeScreen from './src/screens/AccountTypeScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
+import ProfileCompleteScreen from './src/screens/ProfileCompleteScreen';
 import ProfileSetupScreen from './src/screens/ProfileSetupScreen';
 import RegistrationScreen, {
   RegistrationDetails,
@@ -29,6 +30,7 @@ type Phase =
   | 'login'
   | 'verifyEmail'
   | 'profileSetup'
+  | 'profileComplete'
   | 'studentHome'
   | 'welcome';
 
@@ -123,8 +125,10 @@ function Flow() {
 
   const handleProfileComplete = useCallback((completed: StudentProfile) => {
     setProfile(completed);
-    setPhase('studentHome');
+    setPhase('profileComplete');
   }, []);
+
+  const goToStudentHome = useCallback(() => setPhase('studentHome'), []);
 
   const goToProfileSetup = useCallback(() => setPhase('profileSetup'), []);
 
@@ -168,6 +172,12 @@ function Flow() {
         <ProfileSetupScreen
           initialProfile={profile}
           onComplete={handleProfileComplete}
+        />
+      )}
+      {phase === 'profileComplete' && profile && (
+        <ProfileCompleteScreen
+          university={profile.university}
+          onDone={goToStudentHome}
         />
       )}
       {phase === 'studentHome' && (

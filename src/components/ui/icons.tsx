@@ -134,6 +134,14 @@ export function ChevronLeftIcon({ size = 24, color = '#111827', strokeWidth = 2 
   );
 }
 
+export function ChevronDownIcon({ size = 20, color = '#6B7280', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="m6 9 6 6 6-6" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
 export function BellIcon({ size = 24, color = '#111827', strokeWidth = 2 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
