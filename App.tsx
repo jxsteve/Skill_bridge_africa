@@ -1,7 +1,7 @@
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, StyleSheet } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider, useAuth } from './src/auth';
@@ -41,10 +41,20 @@ type Phase =
 type AuthIntent = 'signup' | 'login';
 
 export default function App() {
-  const [fontsLoaded] = useFonts(fontSources);
+  const [fontsLoaded, fontError] = useFonts(fontSources);
 
-  if (!fontsLoaded) {
-    return null;
+  // Never block the app on fonts: proceed once they load, on error, or after
+  // a short timeout so a slow/failed font request can't leave a blank screen.
+  const [fontTimedOut, setFontTimedOut] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setFontTimedOut(true), 3500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const ready = fontsLoaded || fontError != null || fontTimedOut;
+
+  if (!ready) {
+    return <View style={styles.boot} />;
   }
 
   return (
@@ -219,5 +229,9 @@ function Flow() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
+  },
+  boot: {
+    flex: 1,
+    backgroundColor: '#F8FAFB',
   },
 });
