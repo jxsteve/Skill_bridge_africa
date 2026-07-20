@@ -108,9 +108,9 @@ function Flow() {
         disableSignup: intent === 'login',
       });
       if (user) {
-        // New students go on to build their professional profile.
-        if (intent === 'signup' && accountType === 'student') {
-          setPhase('profileSetup');
+        // Students land on their dashboard and complete the profile from there.
+        if (accountType === 'student') {
+          setPhase('studentHome');
         } else {
           setPhase('welcome');
         }
@@ -125,6 +125,8 @@ function Flow() {
     setProfile(completed);
     setPhase('studentHome');
   }, []);
+
+  const goToProfileSetup = useCallback(() => setPhase('profileSetup'), []);
 
   const handleResend = useCallback(() => {
     if (email) {
@@ -163,14 +165,18 @@ function Flow() {
         />
       )}
       {phase === 'profileSetup' && (
-        <ProfileSetupScreen onComplete={handleProfileComplete} />
+        <ProfileSetupScreen
+          initialProfile={profile}
+          onComplete={handleProfileComplete}
+        />
       )}
-      {phase === 'studentHome' && profile && (
+      {phase === 'studentHome' && (
         <StudentHomeScreen
           name={fullName}
           email={email}
           walletAddress={auth.user?.walletAddress}
           profile={profile}
+          onCompleteProfile={goToProfileSetup}
         />
       )}
       {phase === 'welcome' && <WelcomeScreen walletAddress={auth.user?.walletAddress} />}

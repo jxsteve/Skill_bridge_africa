@@ -134,6 +134,127 @@ export function ChevronLeftIcon({ size = 24, color = '#111827', strokeWidth = 2 
   );
 }
 
+export function BellIcon({ size = 24, color = '#111827', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M10.268 21a2 2 0 0 0 3.464 0" {...strokeProps(color, strokeWidth)} />
+      <Path
+        d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
+        {...strokeProps(color, strokeWidth)}
+      />
+    </Svg>
+  );
+}
+
+export function WalletIcon({ size = 20, color = '#6014E0', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"
+        {...strokeProps(color, strokeWidth)}
+      />
+      <Path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function SearchIcon({ size = 20, color = '#111827', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Circle cx={11} cy={11} r={8} {...strokeProps(color, strokeWidth)} />
+      <Path d="m21 21-4.3-4.3" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function UsersIcon({ size = 20, color = '#111827', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" {...strokeProps(color, strokeWidth)} />
+      <Circle cx={9} cy={7} r={4} {...strokeProps(color, strokeWidth)} />
+      <Path d="M22 21v-2a4 4 0 0 0-3-3.87" {...strokeProps(color, strokeWidth)} />
+      <Path d="M16 3.13a4 4 0 0 1 0 7.75" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function ClipboardListIcon({ size = 48, color = '#6014E0', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Rect x={8} y={2} width={8} height={4} rx={1} {...strokeProps(color, strokeWidth)} />
+      <Path
+        d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+        {...strokeProps(color, strokeWidth)}
+      />
+      <Path d="M12 11h4" {...strokeProps(color, strokeWidth)} />
+      <Path d="M12 16h4" {...strokeProps(color, strokeWidth)} />
+      <Path d="M8 11h.01" {...strokeProps(color, strokeWidth)} />
+      <Path d="M8 16h.01" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function HomeIcon({ size = 22, color = '#111827', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"
+        {...strokeProps(color, strokeWidth)}
+      />
+      <Path
+        d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+        {...strokeProps(color, strokeWidth)}
+      />
+    </Svg>
+  );
+}
+
+export function ActivityIcon({ size = 16, color = '#6014E0', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"
+        {...strokeProps(color, strokeWidth)}
+      />
+    </Svg>
+  );
+}
+
+export function DollarSignIcon({ size = 16, color = '#16A34A', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M12 2v20" {...strokeProps(color, strokeWidth)} />
+      <Path
+        d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
+        {...strokeProps(color, strokeWidth)}
+      />
+    </Svg>
+  );
+}
+
+export function IdCardIcon({ size = 18, color = '#6014E0', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M16 10h2" {...strokeProps(color, strokeWidth)} />
+      <Path d="M16 14h2" {...strokeProps(color, strokeWidth)} />
+      <Path d="M6.17 15a3 3 0 0 1 5.66 0" {...strokeProps(color, strokeWidth)} />
+      <Circle cx={9} cy={11} r={2} {...strokeProps(color, strokeWidth)} />
+      <Rect x={2} y={5} width={20} height={14} rx={2} {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function MessageSquareIcon({ size = 18, color = '#6014E0', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+        {...strokeProps(color, strokeWidth)}
+      />
+    </Svg>
+  );
+}
+
 export function GraduationCapIcon({ size = 56, color = '#0E3A9A', strokeWidth = 2 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">

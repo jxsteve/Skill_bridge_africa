@@ -37,20 +37,23 @@ import {
 const TOTAL_STEPS = 4;
 
 type Props = {
+  initialProfile?: StudentProfile | null;
   onComplete: (profile: StudentProfile) => void;
 };
 
-export default function ProfileSetupScreen({ onComplete }: Props) {
+export default function ProfileSetupScreen({ initialProfile, onComplete }: Props) {
   const insets = useScreenInsets();
   const [step, setStep] = useState(1);
 
-  const [university, setUniversity] = useState('');
-  const [course, setCourse] = useState('');
-  const [level, setLevel] = useState('');
-  const [skills, setSkills] = useState<string[]>([]);
-  const [portfolio, setPortfolio] = useState<string[]>([]);
-  const [bio, setBio] = useState('');
-  const [available, setAvailable] = useState(true);
+  const [university, setUniversity] = useState(initialProfile?.university ?? '');
+  const [course, setCourse] = useState(initialProfile?.course ?? '');
+  const [level, setLevel] = useState(initialProfile?.level ?? '');
+  const [skills, setSkills] = useState<string[]>(initialProfile?.skills ?? []);
+  const [portfolio, setPortfolio] = useState<string[]>(
+    initialProfile?.portfolio ?? [],
+  );
+  const [bio, setBio] = useState(initialProfile?.bio ?? '');
+  const [available, setAvailable] = useState(initialProfile?.available ?? true);
 
   const canContinue =
     step === 1
