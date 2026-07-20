@@ -29,6 +29,7 @@ src/
   screens/         # Splash, onboarding, account type, registration, verify
   theme/           # Brand colors, tokens and typography
   hooks/           # Screen inset helpers
+  types/           # Profile model plus university, course and skill lists
 assets/
   images/          # Logo and onboarding illustrations
   fonts/           # Manrope font family (bundled)

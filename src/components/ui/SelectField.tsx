@@ -10,6 +10,7 @@ import {
 
 import { palette } from '../../theme/colors';
 import { fonts } from '../../theme/fonts';
+import { FRAME_WIDTH, useWebFrame } from '../PhoneFrame';
 import { CheckIcon, ChevronDownIcon } from './icons';
 
 type Props = {
@@ -29,6 +30,9 @@ export default function SelectField({
   onSelect,
 }: Props) {
   const [open, setOpen] = useState(false);
+  // Inside the desktop web frame the options render as a centered,
+  // frame-width card; elsewhere they slide up as a bottom sheet.
+  const framed = useWebFrame();
 
   return (
     <>
@@ -46,9 +50,15 @@ export default function SelectField({
         animationType="fade"
         onRequestClose={() => setOpen(false)}
       >
-        <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
-          <Pressable style={styles.sheet} onPress={() => {}}>
-            <View style={styles.grabber} />
+        <Pressable
+          style={[styles.backdrop, framed && styles.backdropCentered]}
+          onPress={() => setOpen(false)}
+        >
+          <Pressable
+            style={[styles.sheet, framed && styles.sheetFramed]}
+            onPress={() => {}}
+          >
+            {!framed && <View style={styles.grabber} />}
             <Text style={styles.sheetTitle}>{placeholder}</Text>
             <FlatList
               data={[...options]}
@@ -111,6 +121,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(17, 24, 39, 0.45)',
     justifyContent: 'flex-end',
   },
+  backdropCentered: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   sheet: {
     maxHeight: '70%',
     backgroundColor: '#FFFFFF',
@@ -118,6 +132,13 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     paddingHorizontal: 20,
     paddingBottom: 28,
+  },
+  sheetFramed: {
+    width: FRAME_WIDTH - 32,
+    maxHeight: '62%',
+    borderRadius: 20,
+    paddingTop: 4,
+    paddingBottom: 20,
   },
   grabber: {
     alignSelf: 'center',
