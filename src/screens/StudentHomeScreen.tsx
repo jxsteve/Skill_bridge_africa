@@ -107,7 +107,7 @@ export default function StudentHomeScreen({
         <View style={styles.welcomeRow}>
           <View style={styles.welcomeText}>
             <Text style={styles.welcomeLabel}>Welcome,</Text>
-            <Text style={styles.welcomeName}>{displayName} 👋</Text>
+            <Text style={styles.welcomeName}>{displayName}</Text>
           </View>
           <View style={styles.avatar}>
             <Text style={styles.avatarInitial}>{initial}</Text>
