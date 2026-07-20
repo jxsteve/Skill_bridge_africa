@@ -10,13 +10,15 @@ import { AccountType } from './src/components/ui';
 import AccountTypeScreen from './src/screens/AccountTypeScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
-import ProfileCompleteScreen from './src/screens/ProfileCompleteScreen';
 import ProfileSetupScreen from './src/screens/ProfileSetupScreen';
 import RegistrationScreen, {
   RegistrationDetails,
 } from './src/screens/RegistrationScreen';
 import SplashScreen from './src/screens/SplashScreen';
+import StudentDashboardScreen from './src/screens/StudentDashboardScreen';
 import StudentHomeScreen from './src/screens/StudentHomeScreen';
+import VerificationProgressScreen from './src/screens/VerificationProgressScreen';
+import VerificationSuccessScreen from './src/screens/VerificationSuccessScreen';
 import VerifyEmailScreen from './src/screens/VerifyEmailScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
 import { fontSources } from './src/theme/fonts';
@@ -30,8 +32,10 @@ type Phase =
   | 'login'
   | 'verifyEmail'
   | 'profileSetup'
-  | 'profileComplete'
+  | 'verifyingProfile'
+  | 'profileVerified'
   | 'studentHome'
+  | 'studentDashboard'
   | 'welcome';
 
 type AuthIntent = 'signup' | 'login';
@@ -63,6 +67,7 @@ function Flow() {
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [verified, setVerified] = useState(false);
   const opacity = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -119,12 +124,21 @@ function Flow() {
     setPhase(accountType === 'student' ? 'studentHome' : 'welcome');
   }, [accountType]);
 
-  const handleProfileComplete = useCallback((completed: StudentProfile) => {
-    setProfile(completed);
-    setPhase('profileComplete');
-  }, []);
+  const handleProfileComplete = useCallback(
+    (completed: StudentProfile) => {
+      setProfile(completed);
+      // Verify only the first time; later edits go straight to the dashboard.
+      setPhase(verified ? 'studentDashboard' : 'verifyingProfile');
+    },
+    [verified],
+  );
 
-  const goToStudentHome = useCallback(() => setPhase('studentHome'), []);
+  const goToProfileVerified = useCallback(() => setPhase('profileVerified'), []);
+
+  const handleVerifiedDone = useCallback(() => {
+    setVerified(true);
+    setPhase('studentDashboard');
+  }, []);
 
   const goToProfileSetup = useCallback(() => setPhase('profileSetup'), []);
 
@@ -171,10 +185,13 @@ function Flow() {
           onComplete={handleProfileComplete}
         />
       )}
-      {phase === 'profileComplete' && profile && (
-        <ProfileCompleteScreen
-          university={profile.university}
-          onDone={goToStudentHome}
+      {phase === 'verifyingProfile' && (
+        <VerificationProgressScreen onDone={goToProfileVerified} />
+      )}
+      {phase === 'profileVerified' && (
+        <VerificationSuccessScreen
+          walletAddress={auth.user?.walletAddress}
+          onDone={handleVerifiedDone}
         />
       )}
       {phase === 'studentHome' && (
@@ -184,6 +201,14 @@ function Flow() {
           walletAddress={auth.user?.walletAddress}
           profile={profile}
           onCompleteProfile={goToProfileSetup}
+        />
+      )}
+      {phase === 'studentDashboard' && (
+        <StudentDashboardScreen
+          name={fullName}
+          email={email}
+          walletAddress={auth.user?.walletAddress}
+          onImproveProfile={goToProfileSetup}
         />
       )}
       {phase === 'welcome' && <WelcomeScreen walletAddress={auth.user?.walletAddress} />}

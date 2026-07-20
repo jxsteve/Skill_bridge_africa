@@ -134,6 +134,27 @@ export function ChevronLeftIcon({ size = 24, color = '#111827', strokeWidth = 2 
   );
 }
 
+export function CopyIcon({ size = 18, color = '#FFFFFF', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Rect x={8} y={8} width={14} height={14} rx={2} {...strokeProps(color, strokeWidth)} />
+      <Path
+        d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+        {...strokeProps(color, strokeWidth)}
+      />
+    </Svg>
+  );
+}
+
+export function CheckCircleIcon({ size = 16, color = '#16A34A', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M21.801 10A10 10 0 1 1 17 3.335" {...strokeProps(color, strokeWidth)} />
+      <Path d="m9 11 3 3L22 4" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
 export function ChevronDownIcon({ size = 20, color = '#6B7280', strokeWidth = 2 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
