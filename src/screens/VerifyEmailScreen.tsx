@@ -49,13 +49,10 @@ export default function VerifyEmailScreen({
     }
   };
 
-  // Verify automatically the moment the sixth digit lands.
+  // Clear a previous error as soon as the user edits the code again.
   useEffect(() => {
-    if (code.length === 6 && !verified && !verifyingRef.current) {
-      void handleVerify();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [code, verified]);
+    if (error && code.length < 6) setError(false);
+  }, [code, error]);
 
   const handleResend = () => {
     setSecondsLeft(RESEND_SECONDS);
@@ -120,6 +117,7 @@ export default function VerifyEmailScreen({
         showIcon={false}
         fullWidth
         loading={verifying}
+        disabled={!verified && code.length !== 6}
         onPress={verified ? onContinue : handleVerify}
       />
       {!verified && (

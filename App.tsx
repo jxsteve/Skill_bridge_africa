@@ -21,6 +21,7 @@ import VerificationProgressScreen from './src/screens/VerificationProgressScreen
 import VerificationSuccessScreen from './src/screens/VerificationSuccessScreen';
 import VerifyEmailScreen from './src/screens/VerifyEmailScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
+import WelcomeToSkillBridgeScreen from './src/screens/WelcomeToSkillBridgeScreen';
 import {
   getCompletedProfile,
   loadLoginPrefs,
@@ -37,6 +38,7 @@ type Phase =
   | 'registration'
   | 'login'
   | 'verifyEmail'
+  | 'welcomeIntro'
   | 'profileSetup'
   | 'verifyingProfile'
   | 'profileVerified'
@@ -157,16 +159,27 @@ function Flow() {
     [auth, email, intent],
   );
 
+  // Destination shown after the "Welcome to SkillBridge" interstitial: a
+  // returning student with a finished profile goes straight to the dashboard;
+  // everyone else lands on the complete-your-profile home.
+  const [postWelcome, setPostWelcome] = useState<Phase>('studentHome');
+
   const handleVerifiedContinue = useCallback(() => {
-    // A returning student with a finished profile goes straight to the
-    // dashboard; everyone else lands on the complete-your-profile home.
     if (intent === 'login' && loginCompleted) {
       setVerified(true);
-      setPhase('studentDashboard');
+      setPostWelcome('studentDashboard');
+    } else if (accountType === 'student') {
+      setPostWelcome('studentHome');
     } else {
-      setPhase(accountType === 'student' ? 'studentHome' : 'welcome');
+      setPostWelcome('welcome');
     }
+    setPhase('welcomeIntro');
   }, [intent, loginCompleted, accountType]);
+
+  const finishWelcomeIntro = useCallback(
+    () => setPhase(postWelcome),
+    [postWelcome],
+  );
 
   const handleProfileComplete = useCallback(
     (completed: StudentProfile) => {
@@ -237,6 +250,9 @@ function Flow() {
           initialProfile={profile}
           onComplete={handleProfileComplete}
         />
+      )}
+      {phase === 'welcomeIntro' && (
+        <WelcomeToSkillBridgeScreen name={fullName} onDone={finishWelcomeIntro} />
       )}
       {phase === 'verifyingProfile' && (
         <VerificationProgressScreen onDone={goToProfileVerified} />
