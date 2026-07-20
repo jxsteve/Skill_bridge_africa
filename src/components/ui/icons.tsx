@@ -108,6 +108,32 @@ export function CheckIcon({ size = 16, color = '#FFFFFF', strokeWidth = 3 }: Ico
   );
 }
 
+export function PlusIcon({ size = 24, color = '#6B7280', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M5 12h14" {...strokeProps(color, strokeWidth)} />
+      <Path d="M12 5v14" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function CloseIcon({ size = 14, color = '#FFFFFF', strokeWidth = 2.5 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M18 6 6 18" {...strokeProps(color, strokeWidth)} />
+      <Path d="m6 6 12 12" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function ChevronLeftIcon({ size = 24, color = '#111827', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="m15 18-6-6 6-6" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
 export function GraduationCapIcon({ size = 56, color = '#0E3A9A', strokeWidth = 2 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">

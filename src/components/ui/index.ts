@@ -7,4 +7,6 @@ export type { AccountType } from './AccountTypeCard';
 export { default as TextField } from './TextField';
 export { default as Checkbox } from './Checkbox';
 export { default as OtpInput } from './OtpInput';
+export { default as Chip } from './Chip';
+export { default as StepProgress } from './StepProgress';
 export * from './icons';

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   KeyboardTypeOptions,
+  Platform,
   StyleSheet,
   TextInput,
   View,
@@ -19,6 +20,7 @@ type Props = {
   secure?: boolean;
   keyboardType?: KeyboardTypeOptions;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  multiline?: boolean;
 };
 
 /** Rounded input field with a leading icon and optional password toggle. */
@@ -30,13 +32,14 @@ export default function TextField({
   secure = false,
   keyboardType,
   autoCapitalize,
+  multiline = false,
 }: Props) {
   const [hidden, setHidden] = useState(true);
   return (
-    <View style={styles.field}>
+    <View style={[styles.field, multiline && styles.fieldMultiline]}>
       {icon && <View style={styles.icon}>{icon}</View>}
       <TextInput
-        style={styles.input}
+        style={[styles.input, multiline && styles.inputMultiline]}
         placeholder={placeholder}
         placeholderTextColor={palette.gray400}
         value={value}
@@ -44,6 +47,7 @@ export default function TextField({
         secureTextEntry={secure && hidden}
         keyboardType={keyboardType}
         autoCapitalize={autoCapitalize ?? (secure ? 'none' : undefined)}
+        multiline={multiline}
       />
       {secure && (
         <IconButton onPress={() => setHidden((h) => !h)}>
@@ -70,6 +74,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     gap: 10,
   },
+  fieldMultiline: {
+    height: 110,
+    alignItems: 'flex-start',
+    paddingVertical: 12,
+  },
   icon: {
     width: 20,
     alignItems: 'center',
@@ -80,5 +89,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.regular,
     fontSize: 16,
     paddingVertical: 0,
+    // Browsers draw their own focus ring; the field border is the affordance.
+    ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : {}),
+  },
+  inputMultiline: {
+    height: '100%',
+    textAlignVertical: 'top',
   },
 });
