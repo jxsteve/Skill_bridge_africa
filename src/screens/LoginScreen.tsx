@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 
-import { MailIcon, PrimaryButton, TextField } from '../components/ui';
+import { Checkbox, MailIcon, PrimaryButton, TextField } from '../components/ui';
 import { useScreenInsets } from '../hooks/useScreenInsets';
 import { colors, palette } from '../theme/colors';
 import { fonts } from '../theme/fonts';
@@ -17,14 +17,23 @@ import { fonts } from '../theme/fonts';
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
 
 type Props = {
-  /** Called with the email; the app then sends a login code. */
-  onSubmit: (email: string) => void | Promise<void>;
+  /** Prefilled email from a previous "remember me" login. */
+  initialEmail?: string;
+  initialRememberMe?: boolean;
+  /** Called with the email and whether to remember it for next time. */
+  onSubmit: (email: string, rememberMe: boolean) => void | Promise<void>;
   onSignUp: () => void;
 };
 
-export default function LoginScreen({ onSubmit, onSignUp }: Props) {
+export default function LoginScreen({
+  initialEmail = '',
+  initialRememberMe = true,
+  onSubmit,
+  onSignUp,
+}: Props) {
   const insets = useScreenInsets();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(initialEmail);
+  const [rememberMe, setRememberMe] = useState(initialRememberMe);
   const [submitting, setSubmitting] = useState(false);
 
   const canSubmit = EMAIL_PATTERN.test(email.trim());
@@ -33,7 +42,7 @@ export default function LoginScreen({ onSubmit, onSignUp }: Props) {
     if (!canSubmit || submitting) return;
     setSubmitting(true);
     try {
-      await onSubmit(email.trim());
+      await onSubmit(email.trim(), rememberMe);
     } finally {
       setSubmitting(false);
     }
@@ -65,6 +74,11 @@ export default function LoginScreen({ onSubmit, onSignUp }: Props) {
             keyboardType="email-address"
             autoCapitalize="none"
           />
+        </View>
+
+        <View style={styles.rememberRow}>
+          <Checkbox checked={rememberMe} onToggle={() => setRememberMe((r) => !r)} />
+          <Text style={styles.rememberText}>Remember my email</Text>
         </View>
 
         <View style={styles.submit}>
@@ -116,8 +130,19 @@ const styles = StyleSheet.create({
   form: {
     marginTop: 34,
   },
+  rememberRow: {
+    marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  rememberText: {
+    color: colors.titleDark,
+    fontFamily: fonts.regular,
+    fontSize: 15,
+  },
   submit: {
-    marginTop: 32,
+    marginTop: 28,
   },
   signUpRow: {
     marginTop: 22,

@@ -21,6 +21,12 @@ import VerificationProgressScreen from './src/screens/VerificationProgressScreen
 import VerificationSuccessScreen from './src/screens/VerificationSuccessScreen';
 import VerifyEmailScreen from './src/screens/VerifyEmailScreen';
 import WelcomeScreen from './src/screens/WelcomeScreen';
+import {
+  getCompletedProfile,
+  loadLoginPrefs,
+  markProfileCompleted,
+  saveLoginPrefs,
+} from './src/lib/prefs';
 import { fontSources } from './src/theme/fonts';
 import { StudentProfile } from './src/types/profile';
 
@@ -78,7 +84,17 @@ function Flow() {
   const [fullName, setFullName] = useState('');
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [verified, setVerified] = useState(false);
+  const [rememberedEmail, setRememberedEmail] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const opacity = useRef(new Animated.Value(1)).current;
+
+  // Load the remembered login email once at startup.
+  useEffect(() => {
+    void loadLoginPrefs().then((prefs) => {
+      setRememberedEmail(prefs.email);
+      setRememberMe(prefs.rememberMe);
+    });
+  }, []);
 
   useEffect(() => {
     opacity.setValue(0);
@@ -110,29 +126,47 @@ function Flow() {
   );
 
   const handleLogin = useCallback(
-    async (enteredEmail: string) => {
+    async (enteredEmail: string, remember: boolean) => {
       setIntent('login');
       setEmail(enteredEmail);
+      setRememberMe(remember);
+      await saveLoginPrefs(enteredEmail, remember);
+      setRememberedEmail(remember ? enteredEmail : '');
       await auth.sendCode(enteredEmail, { disableSignup: true });
       setPhase('verifyEmail');
     },
     [auth],
   );
 
+  // True once a login is confirmed for an email whose profile is complete.
+  const [loginCompleted, setLoginCompleted] = useState(false);
+
   const handleVerify = useCallback(
     async (code: string) => {
       const user = await auth.verifyCode(email, code, {
         disableSignup: intent === 'login',
       });
-      return user !== null;
+      if (user === null) return false;
+      if (intent === 'login') {
+        const done = await getCompletedProfile(email);
+        setLoginCompleted(done !== null);
+        if (done) setFullName(done.name);
+      }
+      return true;
     },
     [auth, email, intent],
   );
 
-  // Students land on their dashboard and complete the profile from there.
   const handleVerifiedContinue = useCallback(() => {
-    setPhase(accountType === 'student' ? 'studentHome' : 'welcome');
-  }, [accountType]);
+    // A returning student with a finished profile goes straight to the
+    // dashboard; everyone else lands on the complete-your-profile home.
+    if (intent === 'login' && loginCompleted) {
+      setVerified(true);
+      setPhase('studentDashboard');
+    } else {
+      setPhase(accountType === 'student' ? 'studentHome' : 'welcome');
+    }
+  }, [intent, loginCompleted, accountType]);
 
   const handleProfileComplete = useCallback(
     (completed: StudentProfile) => {
@@ -147,8 +181,12 @@ function Flow() {
 
   const handleVerifiedDone = useCallback(() => {
     setVerified(true);
+    // Remember this account so a later login skips straight to the dashboard.
+    void markProfileCompleted(email, fullName);
+    void saveLoginPrefs(email, true);
+    setRememberedEmail(email);
     setPhase('studentDashboard');
-  }, []);
+  }, [email, fullName]);
 
   const goToProfileSetup = useCallback(() => setPhase('profileSetup'), []);
 
@@ -178,7 +216,12 @@ function Flow() {
         />
       )}
       {phase === 'login' && (
-        <LoginScreen onSubmit={handleLogin} onSignUp={goToAccountType} />
+        <LoginScreen
+          initialEmail={rememberedEmail}
+          initialRememberMe={rememberMe}
+          onSubmit={handleLogin}
+          onSignUp={goToAccountType}
+        />
       )}
       {phase === 'verifyEmail' && (
         <VerifyEmailScreen
