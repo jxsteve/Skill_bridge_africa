@@ -109,19 +109,15 @@ function Flow() {
       const user = await auth.verifyCode(email, code, {
         disableSignup: intent === 'login',
       });
-      if (user) {
-        // Students land on their dashboard and complete the profile from there.
-        if (accountType === 'student') {
-          setPhase('studentHome');
-        } else {
-          setPhase('welcome');
-        }
-        return true;
-      }
-      return false;
+      return user !== null;
     },
-    [auth, email, intent, accountType],
+    [auth, email, intent],
   );
+
+  // Students land on their dashboard and complete the profile from there.
+  const handleVerifiedContinue = useCallback(() => {
+    setPhase(accountType === 'student' ? 'studentHome' : 'welcome');
+  }, [accountType]);
 
   const handleProfileComplete = useCallback((completed: StudentProfile) => {
     setProfile(completed);
@@ -164,6 +160,7 @@ function Flow() {
         <VerifyEmailScreen
           email={email}
           onVerify={handleVerify}
+          onContinue={handleVerifiedContinue}
           onResend={handleResend}
           onChangeEmail={handleChangeEmail}
         />

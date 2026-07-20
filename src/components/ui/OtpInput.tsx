@@ -8,21 +8,41 @@ type Props = {
   length?: number;
   value: string;
   onChange: (code: string) => void;
+  /** Success turns the boxes green and locks input. */
+  status?: 'default' | 'success';
 };
 
 /** Segmented one-time-code input backed by a single hidden text field. */
-export default function OtpInput({ length = 6, value, onChange }: Props) {
+export default function OtpInput({
+  length = 6,
+  value,
+  onChange,
+  status = 'default',
+}: Props) {
   const inputRef = useRef<TextInput>(null);
+  const success = status === 'success';
 
   const handleChange = (text: string) => {
     onChange(text.replace(/\D/g, '').slice(0, length));
   };
 
   return (
-    <Pressable style={styles.row} onPress={() => inputRef.current?.focus()}>
+    <Pressable
+      style={styles.row}
+      onPress={success ? undefined : () => inputRef.current?.focus()}
+    >
       {Array.from({ length }, (_, i) => (
-        <View key={i} style={[styles.box, i === value.length && styles.boxActive]}>
-          <Text style={styles.digit}>{value[i] ?? ''}</Text>
+        <View
+          key={i}
+          style={[
+            styles.box,
+            !success && i === value.length && styles.boxActive,
+            success && styles.boxSuccess,
+          ]}
+        >
+          <Text style={[styles.digit, success && styles.digitSuccess]}>
+            {value[i] ?? ''}
+          </Text>
         </View>
       ))}
       <TextInput
@@ -33,6 +53,7 @@ export default function OtpInput({ length = 6, value, onChange }: Props) {
         keyboardType="number-pad"
         maxLength={length}
         autoFocus
+        editable={!success}
       />
     </Pressable>
   );
@@ -59,10 +80,17 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: palette.blue200,
   },
+  boxSuccess: {
+    borderColor: palette.green500,
+    backgroundColor: '#E9FBF0',
+  },
   digit: {
     color: '#111827',
     fontFamily: fonts.semiBold,
     fontSize: 20,
+  },
+  digitSuccess: {
+    color: palette.green500,
   },
   hiddenInput: {
     position: 'absolute',

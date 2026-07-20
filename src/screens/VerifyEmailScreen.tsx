@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { OtpInput, PrimaryButton } from '../components/ui';
+import { CheckIcon, OtpInput, PrimaryButton } from '../components/ui';
 import { useScreenInsets } from '../hooks/useScreenInsets';
 import { colors, palette } from '../theme/colors';
 import { fonts } from '../theme/fonts';
@@ -12,6 +12,8 @@ type Props = {
   email: string;
   /** Returns true when the code was accepted; false shows an error. */
   onVerify: (code: string) => Promise<boolean>;
+  /** Called when the user taps the CTA after a successful verification. */
+  onContinue: () => void;
   onResend?: () => void;
   onChangeEmail: () => void;
 };
@@ -19,6 +21,7 @@ type Props = {
 export default function VerifyEmailScreen({
   email,
   onVerify,
+  onContinue,
   onResend,
   onChangeEmail,
 }: Props) {
@@ -26,19 +29,33 @@ export default function VerifyEmailScreen({
   const [code, setCode] = useState('');
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
   const [verifying, setVerifying] = useState(false);
+  const [verified, setVerified] = useState(false);
   const [error, setError] = useState(false);
+  const verifyingRef = useRef(false);
 
   const handleVerify = async () => {
-    if (verifying) return;
+    if (verifyingRef.current || verified || code.length !== 6) return;
+    verifyingRef.current = true;
     setVerifying(true);
     setError(false);
     const ok = await onVerify(code);
     setVerifying(false);
-    if (!ok) {
+    verifyingRef.current = false;
+    if (ok) {
+      setVerified(true);
+    } else {
       setError(true);
       setCode('');
     }
   };
+
+  // Verify automatically the moment the sixth digit lands.
+  useEffect(() => {
+    if (code.length === 6 && !verified && !verifyingRef.current) {
+      void handleVerify();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code, verified]);
 
   const handleResend = () => {
     setSecondsLeft(RESEND_SECONDS);
@@ -68,28 +85,48 @@ export default function VerifyEmailScreen({
       </Text>
 
       <View style={styles.otp}>
-        <OtpInput value={code} onChange={setCode} />
+        <OtpInput
+          value={code}
+          onChange={setCode}
+          status={verified ? 'success' : 'default'}
+        />
       </View>
       {error && <Text style={styles.error}>Invalid code. Please try again.</Text>}
-      <Text style={styles.hint}>Didnt receive the code?</Text>
-      <Pressable onPress={secondsLeft <= 0 ? handleResend : undefined} hitSlop={8}>
-        <Text style={styles.resend}>
-          Resend Code{secondsLeft > 0 ? ` (${countdown})` : ''}
-        </Text>
-      </Pressable>
+      {verified ? (
+        <View style={styles.successRow}>
+          <View style={styles.successBadge}>
+            <CheckIcon size={12} strokeWidth={3.5} />
+          </View>
+          <Text style={styles.successText}>Code verified successfully!</Text>
+        </View>
+      ) : (
+        <>
+          <Text style={styles.hint}>Didnt receive the code?</Text>
+          <Pressable
+            onPress={secondsLeft <= 0 ? handleResend : undefined}
+            hitSlop={8}
+          >
+            <Text style={styles.resend}>
+              Resend Code{secondsLeft > 0 ? ` (${countdown})` : ''}
+            </Text>
+          </Pressable>
+        </>
+      )}
 
       <View style={styles.spacer} />
 
       <PrimaryButton
-        label="Verify Code"
+        label={verified ? 'Continue to Dashboard' : 'Verify Code'}
         showIcon={false}
         fullWidth
         loading={verifying}
-        onPress={handleVerify}
+        onPress={verified ? onContinue : handleVerify}
       />
-      <Pressable onPress={onChangeEmail} hitSlop={8} style={styles.changeEmail}>
-        <Text style={styles.changeEmailText}>Change Email</Text>
-      </Pressable>
+      {!verified && (
+        <Pressable onPress={onChangeEmail} hitSlop={8} style={styles.changeEmail}>
+          <Text style={styles.changeEmailText}>Change Email</Text>
+        </Pressable>
+      )}
     </View>
   );
 }
@@ -128,6 +165,26 @@ const styles = StyleSheet.create({
     color: '#DC2626',
     fontFamily: fonts.regular,
     fontSize: 14,
+  },
+  successRow: {
+    marginTop: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  successBadge: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: palette.green500,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  successText: {
+    color: palette.green500,
+    fontFamily: fonts.semiBold,
+    fontSize: 15,
   },
   hint: {
     marginTop: 16,
