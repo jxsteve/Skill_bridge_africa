@@ -16,32 +16,25 @@ const violet = '#6014E0';
 type Props = {
   name: string;
   email: string;
-  walletAddress?: string;
   profile: StudentProfile | null;
-  verified: boolean;
   onEditProfile: () => void;
   onLogout: () => void;
   onTab: (tab: MainTab) => void;
 };
 
-function shortAddress(address?: string) {
-  if (!address) return 'Not yet created';
-  return address.length > 14
-    ? `${address.slice(0, 8)}…${address.slice(-6)}`
-    : address;
+function capitalize(value: string) {
+  return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 }
 
 export default function ProfileScreen({
   name,
   email,
-  walletAddress,
   profile,
-  verified,
   onEditProfile,
   onLogout,
   onTab,
 }: Props) {
-  const displayName = name || email.split('@')[0] || 'Student';
+  const displayName = name || capitalize(email.split('@')[0]) || 'Student';
   const initial = displayName.charAt(0).toUpperCase();
   const role = profile?.skills[0] ?? 'Student';
 
@@ -114,21 +107,10 @@ export default function ProfileScreen({
             </div>
           </div>
 
-          {/* Wallet */}
-          <div className={styles.walletCard}>
-            <span className={styles.walletLabel}>Wallet address</span>
-            <p className={styles.walletValue}>{shortAddress(walletAddress)}</p>
-          </div>
-
           {/* Verification */}
-          <div className={styles.row}>
+          <div className={`${styles.row} ${styles.rowFirst}`}>
             <span className={styles.rowLabel}>Verification status</span>
-            <span
-              className={styles.rowStatus}
-              style={{ color: verified ? '#107535' : '#D97706' }}
-            >
-              {verified ? 'Successful' : 'Pending'}
-            </span>
+            <span className={styles.rowStatus}>Successful</span>
           </div>
 
           {/* Edit profile */}

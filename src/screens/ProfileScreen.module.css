@@ -13,21 +13,23 @@
 
 /* Hero */
 .hero {
-  padding: 18px 20px 24px;
+  padding: 22px 20px 26px;
   display: flex;
   flex-direction: column;
   align-items: center;
   background:
-    radial-gradient(120% 90% at 85% 20%, rgba(78, 165, 200, 0.45) 0%, rgba(78, 165, 200, 0) 55%),
-    radial-gradient(110% 80% at 15% 85%, rgba(120, 190, 214, 0.5) 0%, rgba(120, 190, 214, 0) 60%),
-    linear-gradient(160deg, #c4e4ee 0%, #ade0f2 45%, #bfe9f5 100%);
+    radial-gradient(90% 70% at 88% 12%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 55%),
+    radial-gradient(100% 80% at 8% 90%, rgba(38, 6, 104, 0.45) 0%, rgba(38, 6, 104, 0) 60%),
+    radial-gradient(70% 60% at 20% 15%, rgba(159, 91, 255, 0.55) 0%, rgba(159, 91, 255, 0) 60%),
+    linear-gradient(150deg, #6014e0 0%, #7c3aed 55%, #4c1d95 100%);
 }
 .avatar {
   width: 140px;
   height: 140px;
   border-radius: 50%;
-  background: #6014e0;
-  border: 4px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.18);
+  border: 4px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 10px 30px rgba(26, 4, 74, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,14 +47,14 @@
 }
 .name {
   margin-top: 20px;
-  color: var(--title-dark);
+  color: #ffffff;
   font-weight: 700;
   font-size: 27px;
   text-align: center;
 }
 .role {
   margin-top: 4px;
-  color: #2a3a44;
+  color: #e4d7ff;
   font-weight: 500;
   font-size: 17px;
 }
@@ -63,7 +65,7 @@
   gap: 5px;
 }
 .ratingText {
-  color: var(--title-dark);
+  color: #ffffff;
   font-weight: 600;
   font-size: 13px;
 }
@@ -75,8 +77,9 @@
 }
 .heroStat {
   flex: 1;
-  border: 1px solid rgba(17, 24, 39, 0.35);
-  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
   padding: 10px 8px;
   display: flex;
   flex-direction: column;
@@ -84,12 +87,12 @@
   gap: 6px;
 }
 .heroStatLabel {
-  color: var(--title-dark);
+  color: #e4d7ff;
   font-weight: 500;
   font-size: 13px;
 }
 .heroStatValue {
-  color: var(--title-dark);
+  color: #ffffff;
   font-weight: 700;
   font-size: 14px;
 }
@@ -140,24 +143,9 @@
   justify-content: center;
 }
 
-.walletCard {
-  margin-top: 16px;
-  padding: 16px;
-  border-radius: 14px;
-  background: var(--blue-50);
+.rowFirst {
+  margin-top: 18px;
 }
-.walletLabel {
-  color: var(--blue-600);
-  font-weight: 500;
-  font-size: 13px;
-}
-.walletValue {
-  margin-top: 4px;
-  color: var(--title-dark);
-  font-weight: 600;
-  font-size: 15px;
-}
-
 .row {
   margin-top: 12px;
   width: 100%;
@@ -175,6 +163,7 @@
   font-size: 15px;
 }
 .rowStatus {
+  color: #107535;
   font-weight: 600;
   font-size: 14px;
 }
@@ -184,7 +173,7 @@
   width: 100%;
   height: 50px;
   border-radius: 12px;
-  background: var(--primary-blue);
+  background: #dc2626;
   color: #fff;
   font-weight: 600;
   font-size: 16px;

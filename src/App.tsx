@@ -276,7 +276,6 @@ export default function App() {
             <ProfileScreen
               {...common}
               profile={profile}
-              verified={verified}
               onEditProfile={() => navigate('/profile-setup')}
               onLogout={handleLogout}
               onTab={goTab}
