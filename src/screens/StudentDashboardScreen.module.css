@@ -207,70 +207,46 @@
   background: var(--surface);
   border: 1px solid #e9e7ef;
 }
-.cardHead {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
 .cardTitle {
   color: var(--title-dark);
   font-weight: 600;
   font-size: 15px;
 }
-.viewAll {
-  color: #6014e0;
-  font-weight: 500;
-  font-size: 13px;
-}
-.emptyBlock {
-  margin-top: 14px;
+.tasksEmpty {
+  margin-top: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 6px 0;
+  padding: 6px 0 4px;
 }
-.emptyIcon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: var(--violet-soft);
+.tasksIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  background: #ede4fc;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.emptyText {
-  margin-top: 12px;
+.tasksEmptyText {
+  margin-top: 14px;
   text-align: center;
-  color: #6b7280;
+  color: #4b5563;
   font-weight: 400;
   font-size: 13px;
-  line-height: 19px;
-  padding: 0 12px;
+  line-height: 20px;
+  white-space: pre-line;
 }
-
-/* Quick actions */
-.quickRow {
-  margin-top: 12px;
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-.quickTile {
-  flex: 1;
-  border-radius: 12px;
-  border: 1px solid #e9e7ef;
-  padding: 12px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  background: var(--surface);
-}
-.quickLabel {
-  color: var(--title-dark);
-  font-weight: 500;
-  font-size: 12px;
+.outlineButton {
+  margin-top: 16px;
+  align-self: stretch;
+  height: 42px;
+  border-radius: 10px;
+  border: 1.2px solid #6014e0;
+  background: transparent;
+  color: #6014e0;
+  font-weight: 600;
+  font-size: 15px;
 }
 
 /* Stand out */

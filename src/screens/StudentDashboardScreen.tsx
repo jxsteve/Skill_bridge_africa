@@ -1,24 +1,20 @@
 import { useState, type ReactNode } from 'react';
 
 import {
+  ActivityIcon,
   BellIcon,
   BottomNav,
-  BriefcaseBusinessIcon,
-  CheckCircleIcon,
   ClipboardListIcon,
   CopyIcon,
+  DollarSignIcon,
   EyeIcon,
   EyeOffIcon,
-  SearchIcon,
-  UserIcon,
-  UsersIcon,
   type MainTab,
 } from '../components/ui';
 import logoMark from '../assets/images/logo_mark.png';
 import styles from './StudentDashboardScreen.module.css';
 
 const violet = '#6014E0';
-const green = '#16A34A';
 
 type Props = {
   name: string;
@@ -26,7 +22,6 @@ type Props = {
   walletAddress?: string;
   onImproveProfile: () => void;
   onBrowseTasks: () => void;
-  onOpenBids: () => void;
   onTab: (tab: MainTab) => void;
 };
 
@@ -43,7 +38,6 @@ export default function StudentDashboardScreen({
   walletAddress,
   onImproveProfile,
   onBrowseTasks,
-  onOpenBids,
   onTab,
 }: Props) {
   const [balanceHidden, setBalanceHidden] = useState(false);
@@ -118,65 +112,30 @@ export default function StudentDashboardScreen({
 
         {/* Stats */}
         <div className={styles.statsRow}>
-          <Stat label="Active Bids" value="0" chip="#F9F6FE">
-            <SearchIcon size={12} color={violet} />
+          <Stat label="Active Bids" value="0" chip="#EDE4FC">
+            <ActivityIcon size={12} color={violet} />
           </Stat>
-          <Stat label="Completed" value="0" chip="#DCFCE7">
-            <CheckCircleIcon size={12} color={green} />
-          </Stat>
-          <Stat label="Earnings" value="$0.00" chip="#F9F6FE">
-            <BriefcaseBusinessIcon size={12} color={violet} />
+          <Stat label="Earnings" value="$0.00" chip="#DCFCE7">
+            <DollarSignIcon size={12} color="#16A34A" />
           </Stat>
           <Stat label="Profile Views" value="0" chip="#FEF3C7">
             <EyeIcon size={12} color="#D97706" />
           </Stat>
         </div>
 
-        {/* My Active Tasks — empty */}
+        {/* No active tasks */}
         <div className={styles.card}>
-          <div className={styles.cardHead}>
-            <span className={styles.cardTitle}>My Active Tasks</span>
-            <span className={styles.viewAll}>View all</span>
-          </div>
-          <div className={styles.emptyBlock}>
-            <div className={styles.emptyIcon}>
-              <ClipboardListIcon size={26} color={violet} />
+          <span className={styles.cardTitle}>No Active Tasks</span>
+          <div className={styles.tasksEmpty}>
+            <div className={styles.tasksIcon}>
+              <ClipboardListIcon size={44} color={violet} />
             </div>
-            <p className={styles.emptyText}>
-              No active tasks yet. Browse tasks and place a bid to get started.
+            <p className={styles.tasksEmptyText}>
+              {'You don’t have any active tasks yet.\nBrowse tasks and place a bid'}
             </p>
-          </div>
-        </div>
-
-        {/* Recent Activity — empty */}
-        <div className={styles.card}>
-          <div className={styles.cardHead}>
-            <span className={styles.cardTitle}>Recent Activity</span>
-            <span className={styles.viewAll}>View all</span>
-          </div>
-          <div className={styles.emptyBlock}>
-            <div className={styles.emptyIcon}>
-              <BellIcon size={24} color={violet} />
-            </div>
-            <p className={styles.emptyText}>
-              No activity yet. Payments and updates will show up here.
-            </p>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className={styles.card}>
-          <span className={styles.cardTitle}>Quick Actions</span>
-          <div className={styles.quickRow}>
-            <QuickAction label="Browse Tasks" onClick={onBrowseTasks}>
-              <SearchIcon size={18} color={violet} />
-            </QuickAction>
-            <QuickAction label="My Bids" onClick={onOpenBids}>
-              <UsersIcon size={18} color={violet} />
-            </QuickAction>
-            <QuickAction label="Profile" onClick={() => onTab('profile')}>
-              <UserIcon size={18} color={violet} />
-            </QuickAction>
+            <button className={styles.outlineButton} onClick={onBrowseTasks}>
+              Browse Tasks
+            </button>
           </div>
         </div>
 
@@ -218,22 +177,5 @@ function Stat({
         </div>
       </div>
     </div>
-  );
-}
-
-function QuickAction({
-  label,
-  children,
-  onClick,
-}: {
-  label: string;
-  children: ReactNode;
-  onClick?: () => void;
-}) {
-  return (
-    <button className={styles.quickTile} onClick={onClick}>
-      {children}
-      <span className={styles.quickLabel}>{label}</span>
-    </button>
   );
 }

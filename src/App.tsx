@@ -231,7 +231,6 @@ export default function App() {
               {...common}
               onImproveProfile={() => navigate('/profile-setup')}
               onBrowseTasks={() => navigate('/app/tasks')}
-              onOpenBids={() => navigate('/app/bids')}
               onTab={goTab}
             />
           }
