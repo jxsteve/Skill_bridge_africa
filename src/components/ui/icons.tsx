@@ -212,6 +212,15 @@ export const ArrowRightCircleIcon = ({ size = 20, color = '#124CC9', strokeWidth
     <path d="M12 8l4 4-4 4M8 12h8" {...stroke(color, strokeWidth)} />
   </Svg>
 );
+export const CameraIcon = ({ size = 16, color = '#FFFFFF', strokeWidth = 2 }: IconProps) => (
+  <Svg size={size}>
+    <path
+      d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"
+      {...stroke(color, strokeWidth)}
+    />
+    <circle cx={12} cy={13} r={3} {...stroke(color, strokeWidth)} />
+  </Svg>
+);
 export const CopyIcon = ({ size = 18, color = '#FFFFFF', strokeWidth = 2 }: IconProps) => (
   <Svg size={size}>
     <rect x={8} y={8} width={14} height={14} rx={2} {...stroke(color, strokeWidth)} />

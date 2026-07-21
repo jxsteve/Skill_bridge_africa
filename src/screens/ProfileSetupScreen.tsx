@@ -1,29 +1,25 @@
 import { useRef, useState } from 'react';
 
 import {
-  Chip,
+  CameraIcon,
   ChevronLeftIcon,
+  Chip,
   CloseIcon,
-  GraduationCapIcon,
   PlusIcon,
   PrimaryButton,
   SelectField,
-  StepProgress,
   TextButton,
-  TextField,
   UserIcon,
 } from '../components/ui';
 import {
-  ACADEMIC_LEVELS,
-  COURSES,
   MAX_SKILLS,
   SKILL_OPTIONS,
   UNIVERSITIES,
+  type StudentProfile,
 } from '../types/profile';
-import type { StudentProfile } from '../types/profile';
 import styles from './ProfileSetupScreen.module.css';
 
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 3;
 
 type Props = {
   initialProfile?: StudentProfile | null;
@@ -33,19 +29,24 @@ type Props = {
 export default function ProfileSetupScreen({ initialProfile, onComplete }: Props) {
   const [step, setStep] = useState(1);
 
-  const [university, setUniversity] = useState(initialProfile?.university ?? '');
-  const [course, setCourse] = useState(initialProfile?.course ?? '');
-  const [level, setLevel] = useState(initialProfile?.level ?? '');
-  const [skills, setSkills] = useState<string[]>(initialProfile?.skills ?? []);
-  const [portfolio, setPortfolio] = useState<string[]>(initialProfile?.portfolio ?? []);
+  const [avatarUri, setAvatarUri] = useState(initialProfile?.avatarUri ?? '');
   const [bio, setBio] = useState(initialProfile?.bio ?? '');
+  const [university, setUniversity] = useState(initialProfile?.university ?? '');
+  const [department, setDepartment] = useState(initialProfile?.department ?? '');
+  const [regNumber, setRegNumber] = useState(initialProfile?.regNumber ?? '');
+  const [linkedin, setLinkedin] = useState(initialProfile?.linkedin ?? '');
+  const [skills, setSkills] = useState<string[]>(initialProfile?.skills ?? []);
+  const [portfolio, setPortfolio] = useState<string[]>(
+    initialProfile?.portfolio ?? [],
+  );
   const [available, setAvailable] = useState(initialProfile?.available ?? true);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const portfolioInputRef = useRef<HTMLInputElement>(null);
 
   const canContinue =
     step === 1
-      ? university !== '' && course !== '' && level !== ''
+      ? university !== '' && department.trim() !== '' && regNumber.trim() !== ''
       : step === 2
         ? skills.length > 0
         : true;
@@ -60,17 +61,20 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
     );
   };
 
-  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const uris = Array.from(files).map((f) => URL.createObjectURL(f));
-      setPortfolio((current) => [...current, ...uris].slice(0, 6));
-    }
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setAvatarUri(URL.createObjectURL(file));
     e.target.value = '';
   };
 
-  const removePortfolioImage = (uri: string) => {
-    setPortfolio((current) => current.filter((u) => u !== uri));
+  const handlePortfolioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length > 0) {
+      setPortfolio((current) =>
+        [...current, ...files.map((f) => URL.createObjectURL(f))].slice(0, 6),
+      );
+    }
+    e.target.value = '';
   };
 
   const handleContinue = () => {
@@ -78,12 +82,14 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
       setStep(step + 1);
     } else {
       onComplete({
+        avatarUri,
+        bio: bio.trim(),
         university,
-        course,
-        level,
+        department: department.trim(),
+        regNumber: regNumber.trim(),
+        linkedin: linkedin.trim(),
         skills,
         portfolio,
-        bio: bio.trim(),
         available,
       });
     }
@@ -91,158 +97,177 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
+      <div className={styles.scroll}>
+        {/* Header */}
         <div className={styles.headerRow}>
           <button
-            type="button"
             className={`${styles.back} ${step === 1 ? styles.backHidden : ''}`}
             onClick={step > 1 ? () => setStep(step - 1) : undefined}
           >
             <ChevronLeftIcon />
           </button>
         </div>
-        <StepProgress step={step} totalSteps={TOTAL_STEPS} />
-      </div>
+        <p className={styles.title}>Complete Your Profile</p>
+        <p className={styles.stepLabel}>
+          Step {step} of {TOTAL_STEPS}
+        </p>
+        <div className={styles.progressTrack}>
+          <div
+            className={styles.progressFill}
+            style={{ width: `${(step / TOTAL_STEPS) * 100}%` }}
+          />
+        </div>
 
-      <div className={styles.scroll}>
-        <div className={styles.content}>
-          {step === 1 && (
-            <>
-              <span className={styles.title}>Your University</span>
-              <p className={styles.subtitle}>
-                Tell us where you study — this is how
-                <br />
-                you get verified
-              </p>
-              <div className={styles.form}>
-                <SelectField
-                  icon={<GraduationCapIcon size={20} color="#6b7280" />}
-                  placeholder="University"
-                  value={university}
-                  options={UNIVERSITIES}
-                  onSelect={setUniversity}
-                />
-                <SelectField
-                  icon={<UserIcon />}
-                  placeholder="Course of Study"
-                  value={course}
-                  options={COURSES}
-                  onSelect={setCourse}
-                />
-                <span className={styles.fieldLabel}>Current level</span>
-                <div className={styles.chipWrap}>
-                  {ACADEMIC_LEVELS.map((option) => (
-                    <Chip
-                      key={option}
-                      label={option}
-                      selected={level === option}
-                      onClick={() => setLevel(option)}
-                    />
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              <span className={styles.title}>Your Skills</span>
-              <p className={styles.subtitle}>
-                Pick up to {MAX_SKILLS} skills you want to
-                <br />
-                offer clients
-              </p>
-              <div className={`${styles.chipWrap} ${styles.form}`}>
-                {SKILL_OPTIONS.map((skill) => (
-                  <Chip
-                    key={skill}
-                    label={skill}
-                    selected={skills.includes(skill)}
-                    onClick={() => toggleSkill(skill)}
-                  />
-                ))}
-              </div>
-              <p className={styles.helper}>
-                {skills.length}/{MAX_SKILLS} selected
-              </p>
-            </>
-          )}
-
-          {step === 3 && (
-            <>
-              <span className={styles.title}>Your Portfolio</span>
-              <p className={styles.subtitle}>
-                Show off your best work — you can
-                <br />
-                always add more later
-              </p>
-              <div className={styles.portfolioGrid}>
-                {portfolio.map((uri) => (
-                  <div key={uri} className={styles.portfolioTile}>
-                    <img src={uri} className={styles.portfolioImage} alt="" />
-                    <button
-                      type="button"
-                      className={styles.removeBadge}
-                      onClick={() => removePortfolioImage(uri)}
-                    >
-                      <CloseIcon />
-                    </button>
-                  </div>
-                ))}
-                {portfolio.length < 6 && (
-                  <button
-                    type="button"
-                    className={styles.addTile}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <PlusIcon />
-                    <span className={styles.addTileLabel}>Add work</span>
-                  </button>
+        {step === 1 && (
+          <>
+            {/* Avatar */}
+            <div className={styles.avatarWrap}>
+              <button
+                className={styles.avatar}
+                onClick={() => avatarInputRef.current?.click()}
+              >
+                {avatarUri ? (
+                  <img src={avatarUri} className={styles.avatarImage} alt="" />
+                ) : (
+                  <UserIcon size={44} color="#111827" strokeWidth={1.6} />
                 )}
-              </div>
+                <span className={styles.cameraBadge}>
+                  <CameraIcon size={14} />
+                </span>
+              </button>
               <input
-                ref={fileInputRef}
+                ref={avatarInputRef}
                 type="file"
                 accept="image/*"
-                multiple
                 className={styles.hiddenInput}
-                onChange={handleFilesSelected}
+                onChange={handleAvatarChange}
               />
-            </>
-          )}
+            </div>
 
-          {step === 4 && (
-            <>
-              <span className={styles.title}>Almost Done</span>
-              <p className={styles.subtitle}>Tell clients a little about yourself</p>
-              <div className={styles.form}>
-                <TextField
-                  placeholder="Short bio — what do you do best?"
-                  value={bio}
-                  onChange={setBio}
-                  multiline
+            <label className={styles.fieldLabel}>Bio</label>
+            <input
+              className={styles.input}
+              placeholder="Tell us about yourself"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+            />
+
+            <label className={styles.fieldLabel}>University</label>
+            <SelectField
+              placeholder="Type your University"
+              value={university}
+              options={UNIVERSITIES}
+              onSelect={setUniversity}
+            />
+
+            <label className={styles.fieldLabel}>Department</label>
+            <input
+              className={styles.input}
+              placeholder="Type your Faculty"
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+            />
+
+            <label className={styles.fieldLabel}>Reg Number</label>
+            <input
+              className={styles.input}
+              placeholder="Your Registration number"
+              value={regNumber}
+              onChange={(e) => setRegNumber(e.target.value)}
+            />
+
+            <p className={styles.sectionTitle}>Portfolio Links</p>
+            <div className={styles.linkRow}>
+              <span className={styles.linkedinBadge}>in</span>
+              <input
+                className={`${styles.input} ${styles.linkInput}`}
+                placeholder="https://linkedin.com.in/yourprofile"
+                value={linkedin}
+                onChange={(e) => setLinkedin(e.target.value)}
+              />
+            </div>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <p className={styles.stepTitle}>Your Skills</p>
+            <p className={styles.stepSubtitle}>
+              {'Pick up to 5 skills you want to\noffer clients'}
+            </p>
+            <div className={styles.chipWrap}>
+              {SKILL_OPTIONS.map((skill) => (
+                <Chip
+                  key={skill}
+                  label={skill}
+                  selected={skills.includes(skill)}
+                  onClick={() => toggleSkill(skill)}
                 />
-                <div className={styles.availabilityRow}>
-                  <div className={styles.availabilityText}>
-                    <span className={styles.availabilityTitle}>Available for work</span>
-                    <span className={styles.availabilityHint}>
-                      Clients can send you offers
-                    </span>
-                  </div>
+              ))}
+            </div>
+            <p className={styles.helper}>
+              {skills.length}/{MAX_SKILLS} selected
+            </p>
+          </>
+        )}
+
+        {step === 3 && (
+          <>
+            <p className={styles.stepTitle}>Your Portfolio</p>
+            <p className={styles.stepSubtitle}>
+              {'Show off your best work — you can\nalways add more later'}
+            </p>
+            <div className={styles.portfolioGrid}>
+              {portfolio.map((uri) => (
+                <div key={uri} className={styles.portfolioTile}>
+                  <img src={uri} className={styles.portfolioImage} alt="" />
                   <button
-                    type="button"
-                    role="switch"
-                    aria-checked={available}
-                    className={`${styles.toggle} ${available ? styles.toggleOn : ''}`}
-                    onClick={() => setAvailable((v) => !v)}
+                    className={styles.removeBadge}
+                    onClick={() =>
+                      setPortfolio((current) => current.filter((u) => u !== uri))
+                    }
                   >
-                    <span className={styles.knob} />
+                    <CloseIcon />
                   </button>
                 </div>
+              ))}
+              {portfolio.length < 6 && (
+                <button
+                  className={styles.addTile}
+                  onClick={() => portfolioInputRef.current?.click()}
+                >
+                  <PlusIcon />
+                  <span className={styles.addTileLabel}>Add work</span>
+                </button>
+              )}
+            </div>
+            <input
+              ref={portfolioInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className={styles.hiddenInput}
+              onChange={handlePortfolioChange}
+            />
+
+            <div className={styles.availabilityRow}>
+              <div className={styles.availabilityText}>
+                <span className={styles.availabilityTitle}>Available for work</span>
+                <span className={styles.availabilityHint}>
+                  Clients can send you offers
+                </span>
               </div>
-            </>
-          )}
-        </div>
+              <button
+                role="switch"
+                aria-checked={available}
+                className={`${styles.toggle} ${available ? styles.toggleOn : ''}`}
+                onClick={() => setAvailable((a) => !a)}
+              >
+                <span className={styles.toggleKnob} />
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       <div className={styles.footer}>

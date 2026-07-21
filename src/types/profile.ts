@@ -1,21 +1,14 @@
 export type StudentProfile = {
+  avatarUri: string;
+  bio: string;
   university: string;
-  course: string;
-  level: string;
+  department: string;
+  regNumber: string;
+  linkedin: string;
   skills: string[];
   portfolio: string[];
-  bio: string;
   available: boolean;
 };
-
-export const ACADEMIC_LEVELS = [
-  '100 Level',
-  '200 Level',
-  '300 Level',
-  '400 Level',
-  '500 Level',
-  'Postgraduate',
-] as const;
 
 /** Skill categories from the product requirements. */
 export const SKILL_OPTIONS = [
@@ -57,28 +50,4 @@ export const UNIVERSITIES = [
   'Rivers State University',
   'Babcock University, Ilishan-Remo',
   'Afe Babalola University, Ado-Ekiti (ABUAD)',
-] as const;
-
-/** Popular courses of study offered during profile setup. */
-export const COURSES = [
-  'Accounting',
-  'Computer Science',
-  'Medicine & Surgery',
-  'Law',
-  'Business Administration',
-  'Economics',
-  'Mass Communication',
-  'Electrical/Electronics Engineering',
-  'Mechanical Engineering',
-  'Civil Engineering',
-  'Microbiology',
-  'Biochemistry',
-  'Nursing Science',
-  'Pharmacy',
-  'Political Science',
-  'International Relations',
-  'Banking & Finance',
-  'Marketing',
-  'Architecture',
-  'Psychology',
 ] as const;

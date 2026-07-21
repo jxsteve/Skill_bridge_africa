@@ -22,7 +22,7 @@ type Props = {
 export function profileCompletion(profile: StudentProfile | null): number {
   let percent = 40;
   if (!profile) return percent;
-  if (profile.university && profile.course && profile.level) percent += 20;
+  if (profile.university && profile.department && profile.regNumber) percent += 20;
   if (profile.skills.length > 0) percent += 15;
   if (profile.bio) percent += 15;
   if (profile.portfolio.length > 0) percent += 10;
