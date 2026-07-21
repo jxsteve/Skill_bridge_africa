@@ -1,12 +1,4 @@
-import React, { useState } from 'react';
-import {
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { useState, type ReactNode } from 'react';
 
 import {
   BellIcon,
@@ -17,22 +9,16 @@ import {
   CopyIcon,
   EyeIcon,
   EyeOffIcon,
-  MainTab,
   SearchIcon,
   UserIcon,
   UsersIcon,
+  type MainTab,
 } from '../components/ui';
-import { useScreenInsets } from '../hooks/useScreenInsets';
-import { colors } from '../theme/colors';
-import { fonts } from '../theme/fonts';
+import logoMark from '../assets/images/logo_mark.png';
+import styles from './StudentDashboardScreen.module.css';
 
 const violet = '#6014E0';
-const violetSoft = '#F9F6FE';
 const green = '#16A34A';
-
-// The design labels the wallet as Solana; the underlying Privy wallet is
-// currently Ethereum. Change this once the wallet network is finalised.
-const WALLET_NETWORK = 'Solana';
 
 type Props = {
   name: string;
@@ -60,159 +46,154 @@ export default function StudentDashboardScreen({
   onOpenBids,
   onTab,
 }: Props) {
-  const insets = useScreenInsets();
   const [balanceHidden, setBalanceHidden] = useState(false);
   const displayName = name || email.split('@')[0];
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 10 }]}
-        showsVerticalScrollIndicator={false}
-      >
+    <div className={styles.container}>
+      <div className={styles.content}>
         {/* Header */}
-        <View style={styles.headerRow}>
-          <View style={styles.brandRow}>
-            <Image
-              source={require('../../assets/images/logo_mark.png')}
-              style={styles.brandMark}
-              resizeMode="contain"
-            />
-            <View>
-              <Text style={styles.brandWordmark}>
-                <Text style={{ color: colors.primaryBlue }}>Skill</Text>
-                <Text style={{ color: colors.brandGreen }}>Bridge</Text>
-              </Text>
-              <Text style={styles.brandAfrica}>–AFRICA–</Text>
-            </View>
-          </View>
-          <Pressable hitSlop={8} style={styles.bell}>
+        <div className={styles.headerRow}>
+          <div className={styles.brandRow}>
+            <img src={logoMark} className={styles.brandMark} alt="" />
+            <div>
+              <p className={styles.brandWordmark}>
+                <span style={{ color: 'var(--primary-blue)' }}>Skill</span>
+                <span style={{ color: 'var(--brand-green)' }}>Bridge</span>
+              </p>
+              <p className={styles.brandAfrica}>–AFRICA–</p>
+            </div>
+          </div>
+          <button className={styles.bell}>
             <BellIcon />
-            <View style={styles.bellDot} />
-          </Pressable>
-        </View>
+            <span className={styles.bellDot} />
+          </button>
+        </div>
 
         {/* Welcome */}
-        <View style={styles.welcomeRow}>
-          <View style={styles.welcomeText}>
-            <Text style={styles.welcomeLabel}>Welcome,</Text>
-            <Text style={styles.welcomeName}>{displayName}</Text>
-          </View>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarInitial}>{initial}</Text>
-            <View style={styles.onlineDot} />
-          </View>
-        </View>
+        <div className={styles.welcomeRow}>
+          <div className={styles.welcomeText}>
+            <span className={styles.welcomeLabel}>Welcome,</span>
+            <p className={styles.welcomeName}>{displayName}</p>
+          </div>
+          <div className={styles.avatar}>
+            <span className={styles.avatarInitial}>{initial}</span>
+            <span className={styles.onlineDot} />
+          </div>
+        </div>
 
         {/* Wallet */}
-        <View style={styles.walletCard}>
-          <View style={styles.walletHeader}>
-            <Text style={styles.walletLabel}>Wallet Balance</Text>
-            <Pressable hitSlop={8} onPress={() => setBalanceHidden((h) => !h)}>
+        <div className={styles.walletCard}>
+          <div className={styles.walletHeader}>
+            <span className={styles.walletLabel}>Wallet Balance</span>
+            <button
+              className={styles.iconButton}
+              onClick={() => setBalanceHidden((h) => !h)}
+            >
               {balanceHidden ? (
-                <EyeOffIcon size={20} color={colors.white} />
+                <EyeOffIcon size={20} color="#FFFFFF" />
               ) : (
-                <EyeIcon size={20} color={colors.white} />
+                <EyeIcon size={20} color="#FFFFFF" />
               )}
-            </Pressable>
-          </View>
-          <Text style={styles.walletBalance}>
+            </button>
+          </div>
+          <p className={styles.walletBalance}>
             {balanceHidden ? '••••••' : '$0.00'}
-          </Text>
-          <View style={styles.walletAddressRow}>
-            <View style={styles.walletAddressText}>
-              <Text style={styles.walletAddressLabel}>
-                Wallet Address ({WALLET_NETWORK})
-              </Text>
-              <Text style={styles.walletAddressValue}>
+          </p>
+          <div className={styles.walletAddressRow}>
+            <div className={styles.walletAddressText}>
+              <span className={styles.walletAddressLabel}>
+                Wallet Address (Solana)
+              </span>
+              <p className={styles.walletAddressValue}>
                 {shortAddress(walletAddress)}
-              </Text>
-            </View>
-            <Pressable hitSlop={8}>
+              </p>
+            </div>
+            <button className={styles.iconButton}>
               <CopyIcon />
-            </Pressable>
-          </View>
-        </View>
+            </button>
+          </div>
+        </div>
 
         {/* Stats */}
-        <View style={styles.statsRow}>
-          <Stat label="Active Bids" value="0" chip={violetSoft}>
+        <div className={styles.statsRow}>
+          <Stat label="Active Bids" value="0" chip="#F9F6FE">
             <SearchIcon size={12} color={violet} />
           </Stat>
           <Stat label="Completed" value="0" chip="#DCFCE7">
             <CheckCircleIcon size={12} color={green} />
           </Stat>
-          <Stat label="Earnings" value="$0.00" chip={violetSoft}>
+          <Stat label="Earnings" value="$0.00" chip="#F9F6FE">
             <BriefcaseBusinessIcon size={12} color={violet} />
           </Stat>
           <Stat label="Profile Views" value="0" chip="#FEF3C7">
             <EyeIcon size={12} color="#D97706" />
           </Stat>
-        </View>
+        </div>
 
         {/* My Active Tasks — empty */}
-        <View style={styles.card}>
-          <View style={styles.cardHead}>
-            <Text style={styles.cardTitle}>My Active Tasks</Text>
-            <Text style={styles.viewAll}>View all</Text>
-          </View>
-          <View style={styles.emptyBlock}>
-            <View style={styles.emptyIcon}>
+        <div className={styles.card}>
+          <div className={styles.cardHead}>
+            <span className={styles.cardTitle}>My Active Tasks</span>
+            <span className={styles.viewAll}>View all</span>
+          </div>
+          <div className={styles.emptyBlock}>
+            <div className={styles.emptyIcon}>
               <ClipboardListIcon size={26} color={violet} />
-            </View>
-            <Text style={styles.emptyText}>
+            </div>
+            <p className={styles.emptyText}>
               No active tasks yet. Browse tasks and place a bid to get started.
-            </Text>
-          </View>
-        </View>
+            </p>
+          </div>
+        </div>
 
         {/* Recent Activity — empty */}
-        <View style={styles.card}>
-          <View style={styles.cardHead}>
-            <Text style={styles.cardTitle}>Recent Activity</Text>
-            <Text style={styles.viewAll}>View all</Text>
-          </View>
-          <View style={styles.emptyBlock}>
-            <View style={styles.emptyIcon}>
+        <div className={styles.card}>
+          <div className={styles.cardHead}>
+            <span className={styles.cardTitle}>Recent Activity</span>
+            <span className={styles.viewAll}>View all</span>
+          </div>
+          <div className={styles.emptyBlock}>
+            <div className={styles.emptyIcon}>
               <BellIcon size={24} color={violet} />
-            </View>
-            <Text style={styles.emptyText}>
+            </div>
+            <p className={styles.emptyText}>
               No activity yet. Payments and updates will show up here.
-            </Text>
-          </View>
-        </View>
+            </p>
+          </div>
+        </div>
 
         {/* Quick Actions */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Quick Actions</Text>
-          <View style={styles.quickRow}>
-            <QuickAction label="Browse Tasks" onPress={onBrowseTasks}>
+        <div className={styles.card}>
+          <span className={styles.cardTitle}>Quick Actions</span>
+          <div className={styles.quickRow}>
+            <QuickAction label="Browse Tasks" onClick={onBrowseTasks}>
               <SearchIcon size={18} color={violet} />
             </QuickAction>
-            <QuickAction label="My Bids" onPress={onOpenBids}>
+            <QuickAction label="My Bids" onClick={onOpenBids}>
               <UsersIcon size={18} color={violet} />
             </QuickAction>
-            <QuickAction label="Profile" onPress={() => onTab('profile')}>
+            <QuickAction label="Profile" onClick={() => onTab('profile')}>
               <UserIcon size={18} color={violet} />
             </QuickAction>
-          </View>
-        </View>
+          </div>
+        </div>
 
         {/* Stand out */}
-        <View style={styles.standOut}>
-          <Text style={styles.standOutTitle}>Stand Out. Get Hired Faster!</Text>
-          <Text style={styles.standOutBody}>
+        <div className={styles.standOut}>
+          <p className={styles.standOutTitle}>Stand Out. Get Hired Faster!</p>
+          <p className={styles.standOutBody}>
             Complete your profile and add a portfolio to increase your chances
-          </Text>
-          <Pressable style={styles.improveButton} onPress={onImproveProfile}>
-            <Text style={styles.improveButtonLabel}>Improve Profile</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
+          </p>
+          <button className={styles.improveButton} onClick={onImproveProfile}>
+            Improve Profile
+          </button>
+        </div>
+      </div>
 
       <BottomNav active="home" onSelect={onTab} />
-    </View>
+    </div>
   );
 }
 
@@ -225,301 +206,34 @@ function Stat({
   label: string;
   value: string;
   chip: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <View style={styles.statTile}>
-      <Text style={styles.statLabel}>{label}</Text>
-      <View style={styles.statValueRow}>
-        <Text style={styles.statValue}>{value}</Text>
-        <View style={[styles.statIcon, { backgroundColor: chip }]}>{children}</View>
-      </View>
-    </View>
+    <div className={styles.statTile}>
+      <span className={styles.statLabel}>{label}</span>
+      <div className={styles.statValueRow}>
+        <span className={styles.statValue}>{value}</span>
+        <div className={styles.statIcon} style={{ backgroundColor: chip }}>
+          {children}
+        </div>
+      </div>
+    </div>
   );
 }
 
 function QuickAction({
   label,
   children,
-  onPress,
+  onClick,
 }: {
   label: string;
-  children: React.ReactNode;
-  onPress?: () => void;
+  children: ReactNode;
+  onClick?: () => void;
 }) {
   return (
-    <Pressable style={styles.quickTile} onPress={onPress}>
+    <button className={styles.quickTile} onClick={onClick}>
       {children}
-      <Text style={styles.quickLabel}>{label}</Text>
-    </Pressable>
+      <span className={styles.quickLabel}>{label}</span>
+    </button>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.white,
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingBottom: 24,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  brandRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-  },
-  brandMark: {
-    width: 17,
-    height: 28,
-  },
-  brandWordmark: {
-    fontFamily: fonts.extraBold,
-    fontSize: 17,
-    lineHeight: 20,
-  },
-  brandAfrica: {
-    color: colors.primaryBlue,
-    fontFamily: fonts.bold,
-    fontSize: 8,
-    letterSpacing: 2,
-    textAlign: 'center',
-  },
-  bell: {
-    padding: 2,
-  },
-  bellDot: {
-    position: 'absolute',
-    top: 2,
-    right: 2,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#EF4444',
-  },
-  welcomeRow: {
-    marginTop: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  welcomeText: {
-    flex: 1,
-  },
-  welcomeLabel: {
-    color: '#6B7280',
-    fontFamily: fonts.regular,
-    fontSize: 15,
-  },
-  welcomeName: {
-    marginTop: 1,
-    color: colors.titleDark,
-    fontFamily: fonts.bold,
-    fontSize: 23,
-  },
-  avatar: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    backgroundColor: violet,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarInitial: {
-    color: colors.white,
-    fontFamily: fonts.bold,
-    fontSize: 19,
-  },
-  onlineDot: {
-    position: 'absolute',
-    bottom: 1,
-    right: 1,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: green,
-    borderWidth: 2,
-    borderColor: colors.white,
-  },
-  walletCard: {
-    marginTop: 18,
-    borderRadius: 16,
-    padding: 18,
-    backgroundColor: green,
-  },
-  walletHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  walletLabel: {
-    color: '#EAF7EF',
-    fontFamily: fonts.medium,
-    fontSize: 14,
-  },
-  walletBalance: {
-    marginTop: 6,
-    color: colors.white,
-    fontFamily: fonts.extraBold,
-    fontSize: 32,
-  },
-  walletAddressRow: {
-    marginTop: 18,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-  },
-  walletAddressText: {
-    flex: 1,
-  },
-  walletAddressLabel: {
-    color: '#D6EFE0',
-    fontFamily: fonts.regular,
-    fontSize: 13,
-  },
-  walletAddressValue: {
-    marginTop: 2,
-    color: colors.white,
-    fontFamily: fonts.medium,
-    fontSize: 14,
-  },
-  statsRow: {
-    marginTop: 16,
-    flexDirection: 'row',
-    gap: 8,
-  },
-  statTile: {
-    flex: 1,
-    borderRadius: 12,
-    padding: 10,
-    backgroundColor: violetSoft,
-    borderWidth: 1,
-    borderColor: '#EDE9F5',
-  },
-  statLabel: {
-    color: '#4B5563',
-    fontFamily: fonts.regular,
-    fontSize: 11,
-  },
-  statValueRow: {
-    marginTop: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  statValue: {
-    color: colors.titleDark,
-    fontFamily: fonts.bold,
-    fontSize: 17,
-  },
-  statIcon: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  card: {
-    marginTop: 16,
-    borderRadius: 16,
-    padding: 16,
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: '#E9E7EF',
-  },
-  cardHead: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  cardTitle: {
-    color: colors.titleDark,
-    fontFamily: fonts.semiBold,
-    fontSize: 15,
-  },
-  viewAll: {
-    color: violet,
-    fontFamily: fonts.medium,
-    fontSize: 13,
-  },
-  emptyBlock: {
-    marginTop: 14,
-    alignItems: 'center',
-    paddingVertical: 6,
-  },
-  emptyIcon: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: violetSoft,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyText: {
-    marginTop: 12,
-    textAlign: 'center',
-    color: '#6B7280',
-    fontFamily: fonts.regular,
-    fontSize: 13,
-    lineHeight: 19,
-    paddingHorizontal: 12,
-  },
-  quickRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    gap: 10,
-  },
-  quickTile: {
-    flex: 1,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E9E7EF',
-    paddingVertical: 12,
-    alignItems: 'center',
-    gap: 6,
-  },
-  quickLabel: {
-    color: colors.titleDark,
-    fontFamily: fonts.medium,
-    fontSize: 12,
-  },
-  standOut: {
-    marginTop: 16,
-    borderRadius: 16,
-    padding: 16,
-    backgroundColor: violetSoft,
-    borderWidth: 1,
-    borderColor: '#E4DAF9',
-  },
-  standOutTitle: {
-    color: violet,
-    fontFamily: fonts.bold,
-    fontSize: 16,
-  },
-  standOutBody: {
-    marginTop: 6,
-    color: '#4B5563',
-    fontFamily: fonts.regular,
-    fontSize: 13,
-    lineHeight: 19,
-  },
-  improveButton: {
-    marginTop: 14,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 18,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: violet,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  improveButtonLabel: {
-    color: colors.white,
-    fontFamily: fonts.semiBold,
-    fontSize: 14,
-  },
-});

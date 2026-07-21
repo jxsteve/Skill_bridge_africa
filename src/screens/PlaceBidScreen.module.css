@@ -1,0 +1,115 @@
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--splash-base);
+}
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+}
+.back {
+  align-self: flex-start;
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.label {
+  margin-top: 22px;
+  color: var(--title-dark);
+  font-weight: 500;
+  font-size: 15px;
+}
+.field {
+  margin-top: 10px;
+  min-height: 52px;
+  border-radius: 12px;
+  border: 1px solid #d5dbe3;
+  background: var(--surface);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 14px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+.input {
+  flex: 1;
+  color: #111827;
+  font-weight: 400;
+  font-size: 15px;
+  padding: 14px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  min-width: 0;
+}
+.input::placeholder {
+  color: #9ca3af;
+}
+.placeholder {
+  color: #9ca3af;
+}
+.textareaField {
+  min-height: 120px;
+  align-items: flex-start;
+}
+.textarea {
+  height: 96px;
+  resize: none;
+  width: 100%;
+}
+.options {
+  margin-top: 6px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.option {
+  padding: 13px 16px;
+  border: none;
+  border-bottom: 1px solid #eef0f3;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.optionText {
+  color: #111827;
+  font-weight: 400;
+  font-size: 15px;
+}
+.addFile {
+  margin-top: 10px;
+  height: 52px;
+  border-radius: 12px;
+  border: 1px solid #d5dbe3;
+  background: var(--surface);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+}
+.addFileText {
+  color: var(--blue-500);
+  font-weight: 600;
+  font-size: 15px;
+}
+.footer {
+  padding: 12px 24px 16px;
+  background: var(--splash-base);
+  border-top: 1px solid #ececef;
+}

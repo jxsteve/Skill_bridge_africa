@@ -1,99 +1,58 @@
-import React, { useState } from 'react';
-import {
-  KeyboardTypeOptions,
-  Platform,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { useState } from 'react';
 
-import { palette } from '../../theme/colors';
-import { fonts } from '../../theme/fonts';
-import IconButton from './IconButton';
+import styles from './TextField.module.css';
 import { EyeIcon, EyeOffIcon } from './icons';
 
 type Props = {
   icon?: React.ReactNode;
   placeholder: string;
   value: string;
-  onChangeText: (text: string) => void;
+  onChange: (value: string) => void;
   secure?: boolean;
-  keyboardType?: KeyboardTypeOptions;
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  type?: string;
   multiline?: boolean;
 };
 
-/** Rounded input field with a leading icon and optional password toggle. */
-export default function TextField({
+export function TextField({
   icon,
   placeholder,
   value,
-  onChangeText,
+  onChange,
   secure = false,
-  keyboardType,
-  autoCapitalize,
+  type = 'text',
   multiline = false,
 }: Props) {
   const [hidden, setHidden] = useState(true);
+  const inputType = secure ? (hidden ? 'password' : 'text') : type;
+
   return (
-    <View style={[styles.field, multiline && styles.fieldMultiline]}>
-      {icon && <View style={styles.icon}>{icon}</View>}
-      <TextInput
-        style={[styles.input, multiline && styles.inputMultiline]}
-        placeholder={placeholder}
-        placeholderTextColor={palette.gray400}
-        value={value}
-        onChangeText={onChangeText}
-        secureTextEntry={secure && hidden}
-        keyboardType={keyboardType}
-        autoCapitalize={autoCapitalize ?? (secure ? 'none' : undefined)}
-        multiline={multiline}
-      />
-      {secure && (
-        <IconButton onPress={() => setHidden((h) => !h)}>
-          {hidden ? (
-            <EyeOffIcon size={20} color={palette.gray400} />
-          ) : (
-            <EyeIcon size={20} color={palette.gray400} />
-          )}
-        </IconButton>
+    <div className={`${styles.field} ${multiline ? styles.multiline : ''}`}>
+      {icon && <span className={styles.icon}>{icon}</span>}
+      {multiline ? (
+        <textarea
+          className={`${styles.input} ${styles.textarea}`}
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
+      ) : (
+        <input
+          className={styles.input}
+          type={inputType}
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
       )}
-    </View>
+      {secure && (
+        <button className={styles.toggle} type="button" onClick={() => setHidden((h) => !h)}>
+          {hidden ? (
+            <EyeOffIcon size={20} color="#6B7280" />
+          ) : (
+            <EyeIcon size={20} color="#6B7280" />
+          )}
+        </button>
+      )}
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  field: {
-    height: 52,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#D5DBE3',
-    backgroundColor: palette.gray50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    gap: 10,
-  },
-  fieldMultiline: {
-    height: 110,
-    alignItems: 'flex-start',
-    paddingVertical: 12,
-  },
-  icon: {
-    width: 20,
-    alignItems: 'center',
-  },
-  input: {
-    flex: 1,
-    color: '#111827',
-    fontFamily: fonts.regular,
-    fontSize: 16,
-    paddingVertical: 0,
-    // Browsers draw their own focus ring; the field border is the affordance.
-    ...(Platform.OS === 'web' ? ({ outlineStyle: 'none' } as object) : {}),
-  },
-  inputMultiline: {
-    height: '100%',
-    textAlignVertical: 'top',
-  },
-});

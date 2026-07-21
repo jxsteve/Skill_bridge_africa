@@ -1,0 +1,126 @@
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--splash-base);
+}
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+.content {
+  padding: 20px 24px 24px;
+}
+.back {
+  display: inline-flex;
+  align-self: flex-start;
+  cursor: pointer;
+}
+.hiddenInput {
+  display: none;
+}
+.heading {
+  margin-top: 18px;
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 26px;
+}
+.label {
+  margin-top: 24px;
+  color: var(--title-dark);
+  font-weight: 500;
+  font-size: 15px;
+}
+.upload {
+  margin-top: 12px;
+  width: 100%;
+  height: 150px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--blue-500);
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+}
+.uploadIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: var(--blue-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.uploadText {
+  color: var(--blue-500);
+  font-weight: 600;
+  font-size: 15px;
+}
+.hint {
+  margin-top: 10px;
+  text-align: center;
+  color: var(--body-grey);
+  font-weight: 400;
+  font-size: 13px;
+}
+.textareaField {
+  margin-top: 12px;
+  min-height: 110px;
+  border-radius: 12px;
+  border: 1px solid #d5dbe3;
+  background: var(--surface);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+.textarea {
+  flex: 1;
+  min-height: 60px;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: #111827;
+  font-weight: 400;
+  font-size: 15px;
+}
+.textarea::placeholder {
+  color: #9ca3af;
+}
+.counter {
+  align-self: flex-end;
+  color: #9ca3af;
+  font-weight: 400;
+  font-size: 12px;
+}
+.previewRow {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+.previewTile {
+  width: 76px;
+  height: 76px;
+  border-radius: 12px;
+  background: var(--blue-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.previewMore {
+  color: var(--blue-500);
+  font-weight: 600;
+  font-size: 18px;
+}
+.footer {
+  padding: 12px 24px 16px;
+  background: var(--splash-base);
+  border-top: 1px solid #ececef;
+}

@@ -1,10 +1,5 @@
-import React from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-
-import { BottomNav, MainTab, ChevronRightIcon } from '../components/ui';
-import { useScreenInsets } from '../hooks/useScreenInsets';
-import { colors, palette } from '../theme/colors';
-import { fonts } from '../theme/fonts';
+import { BottomNav, ChevronRightIcon, type MainTab } from '../components/ui';
+import styles from './ProfileScreen.module.css';
 
 type Props = {
   name: string;
@@ -28,99 +23,40 @@ export default function ProfileScreen({
   onEditProfile,
   onTab,
 }: Props) {
-  const insets = useScreenInsets();
   const displayName = name || email.split('@')[0];
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
-    <View style={styles.container}>
-      <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + 20 }]}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarInitial}>{initial}</Text>
-          </View>
-          <Text style={styles.name}>{displayName}</Text>
-          <Text style={styles.email}>{email}</Text>
-        </View>
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <div className={styles.avatar}>
+            <span className={styles.avatarInitial}>{initial}</span>
+          </div>
+          <p className={styles.name}>{displayName}</p>
+          <p className={styles.email}>{email}</p>
+        </div>
 
-        <View style={styles.walletCard}>
-          <Text style={styles.walletLabel}>Wallet address</Text>
-          <Text style={styles.walletValue} selectable>
-            {shortAddress(walletAddress)}
-          </Text>
-        </View>
+        <div className={styles.walletCard}>
+          <span className={styles.walletLabel}>Wallet address</span>
+          <p className={styles.walletValue}>{shortAddress(walletAddress)}</p>
+        </div>
 
-        <Pressable style={styles.row} onPress={onEditProfile}>
-          <Text style={styles.rowLabel}>Edit profile</Text>
+        <button className={styles.row} onClick={onEditProfile}>
+          <span className={styles.rowLabel}>Edit profile</span>
           <ChevronRightIcon size={18} color="#9CA3AF" />
-        </Pressable>
-        <Pressable style={styles.row}>
-          <Text style={styles.rowLabel}>Verification status</Text>
-          <Text style={styles.rowValue}>Pending</Text>
-        </Pressable>
-        <Pressable style={styles.row}>
-          <Text style={styles.rowLabel}>Help & support</Text>
+        </button>
+        <button className={styles.row}>
+          <span className={styles.rowLabel}>Verification status</span>
+          <span className={styles.rowValue}>Pending</span>
+        </button>
+        <button className={styles.row}>
+          <span className={styles.rowLabel}>Help &amp; support</span>
           <ChevronRightIcon size={18} color="#9CA3AF" />
-        </Pressable>
-      </ScrollView>
+        </button>
+      </div>
 
       <BottomNav active="profile" onSelect={onTab} />
-    </View>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.splashBase },
-  content: { paddingHorizontal: 20, paddingBottom: 24 },
-  header: { alignItems: 'center' },
-  avatar: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
-    backgroundColor: '#6014E0',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarInitial: { color: colors.white, fontFamily: fonts.bold, fontSize: 34 },
-  name: {
-    marginTop: 14,
-    color: colors.titleDark,
-    fontFamily: fonts.bold,
-    fontSize: 22,
-  },
-  email: {
-    marginTop: 2,
-    color: colors.bodyGrey,
-    fontFamily: fonts.regular,
-    fontSize: 14,
-  },
-  walletCard: {
-    marginTop: 24,
-    padding: 16,
-    borderRadius: 14,
-    backgroundColor: palette.blue50,
-  },
-  walletLabel: { color: palette.blue600, fontFamily: fonts.medium, fontSize: 13 },
-  walletValue: {
-    marginTop: 4,
-    color: colors.titleDark,
-    fontFamily: fonts.semiBold,
-    fontSize: 15,
-  },
-  row: {
-    marginTop: 12,
-    padding: 16,
-    borderRadius: 14,
-    backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: '#EAECEF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  rowLabel: { color: colors.titleDark, fontFamily: fonts.medium, fontSize: 15 },
-  rowValue: { color: '#D97706', fontFamily: fonts.semiBold, fontSize: 14 },
-});

@@ -1,43 +1,25 @@
 {
   "name": "skillbridge-africa",
+  "private": true,
   "version": "1.0.0",
-  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
-    "@ethersproject/shims": "^5.8.0",
-    "@privy-io/expo": "^0.70.3",
-    "@privy-io/expo-native-extensions": "^0.0.12",
-    "@privy-io/react-auth": "^3.35.1",
-    "@react-native-async-storage/async-storage": "^2.2.0",
-    "expo": "~57.0.7",
-    "expo-apple-authentication": "~57.0.1",
-    "expo-application": "~57.0.2",
-    "expo-crypto": "~57.0.1",
-    "expo-font": "~57.0.1",
-    "expo-image-picker": "~57.0.5",
-    "expo-linking": "~57.0.3",
-    "expo-secure-store": "~57.0.1",
-    "expo-status-bar": "~57.0.1",
-    "expo-web-browser": "~57.0.1",
-    "fast-text-encoding": "^1.0.6",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "react-native": "0.86.0",
-    "react-native-get-random-values": "~1.11.0",
-    "react-native-passkeys": "^0.4.1",
-    "react-native-safe-area-context": "~5.7.0",
-    "react-native-svg": "15.15.4",
-    "react-native-web": "^0.21.2",
-    "react-native-webview": "13.16.1"
+    "@privy-io/react-auth": "^2.24.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.1"
   },
   "devDependencies": {
-    "@types/react": "~19.2.2",
-    "typescript": "~6.0.3"
-  },
-  "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
-  },
-  "private": true
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.7.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
 }

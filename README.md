@@ -2,35 +2,57 @@
 
 **Your Skills. Our Bridge.**
 
-A mobile marketplace connecting skilled African talent with trusted clients. Freelancers showcase their skills, work with verified clients, and get paid securely — funds are held until the job is done.
+A marketplace connecting skilled African university students with trusted clients. Students showcase their skills, bid on tasks, and get paid securely, with an embedded wallet created automatically on sign-up.
 
-Built with React Native (Expo) and TypeScript. Authentication and embedded wallets are powered by [Privy](https://privy.io): users sign in with a one-time email code, and every account gets an Ethereum wallet created automatically on first login.
+Built with **React + TypeScript** (Vite), React Router, and [Privy](https://privy.io) for passwordless email login and embedded wallets.
 
 ## Getting started
 
 ```bash
 npm install
-npm start
+npm run dev      # start the dev server (http://localhost:8090)
 ```
 
-Then press `i` for iOS, `a` for Android, or `w` for web.
+Other scripts:
 
-Note: the Privy SDK runs on iOS/Android only. The web build uses a
-preview stand-in that accepts any 6-digit code, so the full flow can be
-demoed in a browser without real authentication.
+```bash
+npm run build      # type-check and build for production (outputs to dist/)
+npm run preview    # preview the production build
+npm run typecheck  # type-check only
+```
 
 ## Project structure
 
 ```
-App.tsx            # Entry point: fonts, auth provider, screen flow
+index.html               # Vite entry
 src/
-  auth/            # Privy auth (native) + web preview stand-in
-  components/      # Phone frame + design-system UI components
-  screens/         # Splash, onboarding, account type, registration, verify
-  theme/           # Brand colors, tokens and typography
-  hooks/           # Screen inset helpers
-  types/           # Profile model plus university, course and skill lists
-assets/
-  images/          # Logo and onboarding illustrations
-  fonts/           # Manrope font family (bundled)
+  main.tsx               # React entry: Privy provider + router
+  App.tsx                # Routes and top-level flow state
+  index.css              # Design tokens (CSS variables), fonts, reset
+  auth/                  # Privy web auth + config
+  lib/                   # localStorage-backed preferences
+  data/                  # Mock marketplace data (tasks, bids, projects)
+  types/                 # Shared TypeScript types
+  components/
+    PhoneFrame.tsx       # Phone frame for desktop preview
+    ui/                  # Reusable UI (buttons, inputs, cards, nav…)
+  screens/               # One folder-free file per screen (.tsx + .module.css)
+  assets/                # Images and Manrope fonts
+public/
+  _redirects             # SPA fallback for client-side routing on Netlify
 ```
+
+## Styling
+
+Plain CSS via **CSS Modules** (`ScreenName.module.css`), with design tokens as
+CSS variables in `src/index.css`. No CSS framework to learn — any web dev can
+contribute with standard HTML and CSS.
+
+## Notes
+
+- Auth uses Privy: users log in with a one-time email code and get an embedded
+  Ethereum wallet on first sign-up. Privy requires a secure context (https or
+  localhost); over plain HTTP the app falls back to a preview mode that accepts
+  any 6-digit code.
+- Marketplace data is currently mocked (`src/data/marketplace.ts`) pending a
+  backend.

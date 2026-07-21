@@ -1,0 +1,309 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 18px 20px 24px;
+}
+
+/* Header */
+.headerRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.brandRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+}
+.brandMark {
+  width: 17px;
+  height: 28px;
+  object-fit: contain;
+}
+.brandWordmark {
+  font-weight: 800;
+  font-size: 17px;
+  line-height: 20px;
+}
+.brandAfrica {
+  color: var(--primary-blue);
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-align: center;
+}
+.bell {
+  position: relative;
+  padding: 2px;
+  display: flex;
+}
+.bellDot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: #ef4444;
+}
+
+/* Welcome */
+.welcomeRow {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.welcomeText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.welcomeLabel {
+  color: #6b7280;
+  font-weight: 400;
+  font-size: 15px;
+}
+.welcomeName {
+  margin-top: 1px;
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 23px;
+}
+.avatar {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  border-radius: 23px;
+  background: #6014e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatarInitial {
+  color: #fff;
+  font-weight: 700;
+  font-size: 19px;
+}
+.onlineDot {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background: #16a34a;
+  border: 2px solid #fff;
+}
+
+/* Wallet */
+.walletCard {
+  margin-top: 18px;
+  border-radius: 16px;
+  padding: 18px;
+  background: #16a34a;
+}
+.walletHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.walletLabel {
+  color: #eaf7ef;
+  font-weight: 500;
+  font-size: 14px;
+}
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.walletBalance {
+  margin-top: 6px;
+  color: #fff;
+  font-weight: 800;
+  font-size: 32px;
+}
+.walletAddressRow {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.walletAddressText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.walletAddressLabel {
+  color: #d6efe0;
+  font-weight: 400;
+  font-size: 13px;
+}
+.walletAddressValue {
+  margin-top: 2px;
+  color: #fff;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Stats */
+.statsRow {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+.statTile {
+  flex: 1;
+  border-radius: 12px;
+  padding: 10px;
+  background: var(--violet-soft);
+  border: 1px solid #ede9f5;
+}
+.statLabel {
+  color: #4b5563;
+  font-weight: 400;
+  font-size: 11px;
+}
+.statValueRow {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.statValue {
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 17px;
+}
+.statIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Cards */
+.card {
+  margin-top: 16px;
+  border-radius: 16px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid #e9e7ef;
+}
+.cardHead {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.cardTitle {
+  color: var(--title-dark);
+  font-weight: 600;
+  font-size: 15px;
+}
+.viewAll {
+  color: #6014e0;
+  font-weight: 500;
+  font-size: 13px;
+}
+.emptyBlock {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 0;
+}
+.emptyIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: var(--violet-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.emptyText {
+  margin-top: 12px;
+  text-align: center;
+  color: #6b7280;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 19px;
+  padding: 0 12px;
+}
+
+/* Quick actions */
+.quickRow {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.quickTile {
+  flex: 1;
+  border-radius: 12px;
+  border: 1px solid #e9e7ef;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+}
+.quickLabel {
+  color: var(--title-dark);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* Stand out */
+.standOut {
+  margin-top: 16px;
+  border-radius: 16px;
+  padding: 16px;
+  background: var(--violet-soft);
+  border: 1px solid #e4daf9;
+}
+.standOutTitle {
+  color: #6014e0;
+  font-weight: 700;
+  font-size: 16px;
+}
+.standOutBody {
+  margin-top: 6px;
+  color: #4b5563;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 19px;
+}
+.improveButton {
+  margin-top: 14px;
+  align-self: flex-start;
+  padding: 0 18px;
+  height: 40px;
+  border-radius: 10px;
+  background: #6014e0;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

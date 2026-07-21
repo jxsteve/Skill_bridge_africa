@@ -1,0 +1,19 @@
+.label {
+  color: var(--body-grey);
+  font-weight: 500;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.track {
+  display: flex;
+  gap: 6px;
+}
+.segment {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--gray-300);
+}
+.done {
+  background: var(--blue-500);
+}

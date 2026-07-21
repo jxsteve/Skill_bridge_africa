@@ -1,0 +1,36 @@
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+}
+.box {
+  flex: 1;
+  max-width: 44px;
+  height: 56px;
+  border-radius: 10px;
+  border: 1px solid var(--blue-500);
+  background: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 20px;
+  color: #111827;
+}
+.active {
+  border-width: 2px;
+  border-color: var(--blue-200);
+}
+.success {
+  border-color: var(--green-500);
+  background: #e9fbf0;
+  color: var(--green-500);
+}
+.hidden {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  border: none;
+}

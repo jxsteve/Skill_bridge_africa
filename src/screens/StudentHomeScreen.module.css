@@ -1,0 +1,350 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 18px 26px 24px;
+}
+
+/* Header */
+.headerRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.brandRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+}
+.brandMark {
+  width: 17px;
+  height: 28px;
+  object-fit: contain;
+}
+.brandWordmark {
+  font-weight: 800;
+  font-size: 17px;
+  line-height: 20px;
+}
+.brandAfrica {
+  color: var(--primary-blue);
+  font-weight: 700;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-align: center;
+}
+.bell {
+  display: flex;
+}
+
+/* Welcome */
+.welcomeRow {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.welcomeText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.welcomeLabel {
+  color: #6b7280;
+  font-weight: 400;
+  font-size: 15px;
+}
+.welcomeName {
+  margin-top: 1px;
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 23px;
+}
+.avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 23px;
+  background: #6014e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatarInitial {
+  color: #fff;
+  font-weight: 700;
+  font-size: 19px;
+}
+
+/* Cards */
+.card {
+  margin-top: 16px;
+  border-radius: 16px;
+  padding: 16px;
+}
+.softCard {
+  background: var(--violet-soft);
+  border: 1px solid #ede9f5;
+}
+.outlineCard {
+  background: var(--surface);
+  border: 1px solid #e9e7ef;
+}
+.cardTitle {
+  color: var(--title-dark);
+  font-weight: 600;
+  font-size: 17px;
+}
+.cardTitleSmall {
+  color: var(--title-dark);
+  font-weight: 600;
+  font-size: 15px;
+}
+.cardBody {
+  margin-top: 6px;
+  color: #6b7280;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 19px;
+  white-space: pre-line;
+}
+
+/* Progress */
+.progressRow {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.progressTrack {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #d9d3e5;
+  overflow: hidden;
+}
+.progressFill {
+  height: 100%;
+  border-radius: 3px;
+  background: #6014e0;
+}
+.progressLabel {
+  color: var(--title-dark);
+  font-weight: 500;
+  font-size: 13px;
+}
+
+/* Primary button */
+.primaryButton {
+  margin-top: 14px;
+  width: 100%;
+  height: 44px;
+  border-radius: 10px;
+  background: #6014e0;
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Wallet */
+.walletHeader {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.walletLabel {
+  color: var(--title-dark);
+  font-weight: 500;
+  font-size: 15px;
+}
+.walletBalanceRow {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.walletBalance {
+  color: var(--title-dark);
+  font-weight: 800;
+  font-size: 30px;
+}
+.walletIconCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 22px;
+  background: #ede4fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.walletHint {
+  margin-top: 12px;
+  color: #4b5563;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 19px;
+  white-space: pre-line;
+}
+
+/* Stats */
+.statsRow {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+.statTile {
+  flex: 1;
+  border-radius: 12px;
+  padding: 12px;
+  background: var(--violet-soft);
+  border: 1px solid #ede9f5;
+}
+.statLabel {
+  color: #4b5563;
+  font-weight: 400;
+  font-size: 12px;
+}
+.statValueRow {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+.statValue {
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 18px;
+}
+.statIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* No active tasks */
+.tasksEmpty {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tasksIconWrap {
+  width: 74px;
+  height: 74px;
+  border-radius: 16px;
+  background: #ede4fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tasksEmptyText {
+  margin-top: 14px;
+  text-align: center;
+  color: #4b5563;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 20px;
+  white-space: pre-line;
+}
+.outlineButton {
+  margin-top: 16px;
+  align-self: stretch;
+  width: 100%;
+  height: 42px;
+  border-radius: 10px;
+  border: 1.2px solid #6014e0;
+  background: transparent;
+  color: #6014e0;
+  font-weight: 600;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Quick actions */
+.quickRow {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+.quickTile {
+  flex: 1;
+  border-radius: 12px;
+  border: 1px solid #e9e7ef;
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  background: var(--surface);
+}
+.quickLabel {
+  color: var(--title-dark);
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* Tips */
+.tipsList {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tipRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  background: var(--violet-soft);
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: left;
+}
+.tipIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  background: #ede4fc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tipText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.tipTitle {
+  color: #6014e0;
+  font-weight: 500;
+  font-size: 14px;
+}
+.tipBody {
+  margin-top: 1px;
+  color: #6b7280;
+  font-weight: 400;
+  font-size: 12px;
+}

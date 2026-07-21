@@ -1,0 +1,165 @@
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--splash-base);
+}
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 16px 24px 24px;
+  display: flex;
+  flex-direction: column;
+}
+.topRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.backButton {
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.saveButton {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--blue-50);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.title {
+  margin-top: 22px;
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 26px;
+}
+.postedBy {
+  margin-top: 6px;
+  color: var(--body-grey);
+  font-weight: 400;
+  font-size: 14px;
+}
+.client {
+  color: var(--title-dark);
+  font-weight: 600;
+}
+.sectionTitle {
+  margin-top: 24px;
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 18px;
+}
+.description {
+  margin-top: 10px;
+  color: var(--body-grey);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 23px;
+}
+.metaLabel {
+  margin-top: 20px;
+  color: var(--body-grey);
+  font-weight: 400;
+  font-size: 13px;
+}
+.metaValue {
+  margin-top: 4px;
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 22px;
+}
+.metaValueLarge {
+  margin-top: 4px;
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 22px;
+}
+.skillsRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+.skillChip {
+  padding: 9px 16px;
+  border-radius: 10px;
+  background: var(--blue-50);
+}
+.skillText {
+  color: var(--blue-500);
+  font-weight: 500;
+  font-size: 13px;
+}
+.fileRow {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid #eaecef;
+}
+.fileIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fileText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.fileName {
+  color: var(--title-dark);
+  font-weight: 600;
+  font-size: 14px;
+}
+.fileSize {
+  margin-top: 2px;
+  color: var(--body-grey);
+  font-weight: 400;
+  font-size: 12px;
+}
+.footer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px 16px;
+  background: var(--splash-base);
+  border-top: 1px solid #ececef;
+}
+.footerButton {
+  flex: 1;
+}
+.footerSave {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: var(--blue-50);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}

@@ -1,0 +1,100 @@
+@font-face {
+  font-family: 'Manrope';
+  src: url('./assets/fonts/manrope-v20-latin-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('./assets/fonts/manrope-v20-latin-500.ttf') format('truetype');
+  font-weight: 500;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('./assets/fonts/manrope-v20-latin-600.ttf') format('truetype');
+  font-weight: 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('./assets/fonts/manrope-v20-latin-700.ttf') format('truetype');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('./assets/fonts/manrope-v20-latin-800.ttf') format('truetype');
+  font-weight: 800;
+  font-display: swap;
+}
+
+:root {
+  /* Brand */
+  --primary-blue: #124cc9;
+  --brand-green: #107535;
+  --title-dark: #111827;
+  --body-grey: #374151;
+  --splash-base: #f8fafb;
+  --surface: #ffffff;
+
+  /* Blue scale */
+  --blue-50: #dee8fc;
+  --blue-100: #b0c6f8;
+  --blue-200: #81a5f3;
+  --blue-500: #124cc9;
+  --blue-600: #0e3a9a;
+  --blue-700: #0a286b;
+
+  /* Green / gray */
+  --green-50: #93f0b6;
+  --green-500: #107535;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #cccccc;
+  --gray-300: #d1d5db;
+  --gray-400: #6b7280;
+  --text-secondary: #374151;
+
+  /* Dashboard accents */
+  --violet: #6014e0;
+  --violet-soft: #f9f6fe;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--title-dark);
+  background: #edf0f3;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input,
+textarea {
+  font-family: inherit;
+  outline: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

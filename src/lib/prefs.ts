@@ -1,9 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
 /**
- * Lightweight persisted preferences: the remembered login email and a
- * registry of emails whose profile setup is complete, so returning users
- * can skip re-typing their email and land straight on the dashboard.
+ * Persisted preferences backed by localStorage: the remembered login email
+ * and a registry of emails whose profile setup is complete, so returning
+ * users can skip re-typing their email and land straight on the dashboard.
  */
 
 const LAST_EMAIL = 'sb.lastEmail';
@@ -15,49 +13,46 @@ export type LoginPrefs = {
   rememberMe: boolean;
 };
 
-export async function loadLoginPrefs(): Promise<LoginPrefs> {
+export function loadLoginPrefs(): LoginPrefs {
   try {
-    const [remember, email] = await Promise.all([
-      AsyncStorage.getItem(REMEMBER),
-      AsyncStorage.getItem(LAST_EMAIL),
-    ]);
-    return { rememberMe: remember !== '0', email: email ?? '' };
+    return {
+      rememberMe: localStorage.getItem(REMEMBER) !== '0',
+      email: localStorage.getItem(LAST_EMAIL) ?? '',
+    };
   } catch {
     return { rememberMe: true, email: '' };
   }
 }
 
-export async function saveLoginPrefs(email: string, rememberMe: boolean): Promise<void> {
+export function saveLoginPrefs(email: string, rememberMe: boolean): void {
   try {
-    await AsyncStorage.setItem(REMEMBER, rememberMe ? '1' : '0');
+    localStorage.setItem(REMEMBER, rememberMe ? '1' : '0');
     if (rememberMe && email) {
-      await AsyncStorage.setItem(LAST_EMAIL, email);
+      localStorage.setItem(LAST_EMAIL, email);
     } else {
-      await AsyncStorage.removeItem(LAST_EMAIL);
+      localStorage.removeItem(LAST_EMAIL);
     }
   } catch {
-    // Preferences are best-effort; ignore storage failures.
+    // Best-effort; ignore storage failures.
   }
 }
 
 type CompletedProfile = { name: string };
 
-export async function markProfileCompleted(email: string, name: string): Promise<void> {
+export function markProfileCompleted(email: string, name: string): void {
   try {
-    const raw = await AsyncStorage.getItem(COMPLETED);
+    const raw = localStorage.getItem(COMPLETED);
     const map: Record<string, CompletedProfile> = raw ? JSON.parse(raw) : {};
     map[email.trim().toLowerCase()] = { name };
-    await AsyncStorage.setItem(COMPLETED, JSON.stringify(map));
+    localStorage.setItem(COMPLETED, JSON.stringify(map));
   } catch {
     // Best-effort.
   }
 }
 
-export async function getCompletedProfile(
-  email: string,
-): Promise<CompletedProfile | null> {
+export function getCompletedProfile(email: string): CompletedProfile | null {
   try {
-    const raw = await AsyncStorage.getItem(COMPLETED);
+    const raw = localStorage.getItem(COMPLETED);
     if (!raw) return null;
     const map: Record<string, CompletedProfile> = JSON.parse(raw);
     return map[email.trim().toLowerCase()] ?? null;

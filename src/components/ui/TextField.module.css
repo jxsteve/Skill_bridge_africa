@@ -1,0 +1,43 @@
+.field {
+  height: 52px;
+  border-radius: 12px;
+  border: 1px solid #d5dbe3;
+  background: var(--gray-50);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+}
+.multiline {
+  height: 110px;
+  align-items: flex-start;
+  padding: 12px 14px;
+}
+.icon {
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: #111827;
+  font-size: 16px;
+}
+.input::placeholder {
+  color: var(--gray-400);
+}
+.textarea {
+  height: 100%;
+  resize: none;
+  line-height: 1.4;
+}
+.toggle {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}

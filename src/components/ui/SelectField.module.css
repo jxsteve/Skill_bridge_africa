@@ -1,0 +1,89 @@
+.field {
+  width: 100%;
+  height: 52px;
+  border-radius: 12px;
+  border: 1px solid #d5dbe3;
+  background: var(--gray-50);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+}
+.icon {
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.value {
+  flex: 1;
+  text-align: left;
+  color: #111827;
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.placeholder {
+  color: var(--gray-400);
+}
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.45);
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  z-index: 50;
+}
+.backdropCentered {
+  justify-content: center;
+  align-items: center;
+}
+.sheet {
+  max-height: 70%;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 0 20px 28px;
+  display: flex;
+  flex-direction: column;
+}
+.sheetFramed {
+  width: calc(100% - 48px);
+  max-height: 62%;
+  border-radius: 20px;
+  padding: 4px 20px 20px;
+}
+.grabber {
+  align-self: center;
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--gray-300);
+  margin-top: 10px;
+}
+.sheetTitle {
+  margin: 14px 0 8px;
+  color: #111827;
+  font-weight: 600;
+  font-size: 17px;
+}
+.options {
+  overflow-y: auto;
+}
+.option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 10px;
+  border-radius: 10px;
+  color: #111827;
+  font-size: 15px;
+  text-align: left;
+}
+.optionSelected {
+  background: var(--blue-50);
+  color: var(--blue-600);
+  font-weight: 500;
+}

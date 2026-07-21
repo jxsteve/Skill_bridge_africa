@@ -1,0 +1,35 @@
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--splash-base);
+}
+.content {
+  padding: 24px 24px;
+}
+.title {
+  margin-top: 40px;
+  text-align: center;
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 40px;
+  white-space: pre-line;
+}
+.subtitle {
+  margin-top: 16px;
+  text-align: center;
+  color: var(--body-grey);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25px;
+  white-space: pre-line;
+}
+.cards {
+  margin-top: 33px;
+  display: flex;
+  flex-direction: column;
+  gap: 33px;
+}

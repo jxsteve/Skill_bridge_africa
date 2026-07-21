@@ -1,0 +1,110 @@
+.primary {
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 8px;
+  background: var(--blue-500);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.primary:active:not(:disabled) {
+  background: var(--blue-700);
+}
+.primary:disabled {
+  background: var(--gray-300);
+  cursor: default;
+}
+.fullWidth {
+  width: 100%;
+  display: flex;
+}
+.content {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gray-50);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 24px;
+}
+.primary:disabled .content {
+  color: var(--gray-400);
+}
+.hidden {
+  opacity: 0.15;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: var(--gray-50);
+}
+.spinner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(249, 250, 251, 0.4);
+  border-top-color: #f9fafb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.secondary {
+  height: 48px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--blue-500);
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--blue-500);
+  font-size: 16px;
+  line-height: 24px;
+}
+.secondary:active:not(:disabled) {
+  background: var(--blue-100);
+}
+.secondary:disabled {
+  border-color: var(--gray-300);
+  background: var(--blue-100);
+  color: var(--gray-400);
+  cursor: default;
+}
+
+.text {
+  padding: 4px 8px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--blue-500);
+  font-size: 16px;
+  line-height: 24px;
+}
+.text:active:not(:disabled) {
+  background: var(--blue-100);
+}
+.text:disabled {
+  color: var(--gray-400);
+  cursor: default;
+}
+
+.icon {
+  height: 32px;
+  padding: 10px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon:active {
+  background: var(--gray-200);
+}
