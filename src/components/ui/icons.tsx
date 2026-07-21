@@ -284,6 +284,72 @@ export function MessageSquareIcon({ size = 18, color = '#6014E0', strokeWidth = 
   );
 }
 
+export function SlidersIcon({ size = 20, color = '#374151', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3" {...strokeProps(color, strokeWidth)} />
+      <Path d="M1 14h6M9 8h6M17 16h6" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function BookmarkIcon({ size = 20, color = '#124CC9', strokeWidth = 2, filled = false }: IconProps & { filled?: boolean }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill={filled ? color : 'none'}
+      />
+    </Svg>
+  );
+}
+
+export function DownloadIcon({ size = 18, color = '#124CC9', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" {...strokeProps(color, strokeWidth)} />
+      <Path d="M7 10l5 5 5-5M12 15V3" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function FileIcon({ size = 22, color = '#DC2626', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path
+        d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"
+        {...strokeProps(color, strokeWidth)}
+      />
+      <Path d="M14 2v5h5" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
+export function UploadCloudIcon({ size = 28, color = '#124CC9', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Path d="M12 13v8M8 17l4-4 4 4" {...strokeProps(color, strokeWidth)} />
+      <Path
+        d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"
+        {...strokeProps(color, strokeWidth)}
+      />
+    </Svg>
+  );
+}
+
+export function ArrowRightCircleIcon({ size = 20, color = '#124CC9', strokeWidth = 2 }: IconProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Circle cx={12} cy={12} r={10} {...strokeProps(color, strokeWidth)} />
+      <Path d="M12 8l4 4-4 4M8 12h8" {...strokeProps(color, strokeWidth)} />
+    </Svg>
+  );
+}
+
 export function GraduationCapIcon({ size = 56, color = '#0E3A9A', strokeWidth = 2 }: IconProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">

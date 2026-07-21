@@ -14,8 +14,8 @@ import ProfileSetupScreen from './src/screens/ProfileSetupScreen';
 import RegistrationScreen, {
   RegistrationDetails,
 } from './src/screens/RegistrationScreen';
+import MainShell from './src/screens/MainShell';
 import SplashScreen from './src/screens/SplashScreen';
-import StudentDashboardScreen from './src/screens/StudentDashboardScreen';
 import StudentHomeScreen from './src/screens/StudentHomeScreen';
 import VerificationProgressScreen from './src/screens/VerificationProgressScreen';
 import VerificationSuccessScreen from './src/screens/VerificationSuccessScreen';
@@ -273,11 +273,11 @@ function Flow() {
         />
       )}
       {phase === 'studentDashboard' && (
-        <StudentDashboardScreen
+        <MainShell
           name={fullName}
           email={email}
           walletAddress={auth.user?.walletAddress}
-          onImproveProfile={goToProfileSetup}
+          onEditProfile={goToProfileSetup}
         />
       )}
       {phase === 'welcome' && <WelcomeScreen walletAddress={auth.user?.walletAddress} />}

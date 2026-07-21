@@ -10,4 +10,7 @@ export { default as OtpInput } from './OtpInput';
 export { default as Chip } from './Chip';
 export { default as StepProgress } from './StepProgress';
 export { default as SelectField } from './SelectField';
+export { default as BottomNav } from './BottomNav';
+export type { MainTab } from './BottomNav';
+export { default as SegmentedTabs } from './SegmentedTabs';
 export * from './icons';

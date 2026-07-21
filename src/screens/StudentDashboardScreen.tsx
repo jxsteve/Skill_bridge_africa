@@ -10,13 +10,14 @@ import {
 
 import {
   BellIcon,
+  BottomNav,
   BriefcaseBusinessIcon,
   CheckCircleIcon,
   ClipboardListIcon,
   CopyIcon,
   EyeIcon,
   EyeOffIcon,
-  HomeIcon,
+  MainTab,
   SearchIcon,
   UserIcon,
   UsersIcon,
@@ -28,7 +29,6 @@ import { fonts } from '../theme/fonts';
 const violet = '#6014E0';
 const violetSoft = '#F9F6FE';
 const green = '#16A34A';
-const inactiveGrey = '#9CA3AF';
 
 // The design labels the wallet as Solana; the underlying Privy wallet is
 // currently Ethereum. Change this once the wallet network is finalised.
@@ -39,6 +39,9 @@ type Props = {
   email: string;
   walletAddress?: string;
   onImproveProfile: () => void;
+  onBrowseTasks: () => void;
+  onOpenBids: () => void;
+  onTab: (tab: MainTab) => void;
 };
 
 function shortAddress(address?: string) {
@@ -53,6 +56,9 @@ export default function StudentDashboardScreen({
   email,
   walletAddress,
   onImproveProfile,
+  onBrowseTasks,
+  onOpenBids,
+  onTab,
 }: Props) {
   const insets = useScreenInsets();
   const [balanceHidden, setBalanceHidden] = useState(false);
@@ -181,13 +187,13 @@ export default function StudentDashboardScreen({
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Quick Actions</Text>
           <View style={styles.quickRow}>
-            <QuickAction label="Browse Tasks">
+            <QuickAction label="Browse Tasks" onPress={onBrowseTasks}>
               <SearchIcon size={18} color={violet} />
             </QuickAction>
-            <QuickAction label="My Bids">
+            <QuickAction label="My Bids" onPress={onOpenBids}>
               <UsersIcon size={18} color={violet} />
             </QuickAction>
-            <QuickAction label="Profile">
+            <QuickAction label="Profile" onPress={() => onTab('profile')}>
               <UserIcon size={18} color={violet} />
             </QuickAction>
           </View>
@@ -205,25 +211,7 @@ export default function StudentDashboardScreen({
         </View>
       </ScrollView>
 
-      {/* Bottom nav */}
-      <View style={[styles.bottomNav, { paddingBottom: Math.max(insets.bottom - 14, 8) }]}>
-        <View style={styles.navItem}>
-          <HomeIcon size={22} color={violet} />
-          <Text style={[styles.navLabel, { color: violet }]}>Home</Text>
-        </View>
-        <Pressable style={styles.navItem}>
-          <ClipboardListIcon size={22} color={inactiveGrey} />
-          <Text style={styles.navLabel}>Tasks</Text>
-        </Pressable>
-        <Pressable style={styles.navItem}>
-          <UsersIcon size={22} color={inactiveGrey} />
-          <Text style={styles.navLabel}>Bids</Text>
-        </Pressable>
-        <Pressable style={styles.navItem}>
-          <UserIcon size={22} color={inactiveGrey} />
-          <Text style={styles.navLabel}>Profile</Text>
-        </Pressable>
-      </View>
+      <BottomNav active="home" onSelect={onTab} />
     </View>
   );
 }
@@ -253,12 +241,14 @@ function Stat({
 function QuickAction({
   label,
   children,
+  onPress,
 }: {
   label: string;
   children: React.ReactNode;
+  onPress?: () => void;
 }) {
   return (
-    <Pressable style={styles.quickTile}>
+    <Pressable style={styles.quickTile} onPress={onPress}>
       {children}
       <Text style={styles.quickLabel}>{label}</Text>
     </Pressable>
@@ -531,22 +521,5 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontFamily: fonts.semiBold,
     fontSize: 14,
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: '#ECECEF',
-    backgroundColor: colors.white,
-    paddingTop: 10,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 3,
-  },
-  navLabel: {
-    color: inactiveGrey,
-    fontFamily: fonts.medium,
-    fontSize: 11,
   },
 });
