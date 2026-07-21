@@ -12,6 +12,7 @@ import {
   UserIcon,
 } from '../components/ui';
 import {
+  DEPARTMENTS,
   MAX_SKILLS,
   SKILL_OPTIONS,
   UNIVERSITIES,
@@ -46,7 +47,7 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
 
   const canContinue =
     step === 1
-      ? university !== '' && department.trim() !== '' && regNumber.trim() !== ''
+      ? university !== '' && department !== '' && regNumber.trim() !== ''
       : step === 2
         ? skills.length > 0
         : true;
@@ -161,11 +162,11 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
             />
 
             <label className={styles.fieldLabel}>Department</label>
-            <input
-              className={styles.input}
+            <SelectField
               placeholder="Type your Faculty"
               value={department}
-              onChange={(e) => setDepartment(e.target.value)}
+              options={DEPARTMENTS}
+              onSelect={setDepartment}
             />
 
             <label className={styles.fieldLabel}>Reg Number</label>

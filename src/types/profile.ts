@@ -28,6 +28,30 @@ export const SKILL_OPTIONS = [
 
 export const MAX_SKILLS = 5;
 
+/** Common departments offered during profile setup. */
+export const DEPARTMENTS = [
+  'Accounting',
+  'Computer Science',
+  'Medicine & Surgery',
+  'Law',
+  'Business Administration',
+  'Economics',
+  'Mass Communication',
+  'Electrical/Electronics Engineering',
+  'Mechanical Engineering',
+  'Civil Engineering',
+  'Microbiology',
+  'Biochemistry',
+  'Nursing Science',
+  'Pharmacy',
+  'Political Science',
+  'International Relations',
+  'Banking & Finance',
+  'Marketing',
+  'Architecture',
+  'Psychology',
+] as const;
+
 /** Top Nigerian universities offered during profile setup. */
 export const UNIVERSITIES = [
   'University of Lagos (UNILAG)',
