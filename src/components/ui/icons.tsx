@@ -31,12 +31,6 @@ export const ChevronLeftIcon = ({ size = 24, color = '#111827', strokeWidth = 2 
 export const ChevronDownIcon = ({ size = 20, color = '#6B7280', strokeWidth = 2 }: IconProps) => (
   <Svg size={size}><path d="m6 9 6 6 6-6" {...stroke(color, strokeWidth)} /></Svg>
 );
-export const CornerUpLeftIcon = ({ size = 16, color = '#124CC9', strokeWidth = 2 }: IconProps) => (
-  <Svg size={size}>
-    <path d="M20 20v-7a4 4 0 0 0-4-4H4" {...stroke(color, strokeWidth)} />
-    <path d="M9 14 4 9l5-5" {...stroke(color, strokeWidth)} />
-  </Svg>
-);
 export const EyeIcon = ({ size = 16, color = '#374151', strokeWidth = 2 }: IconProps) => (
   <Svg size={size}>
     <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" {...stroke(color, strokeWidth)} />
@@ -68,12 +62,6 @@ export const PhoneIcon = ({ size = 20, color = '#6B7280', strokeWidth = 2 }: Ico
     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" {...stroke(color, strokeWidth)} />
   </Svg>
 );
-export const LockIcon = ({ size = 20, color = '#6B7280', strokeWidth = 2 }: IconProps) => (
-  <Svg size={size}>
-    <rect x={3} y={11} width={18} height={11} rx={2} {...stroke(color, strokeWidth)} />
-    <path d="M7 11V7a5 5 0 0 1 10 0v4" {...stroke(color, strokeWidth)} />
-  </Svg>
-);
 export const CheckIcon = ({ size = 16, color = '#FFFFFF', strokeWidth = 3 }: IconProps) => (
   <Svg size={size}><path d="M20 6 9 17l-5-5" {...stroke(color, strokeWidth)} /></Svg>
 );
@@ -81,18 +69,6 @@ export const CheckCircleIcon = ({ size = 16, color = '#16A34A', strokeWidth = 2 
   <Svg size={size}>
     <path d="M21.801 10A10 10 0 1 1 17 3.335" {...stroke(color, strokeWidth)} />
     <path d="m9 11 3 3L22 4" {...stroke(color, strokeWidth)} />
-  </Svg>
-);
-export const PlusIcon = ({ size = 24, color = '#6B7280', strokeWidth = 2 }: IconProps) => (
-  <Svg size={size}>
-    <path d="M5 12h14" {...stroke(color, strokeWidth)} />
-    <path d="M12 5v14" {...stroke(color, strokeWidth)} />
-  </Svg>
-);
-export const CloseIcon = ({ size = 14, color = '#FFFFFF', strokeWidth = 2.5 }: IconProps) => (
-  <Svg size={size}>
-    <path d="M18 6 6 18" {...stroke(color, strokeWidth)} />
-    <path d="m6 6 12 12" {...stroke(color, strokeWidth)} />
   </Svg>
 );
 export const GraduationCapIcon = ({ size = 56, color = '#0E3A9A', strokeWidth = 2 }: IconProps) => (

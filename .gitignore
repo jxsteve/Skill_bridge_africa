@@ -20,3 +20,6 @@ dist-ssr/
 
 # Expo (legacy)
 .expo/
+
+# TypeScript build cache
+tsconfig.tsbuildinfo

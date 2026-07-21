@@ -1,8 +1,7 @@
-export { PrimaryButton, SecondaryButton, TextButton, IconButton } from './Button';
+export { PrimaryButton } from './Button';
 export { TextField } from './TextField';
 export { Checkbox } from './Checkbox';
 export { Chip } from './Chip';
-export { StepProgress } from './StepProgress';
 export { SegmentedTabs } from './SegmentedTabs';
 export { OtpInput } from './OtpInput';
 export { SelectField } from './SelectField';
