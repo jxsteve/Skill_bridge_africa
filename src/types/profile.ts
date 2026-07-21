@@ -18,12 +18,8 @@ export const SKILL_OPTIONS = [
   'Writing',
   'Web Development',
   'Mobile Development',
-  'Tutoring',
   'Video Editing',
   'Digital Marketing',
-  'Photography',
-  'Fashion Design',
-  'Catering',
   'Virtual Assistant',
 ] as const;
 
