@@ -1,33 +1,21 @@
 import {
   ActivityIcon,
   BellIcon,
-  BottomNav,
   ChevronRightIcon,
-  ClipboardListIcon,
-  DollarSignIcon,
-  EyeIcon,
   IdCardIcon,
   MessageSquareIcon,
-  SearchIcon,
-  UserIcon,
-  UsersIcon,
-  WalletIcon,
-  type MainTab,
 } from '../components/ui';
 import type { StudentProfile } from '../types/profile';
 import logoMark from '../assets/images/logo_mark.png';
 import styles from './StudentHomeScreen.module.css';
 
 const violet = '#6014E0';
-const amber = '#D97706';
 
 type Props = {
   name: string;
   email: string;
-  walletAddress?: string;
   profile: StudentProfile | null;
   onCompleteProfile: () => void;
-  onTab: (tab: MainTab) => void;
 };
 
 /** Signup alone earns the base completion shown in the design. */
@@ -41,19 +29,16 @@ export function profileCompletion(profile: StudentProfile | null): number {
   return Math.min(percent, 100);
 }
 
-function shortAddress(address: string) {
-  return address.length > 14
-    ? `${address.slice(0, 6)}…${address.slice(-4)}`
-    : address;
-}
-
+/**
+ * Pre-completion home: the full app (wallet, tasks, tabs) unlocks only after
+ * the profile is completed and verified, so this screen stays focused on the
+ * completion call-to-action and starter tips.
+ */
 export default function StudentHomeScreen({
   name,
   email,
-  walletAddress,
   profile,
   onCompleteProfile,
-  onTab,
 }: Props) {
   const displayName = name || email.split('@')[0];
   const initial = displayName.charAt(0).toUpperCase();
@@ -112,94 +97,6 @@ export default function StudentHomeScreen({
           </div>
         )}
 
-        {/* Wallet */}
-        <div className={`${styles.card} ${styles.softCard}`}>
-          <div className={styles.walletHeader}>
-            <span className={styles.walletLabel}>Wallet Balance</span>
-            <ChevronRightIcon size={18} color="#111827" />
-          </div>
-          <div className={styles.walletBalanceRow}>
-            <span className={styles.walletBalance}>$0.00</span>
-            <div className={styles.walletIconCircle}>
-              <WalletIcon />
-            </div>
-          </div>
-          <p className={styles.walletHint}>
-            {walletAddress
-              ? `Your wallet is ready — ${shortAddress(walletAddress)}`
-              : 'Complete your profile to create\nyour wallet and receive payments'}
-          </p>
-        </div>
-
-        {/* Stats */}
-        <div className={styles.statsRow}>
-          <div className={styles.statTile}>
-            <span className={styles.statLabel}>Active Bids</span>
-            <div className={styles.statValueRow}>
-              <span className={styles.statValue}>0</span>
-              <div className={styles.statIcon} style={{ backgroundColor: '#EDE4FC' }}>
-                <ActivityIcon size={12} />
-              </div>
-            </div>
-          </div>
-          <div className={styles.statTile}>
-            <span className={styles.statLabel}>Earnings</span>
-            <div className={styles.statValueRow}>
-              <span className={styles.statValue}>$0.00</span>
-              <div className={styles.statIcon} style={{ backgroundColor: '#DCFCE7' }}>
-                <DollarSignIcon size={12} />
-              </div>
-            </div>
-          </div>
-          <div className={styles.statTile}>
-            <span className={styles.statLabel}>Profile Views</span>
-            <div className={styles.statValueRow}>
-              <span className={styles.statValue}>0</span>
-              <div className={styles.statIcon} style={{ backgroundColor: '#FEF3C7' }}>
-                <EyeIcon size={12} color={amber} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* No active tasks */}
-        <div className={`${styles.card} ${styles.outlineCard}`}>
-          <span className={styles.cardTitleSmall}>No Active Tasks</span>
-          <div className={styles.tasksEmpty}>
-            <div className={styles.tasksIconWrap}>
-              <ClipboardListIcon size={44} />
-            </div>
-            <p className={styles.tasksEmptyText}>
-              {'You don’t have any active tasks yet.\nBrowse tasks and place a bid'}
-            </p>
-            <button
-              className={styles.outlineButton}
-              onClick={() => onTab('tasks')}
-            >
-              Browse Tasks
-            </button>
-          </div>
-        </div>
-
-        {/* Quick actions */}
-        <div className={`${styles.card} ${styles.outlineCard}`}>
-          <span className={styles.cardTitleSmall}>Quick Actions</span>
-          <div className={styles.quickRow}>
-            <button className={styles.quickTile} onClick={() => onTab('tasks')}>
-              <SearchIcon size={18} />
-              <span className={styles.quickLabel}>Browse Tasks</span>
-            </button>
-            <button className={styles.quickTile} onClick={() => onTab('bids')}>
-              <UsersIcon size={18} />
-              <span className={styles.quickLabel}>My Bids</span>
-            </button>
-            <button className={styles.quickTile} onClick={() => onTab('profile')}>
-              <UserIcon size={18} color="#111827" />
-              <span className={styles.quickLabel}>Profile</span>
-            </button>
-          </div>
-        </div>
-
         {/* Tips */}
         <div className={`${styles.card} ${styles.outlineCard}`}>
           <span className={styles.cardTitleSmall}>Tips to Get Started</span>
@@ -243,8 +140,6 @@ export default function StudentHomeScreen({
           </div>
         </div>
       </div>
-
-      <BottomNav active="home" onSelect={onTab} />
     </div>
   );
 }

@@ -217,10 +217,10 @@ export default function App() {
           path="/home"
           element={
             <StudentHomeScreen
-              {...common}
+              name={fullName}
+              email={email}
               profile={profile}
               onCompleteProfile={() => navigate('/profile-setup')}
-              onTab={goTab}
             />
           }
         />
