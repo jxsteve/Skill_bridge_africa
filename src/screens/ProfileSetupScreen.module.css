@@ -115,6 +115,12 @@
 .input::placeholder {
   color: var(--gray-400);
 }
+.textarea {
+  height: 104px;
+  padding: 14px;
+  resize: none;
+  line-height: 1.45;
+}
 
 /* Portfolio links */
 .sectionTitle {

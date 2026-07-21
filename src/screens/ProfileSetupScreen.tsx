@@ -146,8 +146,8 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
             </div>
 
             <label className={styles.fieldLabel}>Bio</label>
-            <input
-              className={styles.input}
+            <textarea
+              className={`${styles.input} ${styles.textarea}`}
               placeholder="Tell us about yourself"
               value={bio}
               onChange={(e) => setBio(e.target.value)}
