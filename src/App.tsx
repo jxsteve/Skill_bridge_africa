@@ -251,6 +251,7 @@ export default function App() {
           element={
             <BrowseTasksScreen
               onOpenTask={(id) => navigate(`/app/tasks/${id}`)}
+              onOpenProject={(id) => navigate(`/app/projects/${id}/submit`)}
               onTab={goTab}
             />
           }
