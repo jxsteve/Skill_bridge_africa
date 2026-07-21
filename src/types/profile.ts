@@ -5,6 +5,7 @@ export type StudentProfile = {
   department: string;
   regNumber: string;
   linkedin: string;
+  studentIdUri: string;
   skills: string[];
   portfolio: string[];
   available: boolean;

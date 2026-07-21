@@ -153,81 +153,62 @@
   font-size: 14px;
 }
 
-/* Steps 2-3 shared */
-.stepTitle {
-  margin-top: 24px;
-  text-align: center;
-  color: var(--title-dark);
-  font-weight: 700;
-  font-size: 22px;
+/* Step 2 */
+.uploadBox {
+  width: 100%;
+  height: 132px;
+  border-radius: 12px;
+  border: 1.5px dashed var(--primary-blue);
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
-.stepSubtitle {
-  margin-top: 8px;
+.uploadIconCircle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--blue-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.uploadText {
+  color: var(--primary-blue);
+  font-weight: 600;
+  font-size: 15px;
+}
+.uploadedName {
+  color: var(--title-dark);
+  font-weight: 500;
+  font-size: 14px;
+  max-width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.uploadHint {
+  margin-top: 10px;
   text-align: center;
   color: var(--body-grey);
-  font-size: 15px;
-  line-height: 23px;
-  white-space: pre-line;
+  font-size: 13px;
+}
+.skillsHint {
+  margin-top: 6px;
+  color: var(--body-grey);
+  font-size: 14px;
 }
 .chipWrap {
-  margin-top: 24px;
+  margin-top: 14px;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 .helper {
-  margin-top: 16px;
-  text-align: center;
+  margin-top: 12px;
   color: var(--body-grey);
-  font-size: 13px;
-}
-
-/* Portfolio grid */
-.portfolioGrid {
-  margin-top: 24px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.portfolioTile {
-  position: relative;
-  width: 104px;
-  height: 104px;
-  border-radius: 12px;
-  overflow: hidden;
-}
-.portfolioImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.removeBadge {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  width: 22px;
-  height: 22px;
-  border-radius: 11px;
-  background: rgba(17, 24, 39, 0.65);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.addTile {
-  width: 104px;
-  height: 104px;
-  border-radius: 12px;
-  border: 1.5px dashed var(--gray-300);
-  background: var(--gray-50);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-.addTileLabel {
-  color: var(--gray-400);
-  font-weight: 500;
   font-size: 13px;
 }
 
@@ -287,9 +268,4 @@
 .footer {
   flex-shrink: 0;
   padding: 12px 24px 20px;
-}
-.skipRow {
-  margin-top: 12px;
-  display: flex;
-  justify-content: center;
 }

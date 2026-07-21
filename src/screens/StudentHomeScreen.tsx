@@ -25,7 +25,7 @@ export function profileCompletion(profile: StudentProfile | null): number {
   if (profile.university && profile.department && profile.regNumber) percent += 20;
   if (profile.skills.length > 0) percent += 15;
   if (profile.bio) percent += 15;
-  if (profile.portfolio.length > 0) percent += 10;
+  if (profile.studentIdUri) percent += 10;
   return Math.min(percent, 100);
 }
 

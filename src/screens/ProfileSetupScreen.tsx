@@ -2,13 +2,12 @@ import { useRef, useState } from 'react';
 
 import {
   CameraIcon,
+  CheckCircleIcon,
   ChevronLeftIcon,
   Chip,
-  CloseIcon,
-  PlusIcon,
   PrimaryButton,
   SelectField,
-  TextButton,
+  UploadCloudIcon,
   UserIcon,
 } from '../components/ui';
 import {
@@ -20,7 +19,7 @@ import {
 } from '../types/profile';
 import styles from './ProfileSetupScreen.module.css';
 
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 2;
 
 type Props = {
   initialProfile?: StudentProfile | null;
@@ -36,21 +35,20 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
   const [department, setDepartment] = useState(initialProfile?.department ?? '');
   const [regNumber, setRegNumber] = useState(initialProfile?.regNumber ?? '');
   const [linkedin, setLinkedin] = useState(initialProfile?.linkedin ?? '');
-  const [skills, setSkills] = useState<string[]>(initialProfile?.skills ?? []);
-  const [portfolio, setPortfolio] = useState<string[]>(
-    initialProfile?.portfolio ?? [],
+  const [studentIdUri, setStudentIdUri] = useState(
+    initialProfile?.studentIdUri ?? '',
   );
+  const [studentIdName, setStudentIdName] = useState('');
+  const [skills, setSkills] = useState<string[]>(initialProfile?.skills ?? []);
   const [available, setAvailable] = useState(initialProfile?.available ?? true);
 
   const avatarInputRef = useRef<HTMLInputElement>(null);
-  const portfolioInputRef = useRef<HTMLInputElement>(null);
+  const idInputRef = useRef<HTMLInputElement>(null);
 
   const canContinue =
     step === 1
       ? university !== '' && department !== '' && regNumber.trim() !== ''
-      : step === 2
-        ? skills.length > 0
-        : true;
+      : skills.length > 0;
 
   const toggleSkill = (skill: string) => {
     setSkills((current) =>
@@ -68,12 +66,11 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
     e.target.value = '';
   };
 
-  const handlePortfolioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    if (files.length > 0) {
-      setPortfolio((current) =>
-        [...current, ...files.map((f) => URL.createObjectURL(f))].slice(0, 6),
-      );
+  const handleStudentIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setStudentIdUri(URL.createObjectURL(file));
+      setStudentIdName(file.name);
     }
     e.target.value = '';
   };
@@ -86,11 +83,12 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
         avatarUri,
         bio: bio.trim(),
         university,
-        department: department.trim(),
+        department,
         regNumber: regNumber.trim(),
         linkedin: linkedin.trim(),
+        studentIdUri,
         skills,
-        portfolio,
+        portfolio: initialProfile?.portfolio ?? [],
         available,
       });
     }
@@ -192,9 +190,39 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
 
         {step === 2 && (
           <>
-            <p className={styles.stepTitle}>Your Skills</p>
-            <p className={styles.stepSubtitle}>
-              {'Pick up to 5 skills you want to\noffer clients'}
+            <label className={styles.fieldLabel}>Upload Student ID</label>
+            <button
+              className={styles.uploadBox}
+              onClick={() => idInputRef.current?.click()}
+            >
+              {studentIdUri ? (
+                <>
+                  <CheckCircleIcon size={28} color="#107535" />
+                  <span className={styles.uploadedName}>
+                    {studentIdName || 'Student ID uploaded'}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className={styles.uploadIconCircle}>
+                    <UploadCloudIcon size={24} />
+                  </span>
+                  <span className={styles.uploadText}>Upload ID</span>
+                </>
+              )}
+            </button>
+            <p className={styles.uploadHint}>PNG, JPG or PDF (Max. 10MB)</p>
+            <input
+              ref={idInputRef}
+              type="file"
+              accept="image/png,image/jpeg,application/pdf"
+              className={styles.hiddenInput}
+              onChange={handleStudentIdChange}
+            />
+
+            <p className={styles.sectionTitle}>Skills</p>
+            <p className={styles.skillsHint}>
+              Pick up to {MAX_SKILLS} skills you want to offer clients
             </p>
             <div className={styles.chipWrap}>
               {SKILL_OPTIONS.map((skill) => (
@@ -209,48 +237,8 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
             <p className={styles.helper}>
               {skills.length}/{MAX_SKILLS} selected
             </p>
-          </>
-        )}
 
-        {step === 3 && (
-          <>
-            <p className={styles.stepTitle}>Your Portfolio</p>
-            <p className={styles.stepSubtitle}>
-              {'Show off your best work — you can\nalways add more later'}
-            </p>
-            <div className={styles.portfolioGrid}>
-              {portfolio.map((uri) => (
-                <div key={uri} className={styles.portfolioTile}>
-                  <img src={uri} className={styles.portfolioImage} alt="" />
-                  <button
-                    className={styles.removeBadge}
-                    onClick={() =>
-                      setPortfolio((current) => current.filter((u) => u !== uri))
-                    }
-                  >
-                    <CloseIcon />
-                  </button>
-                </div>
-              ))}
-              {portfolio.length < 6 && (
-                <button
-                  className={styles.addTile}
-                  onClick={() => portfolioInputRef.current?.click()}
-                >
-                  <PlusIcon />
-                  <span className={styles.addTileLabel}>Add work</span>
-                </button>
-              )}
-            </div>
-            <input
-              ref={portfolioInputRef}
-              type="file"
-              accept="image/*"
-              multiple
-              className={styles.hiddenInput}
-              onChange={handlePortfolioChange}
-            />
-
+            <p className={styles.sectionTitle}>Availability</p>
             <div className={styles.availabilityRow}>
               <div className={styles.availabilityText}>
                 <span className={styles.availabilityTitle}>Available for work</span>
@@ -279,11 +267,6 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
           disabled={!canContinue}
           onClick={handleContinue}
         />
-        {step === 3 && portfolio.length === 0 && (
-          <div className={styles.skipRow}>
-            <TextButton label="Skip for now" showIcon={false} onClick={handleContinue} />
-          </div>
-        )}
       </div>
     </div>
   );
