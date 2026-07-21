@@ -145,14 +145,6 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
               />
             </div>
 
-            <label className={styles.fieldLabel}>Bio</label>
-            <textarea
-              className={`${styles.input} ${styles.textarea}`}
-              placeholder="Tell us about yourself"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-            />
-
             <label className={styles.fieldLabel}>University</label>
             <SelectField
               placeholder="Type your University"
@@ -175,6 +167,14 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
               placeholder="Your Registration number"
               value={regNumber}
               onChange={(e) => setRegNumber(e.target.value)}
+            />
+
+            <label className={styles.fieldLabel}>Bio</label>
+            <textarea
+              className={`${styles.input} ${styles.textarea}`}
+              placeholder="Tell us about yourself"
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
             />
 
             <p className={styles.sectionTitle}>Portfolio Links</p>
