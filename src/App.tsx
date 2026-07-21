@@ -138,6 +138,14 @@ export default function App() {
     [verified, navigate],
   );
 
+  const handleLogout = useCallback(() => {
+    void auth.logout();
+    setProfile(null);
+    setVerified(false);
+    setFullName('');
+    navigate('/login');
+  }, [auth, navigate]);
+
   const handleVerifiedDone = useCallback(() => {
     setVerified(true);
     markProfileCompleted(email, fullName);
@@ -267,8 +275,10 @@ export default function App() {
           element={
             <ProfileScreen
               {...common}
-              avatarUri={profile?.avatarUri}
+              profile={profile}
+              verified={verified}
               onEditProfile={() => navigate('/profile-setup')}
+              onLogout={handleLogout}
               onTab={goTab}
             />
           }
