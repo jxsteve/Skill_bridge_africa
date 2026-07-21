@@ -1,0 +1,107 @@
+.container {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--splash-base);
+}
+.header {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px 12px;
+}
+.back {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+.title {
+  flex: 1;
+  text-align: center;
+  color: var(--title-dark);
+  font-weight: 700;
+  font-size: 19px;
+}
+.headerSpacer {
+  width: 28px;
+}
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 20px 24px;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.row {
+  display: flex;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid #eaecef;
+}
+.rowIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.rowText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.rowTitleLine {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.rowTitle {
+  color: var(--title-dark);
+  font-weight: 600;
+  font-size: 15px;
+}
+.rowTime {
+  color: #9ca3af;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.rowBody {
+  color: var(--body-grey);
+  font-size: 13px;
+  line-height: 19px;
+}
+
+.empty {
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 30px;
+}
+.emptyIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--violet-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.emptyText {
+  margin-top: 14px;
+  text-align: center;
+  color: var(--body-grey);
+  font-size: 14px;
+  line-height: 21px;
+}

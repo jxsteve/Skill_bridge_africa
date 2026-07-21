@@ -22,6 +22,7 @@ type Props = {
   walletAddress?: string;
   avatarUri?: string;
   onImproveProfile: () => void;
+  onOpenNotifications: () => void;
   onBrowseTasks: () => void;
   onTab: (tab: MainTab) => void;
 };
@@ -39,6 +40,7 @@ export default function StudentDashboardScreen({
   walletAddress,
   avatarUri,
   onImproveProfile,
+  onOpenNotifications,
   onBrowseTasks,
   onTab,
 }: Props) {
@@ -61,7 +63,7 @@ export default function StudentDashboardScreen({
               <p className={styles.brandAfrica}>–AFRICA–</p>
             </div>
           </div>
-          <button className={styles.bell}>
+          <button className={styles.bell} onClick={onOpenNotifications}>
             <BellIcon />
             <span className={styles.bellDot} />
           </button>

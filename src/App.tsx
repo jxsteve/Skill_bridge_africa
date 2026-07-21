@@ -19,6 +19,7 @@ import BrowseTasksScreen from './screens/BrowseTasksScreen';
 import LoginScreen from './screens/LoginScreen';
 import MyBidsScreen from './screens/MyBidsScreen';
 import MyProjectsScreen from './screens/MyProjectsScreen';
+import NotificationsScreen from './screens/NotificationsScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
 import PlaceBidScreen from './screens/PlaceBidScreen';
 import ProfileScreen from './screens/ProfileScreen';
@@ -240,6 +241,7 @@ export default function App() {
               avatarUri={profile?.avatarUri}
               onImproveProfile={() => navigate('/profile-setup')}
               onBrowseTasks={() => navigate('/app/tasks')}
+              onOpenNotifications={() => navigate('/app/notifications')}
               onTab={goTab}
             />
           }
@@ -252,6 +254,10 @@ export default function App() {
               onTab={goTab}
             />
           }
+        />
+        <Route
+          path="/app/notifications"
+          element={<NotificationsScreen verified={verified} onBack={() => navigate(-1)} />}
         />
         <Route path="/app/tasks/:taskId" element={<TaskDetailRoute />} />
         <Route path="/app/tasks/:taskId/bid" element={<PlaceBidRoute />} />
