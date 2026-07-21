@@ -36,7 +36,9 @@ export default function PlaceBidScreen({ onBack, onSubmit }: Props) {
             placeholder="$23"
             inputMode="numeric"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) =>
+              setAmount(e.target.value.replace(/[^\d.]/g, '').replace(/(\..*)\./g, '$1'))
+            }
           />
         </div>
 

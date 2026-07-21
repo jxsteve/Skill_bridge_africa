@@ -40,7 +40,7 @@ export default function StudentHomeScreen({
   profile,
   onCompleteProfile,
 }: Props) {
-  const displayName = name || email.split('@')[0];
+  const displayName = name || email.split('@')[0] || 'Student';
   const initial = displayName.charAt(0).toUpperCase();
   const completion = profileCompletion(profile);
 
@@ -71,7 +71,11 @@ export default function StudentHomeScreen({
             <p className={styles.welcomeName}>{displayName}</p>
           </div>
           <div className={styles.avatar}>
-            <span className={styles.avatarInitial}>{initial}</span>
+            {profile?.avatarUri ? (
+              <img src={profile.avatarUri} className={styles.avatarImg} alt="" />
+            ) : (
+              <span className={styles.avatarInitial}>{initial}</span>
+            )}
           </div>
         </div>
 

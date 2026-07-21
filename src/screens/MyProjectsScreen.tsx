@@ -4,8 +4,10 @@ import { BottomNav, MainTab, SegmentedTabs } from '../components/ui';
 import { PROJECTS } from '../data/marketplace';
 import styles from './MyProjectsScreen.module.css';
 
-const TABS = ['In Progress (3)', 'Completed (2)'];
 const STATUSES = ['In Progress', 'Completed'] as const;
+const TABS = STATUSES.map(
+  (status) => `${status} (${PROJECTS.filter((p) => p.status === status).length})`,
+);
 
 type Props = {
   onOpenProject: (id: string) => void;

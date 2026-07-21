@@ -4,8 +4,10 @@ import { BottomNav, MainTab, SegmentedTabs } from '../components/ui';
 import { BIDS, BidStatus } from '../data/marketplace';
 import styles from './MyBidsScreen.module.css';
 
-const TABS = ['Active (3)', 'Pending (1)', 'Won (2)'];
 const GROUPS = ['Active', 'Pending', 'Won'] as const;
+const TABS = GROUPS.map(
+  (group) => `${group} (${BIDS.filter((b) => b.group === group).length})`,
+);
 
 const STATUS_STYLE: Record<BidStatus, { bg: string; color: string }> = {
   Approved: { bg: '#93F0B6', color: '#107535' },

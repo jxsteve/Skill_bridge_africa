@@ -20,6 +20,7 @@ type Props = {
   name: string;
   email: string;
   walletAddress?: string;
+  avatarUri?: string;
   onImproveProfile: () => void;
   onBrowseTasks: () => void;
   onTab: (tab: MainTab) => void;
@@ -36,12 +37,13 @@ export default function StudentDashboardScreen({
   name,
   email,
   walletAddress,
+  avatarUri,
   onImproveProfile,
   onBrowseTasks,
   onTab,
 }: Props) {
   const [balanceHidden, setBalanceHidden] = useState(false);
-  const displayName = name || email.split('@')[0];
+  const displayName = name || email.split('@')[0] || 'Student';
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
@@ -72,7 +74,11 @@ export default function StudentDashboardScreen({
             <p className={styles.welcomeName}>{displayName}</p>
           </div>
           <div className={styles.avatar}>
-            <span className={styles.avatarInitial}>{initial}</span>
+            {avatarUri ? (
+              <img src={avatarUri} className={styles.avatarImg} alt="" />
+            ) : (
+              <span className={styles.avatarInitial}>{initial}</span>
+            )}
             <span className={styles.onlineDot} />
           </div>
         </div>

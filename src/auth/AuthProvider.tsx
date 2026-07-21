@@ -116,7 +116,7 @@ function MockAuthProvider({ children }: PropsWithChildren) {
   const sendCode = useCallback(async (email: string) => email.length > 0, []);
   const verifyCode = useCallback(async (email: string, code: string) => {
     if (code.length !== 6) return null;
-    const u: AuthUser = { id: 'preview-user', email, walletAddress: '0x0000…preview' };
+    const u: AuthUser = { id: 'preview-user', email, walletAddress: '0x7a3F92c41B08bD2eA9f1c56720D14E8b6C915dF3' };
     setUser(u);
     return u;
   }, []);

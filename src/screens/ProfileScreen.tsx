@@ -5,6 +5,7 @@ type Props = {
   name: string;
   email: string;
   walletAddress?: string;
+  avatarUri?: string;
   onEditProfile: () => void;
   onTab: (tab: MainTab) => void;
 };
@@ -20,10 +21,11 @@ export default function ProfileScreen({
   name,
   email,
   walletAddress,
+  avatarUri,
   onEditProfile,
   onTab,
 }: Props) {
-  const displayName = name || email.split('@')[0];
+  const displayName = name || email.split('@')[0] || 'Student';
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
@@ -31,7 +33,11 @@ export default function ProfileScreen({
       <div className={styles.content}>
         <div className={styles.header}>
           <div className={styles.avatar}>
-            <span className={styles.avatarInitial}>{initial}</span>
+            {avatarUri ? (
+              <img src={avatarUri} className={styles.avatarImg} alt="" />
+            ) : (
+              <span className={styles.avatarInitial}>{initial}</span>
+            )}
           </div>
           <p className={styles.name}>{displayName}</p>
           <p className={styles.email}>{email}</p>

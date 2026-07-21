@@ -229,6 +229,7 @@ export default function App() {
           element={
             <StudentDashboardScreen
               {...common}
+              avatarUri={profile?.avatarUri}
               onImproveProfile={() => navigate('/profile-setup')}
               onBrowseTasks={() => navigate('/app/tasks')}
               onTab={goTab}
@@ -266,6 +267,7 @@ export default function App() {
           element={
             <ProfileScreen
               {...common}
+              avatarUri={profile?.avatarUri}
               onEditProfile={() => navigate('/profile-setup')}
               onTab={goTab}
             />

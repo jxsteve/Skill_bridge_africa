@@ -110,7 +110,7 @@
   background: var(--gray-50);
   padding: 0 14px;
   color: #111827;
-  font-size: 15px;
+  font-size: 16px;
 }
 .input::placeholder {
   color: var(--gray-400);
@@ -214,7 +214,7 @@
 
 /* Availability */
 .availabilityRow {
-  margin-top: 22px;
+  margin-top: 12px;
   padding: 16px;
   border-radius: 12px;
   background: var(--gray-100);
