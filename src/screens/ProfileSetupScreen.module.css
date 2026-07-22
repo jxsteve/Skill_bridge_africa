@@ -269,3 +269,8 @@
   flex-shrink: 0;
   padding: 12px 24px 20px;
 }
+
+/* Keep natural heights so short screens scroll instead of squashing. */
+.scroll > * {
+  flex-shrink: 0;
+}

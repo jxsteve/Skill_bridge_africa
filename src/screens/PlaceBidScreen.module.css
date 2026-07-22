@@ -113,3 +113,8 @@
   background: var(--splash-base);
   border-top: 1px solid #ececef;
 }
+
+/* Keep natural heights so short screens scroll instead of squashing. */
+.content > * {
+  flex-shrink: 0;
+}

@@ -33,3 +33,8 @@
   flex-direction: column;
   gap: 33px;
 }
+
+/* Keep natural heights so short screens scroll instead of squashing. */
+.container > * {
+  flex-shrink: 0;
+}

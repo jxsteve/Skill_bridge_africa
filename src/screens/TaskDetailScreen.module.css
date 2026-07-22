@@ -163,3 +163,8 @@
   flex-shrink: 0;
   cursor: pointer;
 }
+
+/* Keep natural heights so short screens scroll instead of squashing. */
+.content > * {
+  flex-shrink: 0;
+}
