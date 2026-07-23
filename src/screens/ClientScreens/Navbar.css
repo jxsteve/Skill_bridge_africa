@@ -1,0 +1,10 @@
+.navbar{
+    width:100%;
+    display:flex;
+    align-items:center;
+    padding:30px 30px 10px;
+}
+
+.logo{
+    width:150px;
+}
