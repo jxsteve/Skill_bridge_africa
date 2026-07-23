@@ -149,6 +149,7 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
               value={university}
               options={UNIVERSITIES}
               onSelect={setUniversity}
+              allowCustom
             />
 
             <label className={styles.fieldLabel}>Department</label>
@@ -157,6 +158,7 @@ export default function ProfileSetupScreen({ initialProfile, onComplete }: Props
               value={department}
               options={DEPARTMENTS}
               onSelect={setDepartment}
+              allowCustom
             />
 
             <label className={styles.fieldLabel}>Reg Number</label>

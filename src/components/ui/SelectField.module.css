@@ -87,3 +87,37 @@
   color: var(--blue-600);
   font-weight: 500;
 }
+
+.customArea {
+  padding: 6px 0 10px;
+  display: flex;
+  gap: 10px;
+}
+.customInput {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  border-radius: 12px;
+  border: 1px solid #d5dbe3;
+  background: var(--gray-50);
+  padding: 0 14px;
+  color: #111827;
+  font-size: 16px;
+}
+.customInput::placeholder {
+  color: var(--gray-400);
+}
+.customSave {
+  height: 48px;
+  padding: 0 20px;
+  border-radius: 12px;
+  background: var(--blue-500);
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+}
+.customSave:disabled {
+  background: var(--gray-300);
+  color: var(--gray-400);
+  cursor: default;
+}
