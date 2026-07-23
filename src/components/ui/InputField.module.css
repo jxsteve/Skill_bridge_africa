@@ -1,0 +1,23 @@
+.input-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 0 15px;
+  height: 56px;
+  margin-bottom: 18px;
+}
+
+.input-container input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  margin-left: 12px;
+}
+
+.left-icon,
+.right-icon {
+  color: #6b7280;
+  font-size: 20px;
+}
