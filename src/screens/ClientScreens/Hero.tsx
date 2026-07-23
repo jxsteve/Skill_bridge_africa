@@ -7,7 +7,7 @@ import {
   FiAward
 } from "react-icons/fi";
 
-import student from "../assets/student.png";
+import student from "../assets/images/student.png";
 
 const Hero = () => {
   return (
