@@ -1,0 +1,177 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 18px 20px 28px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  cursor: pointer;
+}
+
+.title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.fieldLabel {
+  display: block;
+  margin: 20px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.amountInput {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid var(--gray-200);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--title-dark);
+  background: var(--surface);
+}
+
+.amountInput:focus {
+  outline: none;
+  border-color: var(--violet);
+}
+
+.addressCard {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 14px;
+  background-color: var(--surface);
+  border: 1px solid var(--gray-200);
+}
+
+.addressLabel {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.addressRow {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background-color: var(--gray-100);
+}
+
+.addressValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--title-dark);
+  font-family: monospace;
+}
+
+.copyButton {
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  cursor: pointer;
+}
+
+.copiedNote {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--brand-green);
+}
+
+.qrRow {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+
+.networkInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.networkRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+}
+
+.networkRow span:first-child {
+  color: var(--gray-400);
+}
+
+.networkRow span:last-child {
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.howTo {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 14px;
+  background-color: var(--blue-50);
+}
+
+.howToTitle {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.howToList {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.submit {
+  margin-top: 24px;
+}
+
+.submit :global(button) {
+  background-color: var(--primary-blue) !important;
+}

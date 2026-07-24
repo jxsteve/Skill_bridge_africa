@@ -1,0 +1,217 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 20px 20px 28px;
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brandMark {
+  width: 28px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.brandWordmark {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.brandAfrica {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--primary-blue);
+}
+
+.eyebrow {
+  margin: 20px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray-400);
+}
+
+.heading {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--title-dark);
+}
+
+.subheading {
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--text-secondary);
+}
+
+.featureList {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.featureCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--gray-200);
+}
+
+.featureIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.featureTitle {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.featureDescription {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.testimonialCard {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 14px;
+  background-color: var(--blue-50);
+}
+
+.testimonialQuote {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--title-dark);
+}
+
+.testimonialAuthorRow {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.testimonialAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.testimonialAvatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.testimonialName {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.testimonialRole {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.guaranteeCard {
+  margin-top: 20px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--gray-200);
+}
+
+.guaranteeTitle {
+  margin: 0 0 12px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.guaranteeList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.guaranteeItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--title-dark);
+}
+
+.ctaCard {
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 16px;
+  background-color: var(--primary-blue);
+  text-align: center;
+}
+
+.ctaTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ctaSubtitle {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ctaButton {
+  margin-top: 16px;
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  border: none;
+  background-color: #fff;
+  color: var(--primary-blue);
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+}

@@ -1,0 +1,25 @@
+.wrap {
+  position: relative;
+  width: 220px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confetti {
+  position: absolute;
+  width: 14px;
+  height: 7px;
+  border-radius: 4px;
+}
+
+.circle {
+  border-radius: 50%;
+  border: 6px solid #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  background: var(--surface);
+}

@@ -1,0 +1,262 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  text-align: center;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.contentPadding {
+  padding: 20px 20px 32px;
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brandMark {
+  width: 28px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.brandWordmark {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.brandAfrica {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--primary-blue);
+}
+
+.badge {
+  margin-top: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 16px;
+  background-color: var(--blue-50);
+  color: var(--primary-blue);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.heading {
+  margin: 20px 0 0;
+  font-size: 30px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--title-dark);
+}
+
+.subheading {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.diagram {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.diagramTopCard,
+.diagramSideCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background-color: var(--blue-50);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--title-dark);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.diagramMiddleRow {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+
+.diagramPhoto {
+  flex: 1;
+  width: 0; /* allows flex-basis to control width instead of intrinsic image size */
+  min-width: 0;
+  height: 100px;
+  border-radius: 16px;
+  object-fit: cover;
+  background-color: var(--gray-100);
+  display: block;
+}
+
+.statsBarBackground {
+  width: 100%;
+  background-color: var(--blue-50);
+  margin-top: 20px;
+  padding: 16px;
+}
+
+.statsBar {
+  display: flex;
+  border-radius: 14px;
+  background-color: white;
+  padding: 16px 8px;
+}
+
+
+
+.statItem {
+  flex: 1;
+  text-align: center;
+}
+
+.statValue {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--primary-blue);
+}
+
+.statLabel {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.sectionEyebrow {
+  margin: 32px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--gray-400);
+}
+
+.sectionHeading {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--title-dark);
+}
+
+.sectionSubheading {
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.timeline {
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.timelineItem {
+  display: flex;
+  gap: 14px;
+}
+
+.timelineMarkerCol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.timelineNumber {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--primary-blue);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.timelineConnector {
+  width: 0;
+  flex: 1;
+  min-height: 40px;
+  border-left: 1.5px dashed var(--gray-300);
+  margin: 4px 0;
+}
+
+.timelineBody {
+  flex: 1;
+  padding-bottom: 24px;
+}
+
+.timelineTitle {
+  margin: 2px 0 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.timelineDescriptionRow {
+  margin-top: 6px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.timelineIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.timelineDescription {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.getStartedButton {
+  margin-top: 8px;
+  width: 100%;
+  height: 52px;
+  border-radius: 12px;
+  border: none;
+  background-color: var(--primary-blue);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
