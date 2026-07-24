@@ -56,6 +56,8 @@ import ReviewWorkScreen from './screens/ReviewWorkScreen';
 import WorkApprovedScreen from './screens/WorkApprovedScreen';
 import PaymentReleasedScreen from './screens/PaymentReleasedScreen';
 import RateExperienceScreen from './screens/RateExperienceScreen';
+import HowItWorksScreen from './screens/HowItWorksScreen';
+import WhyChooseUsScreen from './screens/WhyChooseUsScreen';
 
 const TAB_PATH: Record<MainTab, string> = {
   home: '/app',
@@ -67,9 +69,9 @@ const TAB_PATH: Record<MainTab, string> = {
 
 const CLIENT_TAB_PATH: Record<MainTab, string> = {
   home: '/client/app',
-  tasks: '/client/tasks',
+  tasks: '/client/create-task',
   bids: '/client/app', // not used on the client flow
-  wallet: '/client/wallet',
+  wallet: '/client/fund-wallet',
   profile: '/client/profile',
 };
 
@@ -92,6 +94,9 @@ export default function App() {
   const [clientAccountStatus, setClientAccountStatus] =
     useState<ClientAccountStatus>('unverified');
   const [clientWalletBalance, setClientWalletBalance] = useState(0);
+  const [totalFunded, setTotalFunded] = useState(0);
+  const [totalSpent, setTotalSpent] = useState(0);
+  const [onHold, setOnHold] = useState(0);
   const [clientWalletAddress] = useState('9x4a6vQeUZ9pM2tRwYbN4KcHjD8sXx3kw1');
   const [draftTask, setDraftTask] = useState<NewTaskDetails | null>(null);
 
@@ -182,10 +187,10 @@ export default function App() {
   }, [intent, loginCompleted, navigate]);
 
   const finishWelcome = useCallback(() => {
-    // Client accounts skip the student profile-setup/verifying screens —
-    // the client dashboard itself shows verification status inline.
+    // Client accounts see two explainer screens (How It Works, and whatever
+    // the designer adds next) before landing on the dashboard.
     if (isClient) {
-      navigate('/client/app');
+      navigate('/client/how-it-works');
       return;
     }
     navigate(postWelcome === 'app' ? '/app' : '/home');
@@ -352,6 +357,14 @@ export default function App() {
 
         {/* --- Client flow --- */}
         <Route
+          path="/client/how-it-works"
+          element={<HowItWorksScreen onGetStarted={() => navigate('/client/why-choose-us')} />}
+        />
+        <Route
+          path="/client/why-choose-us"
+          element={<WhyChooseUsScreen onGetStarted={() => navigate('/client/app')} />}
+        />
+        <Route
           path="/client/app"
           element={
             <ClientDashboardScreen
@@ -359,18 +372,18 @@ export default function App() {
               accountStatus={clientAccountStatus}
               walletBalance={clientWalletBalance}
               walletAddress={clientWalletAddress}
-              totalFunded={clientWalletBalance}
-              onHold={0}
-              totalSpent={0}
+              totalFunded={totalFunded}
+              onHold={onHold}
+              totalSpent={totalSpent}
               activeTab="home"
               onSelectTab={goClientTab}
               onFundWallet={() => navigate('/client/fund-wallet')}
               onAddFunds={() => navigate('/client/fund-wallet')}
-              onNotificationsClick={() => navigate('/app/notifications')}
+              onNotificationsClick={() => navigate('/client/work-submitted')}
               onProfileClick={() => navigate('/client/profile')}
               onCreateTask={() => navigate('/client/create-task')}
               onMyTasks={() => navigate('/client/tasks')}
-              onWallet={() => navigate('/client/wallet')}
+              onWallet={() => navigate('/client/fund-wallet')}
               onProjects={() => navigate('/client/projects')}
             />
           }
@@ -383,8 +396,14 @@ export default function App() {
               walletAddress="7xLk3vQeUZ9pM2tRwYbN4KcHjD8sX6uD9K"
               onBack={() => navigate('/client/app')}
               onPaymentSent={(amount) => {
-                setClientWalletBalance(amount);
-                navigate('/client/verifying');
+                setClientWalletBalance((prev) => prev + amount);
+                setTotalFunded((prev) => prev + amount);
+
+                if (clientAccountStatus === 'verified') {
+                  navigate('/client/app');
+                } else {
+                  navigate('/client/verifying');
+                }
               }}
             />
           }
@@ -421,7 +440,9 @@ export default function App() {
             />
           }
         />
-        <Route path="/client/review-task" element={<ClientReviewTaskRoute />} />
+        <Route path="/client/review-task" 
+          element={<ClientReviewTaskRoute />} 
+        />
         <Route
           path="/client/task-under-review"
           element={<TaskUnderReviewScreen onViewMyTasks={() => navigate('/client/student-assigned')} />}
@@ -440,10 +461,10 @@ export default function App() {
           element={
             <TaskInProgressScreen
               student={{ name: assignedStudent.name, role: assignedStudent.role, online: true }}
-              progressPercent={80}
               deadline={draftTask ? formatDeadline(draftTask.deadline) : '24 August, 2026'}
               onBack={() => navigate('/client/student-assigned')}
               onGoBackToDashboard={() => navigate('/client/app')}
+              onCardClick={() => navigate('/client/work-submitted')}
             />
           }
         />
@@ -454,6 +475,7 @@ export default function App() {
               studentName={assignedStudent.name.split(' ')[0]}
               submittedOn="20 August, 2026 · 03:45PM"
               files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
+              onDone={() => navigate('/client/submission-under-review')}
             />
           }
         />
@@ -464,6 +486,7 @@ export default function App() {
               studentName={assignedStudent.name}
               submittedDate="20 August, 2026"
               files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
+              onDone={() => navigate('/client/work-ready')}
             />
           }
         />
@@ -491,7 +514,26 @@ export default function App() {
         <Route
           path="/client/payment-released"
           element={
-            <PaymentReleasedScreen recipientName={assignedStudent.name} amount={draftTask?.budget ?? 10} />
+            <PaymentReleasedScreen 
+              recipientName={assignedStudent.name} 
+              amount={(draftTask?.budget ?? 10) * 1.05}
+              onDone={() => {
+                const payment = draftTask?.budget ?? 10;
+                const totalPayment = payment * 1.05; // Add 5% platform fee
+
+                setOnHold(0);
+
+                setClientWalletBalance((prev) =>
+                  Math.max(0, prev - totalPayment)
+                );
+
+                setTotalSpent((prev) =>
+                  prev + totalPayment
+                );
+
+                navigate('/client/rate-experience');
+              }}
+            />
           }
         />
         <Route
@@ -578,7 +620,10 @@ export default function App() {
         task={draftTask}
         onBack={() => navigate('/client/create-task')}
         onEdit={() => navigate('/client/create-task')}
-        onSubmit={() => navigate('/client/task-under-review')}
+        onSubmit={() => {
+          setOnHold(draftTask?.budget ?? 0);
+          navigate('/client/task-under-review');
+        }}
       />
     );
   }
@@ -620,7 +665,7 @@ function formatDeadline(deadline: string) {
 }
 
 // Temporary placeholder for client screens that haven't been built yet
-// (Tasks list, Wallet, Projects, Profile). Replace each as it's completed.
+// (Profile). Replace each as it's completed.
 function ClientComingSoon({
   title,
   activeTab,

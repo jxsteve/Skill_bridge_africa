@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { CelebrationCheck, DownloadIcon, FileIcon } from '../components/ui';
 import styles from './WorkSubmittedScreen.module.css';
 
@@ -11,6 +12,7 @@ type Props = {
   submittedOn: string;
   files: SubmittedFile[];
   onDownloadFile?: (file: SubmittedFile) => void;
+  onDone: () => void;
 };
 
 export default function WorkSubmittedScreen({
@@ -18,7 +20,16 @@ export default function WorkSubmittedScreen({
   submittedOn,
   files,
   onDownloadFile,
+  onDone,
 }: Props) {
+    useEffect(() => {
+    const timer = setTimeout(() => {
+      onDone();
+    }, 3000); // Wait 3 seconds
+
+    return () => clearTimeout(timer);
+  }, [onDone]);
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>

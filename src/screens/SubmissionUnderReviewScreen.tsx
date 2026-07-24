@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { ClockIcon, DownloadIcon, FileIcon, FileSearchIcon, UserIcon } from '../components/ui';
 import styles from './SubmissionUnderReviewScreen.module.css';
 
@@ -12,6 +13,7 @@ type Props = {
   studentAvatarUrl?: string;
   files: SubmittedFile[];
   onDownloadFile?: (file: SubmittedFile) => void;
+  onDone: () => void;
 };
 
 export default function SubmissionUnderReviewScreen({
@@ -20,8 +22,16 @@ export default function SubmissionUnderReviewScreen({
   studentAvatarUrl,
   files,
   onDownloadFile,
+  onDone,
 }: Props) {
-  return (
+    useEffect(() => {
+    const timer = setTimeout(() => {
+      onDone();
+    }, 3000); // Wait 3 seconds
+
+    return () => clearTimeout(timer);
+  }, [onDone]);
+    return (
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.iconCircle}>

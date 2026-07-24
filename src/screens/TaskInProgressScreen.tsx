@@ -10,18 +10,18 @@ export type TaskInProgressStudent = {
 
 type Props = {
   student: TaskInProgressStudent;
-  progressPercent: number;
   deadline: string;
   onBack: () => void;
   onGoBackToDashboard: () => void;
+  onCardClick: () => void;
 };
 
 export default function TaskInProgressScreen({
   student,
-  progressPercent,
   deadline,
   onBack,
   onGoBackToDashboard,
+  onCardClick,
 }: Props) {
   return (
     <div className={styles.container}>
@@ -33,7 +33,10 @@ export default function TaskInProgressScreen({
           <p className={styles.title}>Task in Progress</p>
         </header>
 
-        <section className={styles.card}>
+        <section className={styles.card}
+          onClick={onCardClick}
+          style={{ cursor: 'pointer' }}
+        >
           <div className={styles.studentRow}>
             <div className={styles.avatar}>
               {student.avatarUrl ? (
@@ -53,21 +56,6 @@ export default function TaskInProgressScreen({
               </span>
             )}
           </div>
-
-          <div className={styles.sectionRow}>
-            <p className={styles.sectionLabel}>Progress</p>
-            <p className={styles.progressText}>{progressPercent}% completed</p>
-            <div className={styles.progressBarRow}>
-              <div className={styles.progressBarTrack}>
-                <div
-                  className={styles.progressBarFill}
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
-              <span className={styles.progressPercentLabel}>{progressPercent}%</span>
-            </div>
-          </div>
-
           <div className={`${styles.sectionRow} ${styles.sectionRowLast}`}>
             <p className={styles.sectionLabel}>Deadline</p>
             <p className={styles.deadlineText}>{deadline}</p>

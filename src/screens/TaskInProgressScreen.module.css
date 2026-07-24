@@ -49,6 +49,11 @@
   gap: 12px;
   padding: 16px;
   border-bottom: 1px solid var(--gray-100);
+  transition: background-color 0.15s ease;
+}
+
+.studentRow[role='button']:hover {
+  background-color: var(--gray-50);
 }
 
 .avatar {
@@ -122,39 +127,6 @@
   color: var(--gray-400);
 }
 
-.progressText {
-  margin: 4px 0 10px;
-  font-size: 14.5px;
-  font-weight: 700;
-  color: var(--title-dark);
-}
-
-.progressBarRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.progressBarTrack {
-  flex: 1;
-  height: 8px;
-  border-radius: 4px;
-  background-color: var(--gray-100);
-  overflow: hidden;
-}
-
-.progressBarFill {
-  height: 100%;
-  border-radius: 4px;
-  background-color: var(--primary-blue);
-  transition: width 0.4s ease;
-}
-
-.progressPercentLabel {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: var(--gray-400);
-}
 
 .deadlineText {
   margin: 4px 0 0;

@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import { ConfettiBurst, WalletIcon } from '../components/ui';
 import styles from './PaymentReleasedScreen.module.css';
 
 type Props = {
   recipientName: string;
   amount: number;
+  onDone: () => void;
 };
 
 function formatCurrency(value: number) {
@@ -14,7 +16,15 @@ function formatCurrency(value: number) {
   });
 }
 
-export default function PaymentReleasedScreen({ recipientName, amount }: Props) {
+export default function PaymentReleasedScreen({ recipientName, amount, onDone }: Props) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onDone();
+    }, 3000); // Wait 3 seconds
+
+    return () => clearTimeout(timer);
+  }, [onDone]);
+  
   return (
     <div className={styles.container}>
       <div className={styles.content}>

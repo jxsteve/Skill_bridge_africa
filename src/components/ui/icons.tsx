@@ -71,7 +71,15 @@ export const CheckCircleIcon = ({ size = 16, color = '#16A34A', strokeWidth = 2 
     <path d="m9 11 3 3L22 4" {...stroke(color, strokeWidth)} />
   </Svg>
 );
-
+export const ThumbsUpIcon = ({ size = 20, color = '#124CC9', strokeWidth = 2 }: IconProps) => (
+  <Svg size={size}>
+    <path d="M7 10v12" {...stroke(color, strokeWidth)} />
+    <path
+      d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"
+      {...stroke(color, strokeWidth)}
+    />
+  </Svg>
+);
 export const ShieldCheckIcon = ({ size = 20, color = '#124CC9', strokeWidth = 2 }: IconProps) => (
   <Svg size={size}>
     <path
@@ -106,6 +114,31 @@ export const ClockIcon = ({ size = 18, color = '#124CC9', strokeWidth = 2 }: Ico
   <Svg size={size}>
     <circle cx={12} cy={12} r={10} {...stroke(color, strokeWidth)} />
     <path d="M12 6v6l4 2" {...stroke(color, strokeWidth)} />
+  </Svg>
+);
+export const HourglassIcon = ({ size = 20, color = '#124CC9', strokeWidth = 2 }: IconProps) => (
+  <Svg size={size}>
+    <path d="M5 22h14" {...stroke(color, strokeWidth)} />
+    <path d="M5 2h14" {...stroke(color, strokeWidth)} />
+    <path
+      d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"
+      {...stroke(color, strokeWidth)}
+    />
+    <path
+      d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"
+      {...stroke(color, strokeWidth)}
+    />
+  </Svg>
+);
+export const HandCoinsIcon = ({ size = 20, color = '#124CC9', strokeWidth = 2 }: IconProps) => (
+  <Svg size={size}>
+    <circle cx={8} cy={8} r={5} {...stroke(color, strokeWidth)} />
+    <path d="M8 6.5v3M6.7 9.5h2.6" {...stroke(color, strokeWidth)} />
+    <path
+      d="M13.5 14.5 16 13a1.5 1.5 0 0 1 2 2.2l-4.7 3.9a3 3 0 0 1-1.9.7H2"
+      {...stroke(color, strokeWidth)}
+    />
+    <path d="M2 13h5.5a1.5 1.5 0 0 1 0 3H10" {...stroke(color, strokeWidth)} />
   </Svg>
 );
 export const WalletIcon = ({ size = 20, color = '#6014E0', strokeWidth = 2 }: IconProps) => (
