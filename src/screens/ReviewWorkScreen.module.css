@@ -1,0 +1,201 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 18px 20px 28px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  cursor: pointer;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.card {
+  margin-top: 22px;
+  border-radius: 14px;
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+}
+
+.sectionRow {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.sectionRowLast {
+  border-bottom: none;
+}
+
+.sectionLabel {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  color: var(--gray-400);
+}
+
+.optional {
+  font-weight: 400;
+}
+
+.sectionValue {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--title-dark);
+  line-height: 1.4;
+}
+
+.studentRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.studentName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.fileRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--gray-200);
+}
+
+.fileIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: var(--blue-50);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.fileName {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--title-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileSize {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--gray-400);
+}
+
+.downloadButton {
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.feedbackInput {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--gray-200);
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--title-dark);
+  font-family: inherit;
+  resize: vertical;
+}
+
+.feedbackInput::placeholder {
+  color: var(--gray-400);
+}
+
+.feedbackInput:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+}
+
+.actions {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.requestChangesButton {
+  flex: 1;
+  height: 48px;
+  border-radius: 10px;
+  border: 1.5px solid var(--primary-blue);
+  background: var(--surface);
+  color: var(--primary-blue);
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.approveButton {
+  flex: 1;
+  height: 48px;
+  border-radius: 10px;
+  border: none;
+  background: #16a34a;
+  color: #fff;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+}

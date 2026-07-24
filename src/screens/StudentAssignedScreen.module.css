@@ -1,0 +1,121 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 32px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  margin: 20px 0 0;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: 280px;
+}
+
+.studentCard {
+  margin-top: 24px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--gray-200);
+  text-align: left;
+}
+
+.studentHeaderRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.studentName {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.studentRole {
+  margin: 3px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.ratingRow {
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.studentSchool {
+  margin: 5px 0 0;
+  font-size: 12.5px;
+  color: var(--gray-400);
+}
+
+.skillsLabel {
+  margin: 16px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.skillsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.spacer {
+  flex: 1;
+  min-height: 24px;
+}
+
+.submit {
+  width: 100%;
+}
+
+.submit :global(button) {
+  background-color: var(--primary-blue) !important;
+}

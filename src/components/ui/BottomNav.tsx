@@ -1,17 +1,27 @@
-import { ClipboardListIcon, HomeIcon, UserIcon, UsersIcon } from './icons';
+import { ClipboardListIcon, HomeIcon, UserIcon, UsersIcon, WalletIcon } from './icons';
 import styles from './BottomNav.module.css';
 
-export type MainTab = 'home' | 'tasks' | 'bids' | 'profile';
+// 'bids' is used for the student flow, 'wallet' for the client flow.
+export type MainTab = 'home' | 'tasks' | 'bids' | 'wallet' | 'profile';
+export type BottomNavVariant = 'student' | 'client';
 
 const violet = '#6014E0';
 const inactive = '#9CA3AF';
 
-const ITEMS: { tab: MainTab; label: string }[] = [
-  { tab: 'home', label: 'Home' },
-  { tab: 'tasks', label: 'Tasks' },
-  { tab: 'bids', label: 'Bids' },
-  { tab: 'profile', label: 'Profile' },
-];
+const ITEMS_BY_VARIANT: Record<BottomNavVariant, { tab: MainTab; label: string }[]> = {
+  student: [
+    { tab: 'home', label: 'Home' },
+    { tab: 'tasks', label: 'Tasks' },
+    { tab: 'bids', label: 'Bids' },
+    { tab: 'profile', label: 'Profile' },
+  ],
+  client: [
+    { tab: 'home', label: 'Home' },
+    { tab: 'tasks', label: 'Tasks' },
+    { tab: 'wallet', label: 'wallet' },
+    { tab: 'profile', label: 'Profile' },
+  ],
+};
 
 function TabIcon({ tab, color }: { tab: MainTab; color: string }) {
   switch (tab) {
@@ -21,6 +31,8 @@ function TabIcon({ tab, color }: { tab: MainTab; color: string }) {
       return <ClipboardListIcon size={22} color={color} />;
     case 'bids':
       return <UsersIcon size={22} color={color} />;
+    case 'wallet':
+      return <WalletIcon size={22} color={color} />;
     case 'profile':
       return <UserIcon size={22} color={color} />;
   }
@@ -29,13 +41,17 @@ function TabIcon({ tab, color }: { tab: MainTab; color: string }) {
 export function BottomNav({
   active,
   onSelect,
+  variant = 'student',
 }: {
   active: MainTab;
   onSelect: (tab: MainTab) => void;
+  variant?: BottomNavVariant;
 }) {
+  const items = ITEMS_BY_VARIANT[variant];
+
   return (
     <nav className={styles.nav}>
-      {ITEMS.map(({ tab, label }) => {
+      {items.map(({ tab, label }) => {
         const color = active === tab ? violet : inactive;
         return (
           <button key={tab} className={styles.item} onClick={() => onSelect(tab)}>

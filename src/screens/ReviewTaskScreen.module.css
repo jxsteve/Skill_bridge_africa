@@ -1,0 +1,115 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 18px 20px 28px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  cursor: pointer;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.sectionLabel {
+  margin: 22px 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.detailsCard {
+  border-radius: 14px;
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+}
+
+.detailRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.detailRowLast {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  border-bottom: none;
+}
+
+.detailLabel {
+  flex-shrink: 0;
+  font-size: 13.5px;
+  color: var(--gray-400);
+  min-width: 68px;
+}
+
+.detailValue {
+  flex: 1;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--title-dark);
+}
+
+.detailDescription {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  white-space: pre-line;
+}
+
+.actions {
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.editButton {
+  flex-shrink: 0;
+  height: 48px;
+  padding: 0 24px;
+  border-radius: 10px;
+  border: 1.5px solid var(--primary-blue);
+  background: var(--surface);
+  color: var(--primary-blue);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submitButton {
+  flex: 1;
+}
+
+.submitButton :global(button) {
+  background-color: var(--primary-blue) !important;
+}

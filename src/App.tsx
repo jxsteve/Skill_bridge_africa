@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-do
 
 import PhoneFrame from './components/PhoneFrame';
 import type { AccountType, MainTab } from './components/ui';
+import { BottomNav } from './components/ui';
 import { useAuth } from './auth/AuthProvider';
 import { PROJECTS, TASKS } from './data/marketplace';
 import {
@@ -36,11 +37,40 @@ import VerificationSuccessScreen from './screens/VerificationSuccessScreen';
 import VerifyEmailScreen from './screens/VerifyEmailScreen';
 import WelcomeToSkillBridgeScreen from './screens/WelcomeToSkillBridgeScreen';
 
+// --- Client flow screens ---
+import ClientDashboardScreen, {
+  type ClientAccountStatus,
+} from './screens/ClientDashboardScreen';
+import FundPlatformWalletScreen from './screens/FundPlatformWalletScreen';
+import ClientVerificationProgressScreen from './screens/ClientVerificationProgressScreen';
+import ClientVerificationSuccessScreen from './screens/ClientVerificationSuccessScreen';
+import CreateTaskScreen, { type NewTaskDetails } from './screens/CreateTaskScreen';
+import ReviewTaskScreen from './screens/ReviewTaskScreen';
+import TaskUnderReviewScreen from './screens/TaskUnderReviewScreen';
+import StudentAssignedScreen, { type AssignedStudent } from './screens/StudentAssignedScreen';
+import TaskInProgressScreen from './screens/TaskInProgressScreen';
+import WorkSubmittedScreen from './screens/WorkSubmittedScreen';
+import SubmissionUnderReviewScreen from './screens/SubmissionUnderReviewScreen';
+import WorkReadyForReviewScreen from './screens/WorkReadyForReviewScreen';
+import ReviewWorkScreen from './screens/ReviewWorkScreen';
+import WorkApprovedScreen from './screens/WorkApprovedScreen';
+import PaymentReleasedScreen from './screens/PaymentReleasedScreen';
+import RateExperienceScreen from './screens/RateExperienceScreen';
+
 const TAB_PATH: Record<MainTab, string> = {
   home: '/app',
   tasks: '/app/tasks',
   bids: '/app/bids',
+  wallet: '/app/wallet', // not used on the student flow
   profile: '/app/profile',
+};
+
+const CLIENT_TAB_PATH: Record<MainTab, string> = {
+  home: '/client/app',
+  tasks: '/client/tasks',
+  bids: '/client/app', // not used on the client flow
+  wallet: '/client/wallet',
+  profile: '/client/profile',
 };
 
 export default function App() {
@@ -58,6 +88,24 @@ export default function App() {
   const [rememberedEmail, setRememberedEmail] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
 
+  // --- Client-flow specific state ---
+  const [clientAccountStatus, setClientAccountStatus] =
+    useState<ClientAccountStatus>('unverified');
+  const [clientWalletBalance, setClientWalletBalance] = useState(0);
+  const [clientWalletAddress] = useState('9x4a6vQeUZ9pM2tRwYbN4KcHjD8sXx3kw1');
+  const [draftTask, setDraftTask] = useState<NewTaskDetails | null>(null);
+
+  // Mock assigned-student data. Replace with a real API response once the
+  // backend can tell us who was assigned to a given task.
+  const [assignedStudent] = useState<AssignedStudent>({
+    name: 'Miracle Igboanusi',
+    role: 'UI/UX Designer',
+    rating: 4.8,
+    reviewCount: 32,
+    school: 'University of Lagos',
+    skills: ['UI/UX Design', 'Figma', 'Landing Page'],
+  });
+
   useEffect(() => {
     const prefs = loadLoginPrefs();
     setRememberedEmail(prefs.email);
@@ -65,9 +113,15 @@ export default function App() {
   }, []);
 
   const walletAddress = auth.user?.walletAddress;
+  const isClient = accountType === 'client';
 
   const goTab = useCallback(
     (tab: MainTab) => navigate(TAB_PATH[tab]),
+    [navigate],
+  );
+
+  const goClientTab = useCallback(
+    (tab: MainTab) => navigate(CLIENT_TAB_PATH[tab]),
     [navigate],
   );
 
@@ -128,8 +182,14 @@ export default function App() {
   }, [intent, loginCompleted, navigate]);
 
   const finishWelcome = useCallback(() => {
+    // Client accounts skip the student profile-setup/verifying screens —
+    // the client dashboard itself shows verification status inline.
+    if (isClient) {
+      navigate('/client/app');
+      return;
+    }
     navigate(postWelcome === 'app' ? '/app' : '/home');
-  }, [postWelcome, navigate]);
+  }, [isClient, postWelcome, navigate]);
 
   const handleProfileComplete = useCallback(
     (completed: StudentProfile) => {
@@ -289,6 +349,180 @@ export default function App() {
             />
           }
         />
+
+        {/* --- Client flow --- */}
+        <Route
+          path="/client/app"
+          element={
+            <ClientDashboardScreen
+              clientName={fullName || 'there'}
+              accountStatus={clientAccountStatus}
+              walletBalance={clientWalletBalance}
+              walletAddress={clientWalletAddress}
+              totalFunded={clientWalletBalance}
+              onHold={0}
+              totalSpent={0}
+              activeTab="home"
+              onSelectTab={goClientTab}
+              onFundWallet={() => navigate('/client/fund-wallet')}
+              onAddFunds={() => navigate('/client/fund-wallet')}
+              onNotificationsClick={() => navigate('/app/notifications')}
+              onProfileClick={() => navigate('/client/profile')}
+              onCreateTask={() => navigate('/client/create-task')}
+              onMyTasks={() => navigate('/client/tasks')}
+              onWallet={() => navigate('/client/wallet')}
+              onProjects={() => navigate('/client/projects')}
+            />
+          }
+        />
+
+        <Route
+          path="/client/fund-wallet"
+          element={
+            <FundPlatformWalletScreen
+              walletAddress="7xLk3vQeUZ9pM2tRwYbN4KcHjD8sX6uD9K"
+              onBack={() => navigate('/client/app')}
+              onPaymentSent={(amount) => {
+                setClientWalletBalance(amount);
+                navigate('/client/verifying');
+              }}
+            />
+          }
+        />
+        <Route
+          path="/client/verifying"
+          element={
+            <ClientVerificationProgressScreen
+              onDone={() => {
+                setClientAccountStatus('verified');
+                navigate('/client/verified');
+              }}
+            />
+          }
+        />
+        <Route
+          path="/client/verified"
+          element={
+            <ClientVerificationSuccessScreen
+              walletAddress={clientWalletAddress}
+              onGoToDashboard={() => navigate('/client/app')}
+            />
+          }
+        />
+        <Route
+          path="/client/create-task"
+          element={
+            <CreateTaskScreen
+              onBack={() => navigate('/client/app')}
+              onNext={(task) => {
+                setDraftTask(task);
+                navigate('/client/review-task');
+              }}
+            />
+          }
+        />
+        <Route path="/client/review-task" element={<ClientReviewTaskRoute />} />
+        <Route
+          path="/client/task-under-review"
+          element={<TaskUnderReviewScreen onViewMyTasks={() => navigate('/client/student-assigned')} />}
+        />
+        <Route
+          path="/client/student-assigned"
+          element={
+            <StudentAssignedScreen
+              student={assignedStudent}
+              onViewTaskDetails={() => navigate('/client/task-in-progress')}
+            />
+          }
+        />
+        <Route
+          path="/client/task-in-progress"
+          element={
+            <TaskInProgressScreen
+              student={{ name: assignedStudent.name, role: assignedStudent.role, online: true }}
+              progressPercent={80}
+              deadline={draftTask ? formatDeadline(draftTask.deadline) : '24 August, 2026'}
+              onBack={() => navigate('/client/student-assigned')}
+              onGoBackToDashboard={() => navigate('/client/app')}
+            />
+          }
+        />
+        <Route
+          path="/client/work-submitted"
+          element={
+            <WorkSubmittedScreen
+              studentName={assignedStudent.name.split(' ')[0]}
+              submittedOn="20 August, 2026 · 03:45PM"
+              files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
+            />
+          }
+        />
+        <Route
+          path="/client/submission-under-review"
+          element={
+            <SubmissionUnderReviewScreen
+              studentName={assignedStudent.name}
+              submittedDate="20 August, 2026"
+              files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
+            />
+          }
+        />
+        <Route
+          path="/client/work-ready"
+          element={
+            <WorkReadyForReviewScreen
+              studentName={assignedStudent.name}
+              submittedDate="20 August, 2026"
+              files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
+              onReviewWork={() => navigate('/client/review-work')}
+            />
+          }
+        />
+        <Route path="/client/review-work" element={<ClientReviewWorkRoute />} />
+        <Route
+          path="/client/work-approved"
+          element={
+            <WorkApprovedScreen
+              amount={draftTask?.budget ?? 10}
+              onReleasePayment={() => navigate('/client/payment-released')}
+            />
+          }
+        />
+        <Route
+          path="/client/payment-released"
+          element={
+            <PaymentReleasedScreen recipientName={assignedStudent.name} amount={draftTask?.budget ?? 10} />
+          }
+        />
+        <Route
+          path="/client/rate-experience"
+          element={
+            <RateExperienceScreen
+              studentName={assignedStudent.name.split(' ')[0]}
+              onSubmit={() => navigate('/client/app')}
+              onSkip={() => navigate('/client/app')}
+            />
+          }
+        />
+
+        {/* Not built yet */}
+        <Route
+          path="/client/tasks"
+          element={<ClientComingSoon title="Tasks" activeTab="tasks" onTab={goClientTab} />}
+        />
+        <Route
+          path="/client/wallet"
+          element={<ClientComingSoon title="Wallet" activeTab="wallet" onTab={goClientTab} />}
+        />
+        <Route
+          path="/client/projects"
+          element={<ClientComingSoon title="Projects" activeTab="tasks" onTab={goClientTab} />}
+        />
+        <Route
+          path="/client/profile"
+          element={<ClientComingSoon title="Profile" activeTab="profile" onTab={goClientTab} />}
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </PhoneFrame>
@@ -336,6 +570,31 @@ export default function App() {
     if (!project) return <Navigate to="/app/projects" replace />;
     return <SubmitWorkScreen onBack={() => navigate(-1)} onSubmit={() => navigate('/app/projects')} />;
   }
+
+  function ClientReviewTaskRoute() {
+    if (!draftTask) return <Navigate to="/client/create-task" replace />;
+    return (
+      <ReviewTaskScreen
+        task={draftTask}
+        onBack={() => navigate('/client/create-task')}
+        onEdit={() => navigate('/client/create-task')}
+        onSubmit={() => navigate('/client/task-under-review')}
+      />
+    );
+  }
+
+  function ClientReviewWorkRoute() {
+    return (
+      <ReviewWorkScreen
+        taskTitle={draftTask?.title ?? 'Design a Landing Page for a Fintech Startup'}
+        studentName={assignedStudent.name}
+        files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
+        onBack={() => navigate('/client/work-ready')}
+        onRequestChanges={() => navigate('/client/app')}
+        onApproveWork={() => navigate('/client/work-approved')}
+      />
+    );
+  }
 }
 
 // Small indirection so TaskDetail can look the task up by id.
@@ -352,4 +611,42 @@ function TaskDetailScreenLoader({
 }) {
   const task = TASKS.find((t) => t.id === taskId)!;
   return <TaskDetailScreen task={task} onBack={onBack} onPlaceBid={onPlaceBid} />;
+}
+
+function formatDeadline(deadline: string) {
+  const date = new Date(`${deadline}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return deadline;
+  return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+// Temporary placeholder for client screens that haven't been built yet
+// (Tasks list, Wallet, Projects, Profile). Replace each as it's completed.
+function ClientComingSoon({
+  title,
+  activeTab,
+  onTab,
+}: {
+  title: string;
+  activeTab: MainTab;
+  onTab: (tab: MainTab) => void;
+}) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 24,
+          textAlign: 'center',
+          color: '#6b7280',
+          fontSize: 15,
+        }}
+      >
+        {title} — coming soon
+      </div>
+      <BottomNav active={activeTab} onSelect={onTab} variant="client" />
+    </div>
+  );
 }

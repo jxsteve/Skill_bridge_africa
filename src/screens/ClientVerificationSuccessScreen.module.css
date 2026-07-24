@@ -1,0 +1,128 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 32px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.celebrationWrap {
+  position: relative;
+  width: 220px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.confetti {
+  position: absolute;
+  width: 14px;
+  height: 7px;
+  border-radius: 4px;
+}
+
+.successCircle {
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  border: 6px solid #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  background: var(--surface);
+}
+
+.title {
+  margin: 20px 0 0;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  max-width: 280px;
+}
+
+.addressCard {
+  margin-top: 24px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--gray-200);
+  text-align: left;
+}
+
+.addressLabel {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.addressRow {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background-color: var(--gray-100);
+}
+
+.addressValue {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--title-dark);
+  font-family: monospace;
+}
+
+.copyButton {
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  cursor: pointer;
+}
+
+.networkLabel {
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: var(--gray-400);
+}
+
+.networkValue {
+  margin: 2px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.spacer {
+  flex: 1;
+  min-height: 24px;
+}
+
+.submit {
+  width: 100%;
+}
+
+.submit :global(button) {
+  background-color: #16a34a !important;
+}

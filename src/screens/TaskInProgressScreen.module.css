@@ -1,0 +1,173 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 18px 20px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  cursor: pointer;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.card {
+  margin-top: 22px;
+  border-radius: 14px;
+  border: 1px solid var(--gray-200);
+  overflow: hidden;
+}
+
+.studentRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.studentInfo {
+  flex: 1;
+}
+
+.studentName {
+  margin: 0;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.studentRole {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.onlineBadge {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid #bbf7d0;
+  background-color: #f0fdf4;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.onlineDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: #16a34a;
+}
+
+.sectionRow {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.sectionRowLast {
+  border-bottom: none;
+}
+
+.sectionLabel {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--gray-400);
+}
+
+.progressText {
+  margin: 4px 0 10px;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.progressBarRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progressBarTrack {
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background-color: var(--gray-100);
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 4px;
+  background-color: var(--primary-blue);
+  transition: width 0.4s ease;
+}
+
+.progressPercentLabel {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--gray-400);
+}
+
+.deadlineText {
+  margin: 4px 0 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.spacer {
+  flex: 1;
+  min-height: 24px;
+}
+
+.submit :global(button) {
+  background-color: var(--primary-blue) !important;
+}
