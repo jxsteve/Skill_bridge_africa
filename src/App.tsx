@@ -5,7 +5,7 @@ import PhoneFrame from './components/PhoneFrame';
 import type { AccountType, MainTab } from './components/ui';
 import { BottomNav } from './components/ui';
 import { useAuth } from './auth/AuthProvider';
-import { PROJECTS, TASKS } from './data/marketplace';
+import { PROJECTS, STUDENTS, TASKS, assignFirstAvailableStudent } from './data/marketplace';
 import {
   getCompletedProfile,
   loadLoginPrefs,
@@ -102,14 +102,7 @@ export default function App() {
 
   // Mock assigned-student data. Replace with a real API response once the
   // backend can tell us who was assigned to a given task.
-  const [assignedStudent] = useState<AssignedStudent>({
-    name: 'Miracle Igboanusi',
-    role: 'UI/UX Designer',
-    rating: 4.8,
-    reviewCount: 32,
-    school: 'University of Lagos',
-    skills: ['UI/UX Design', 'Figma', 'Landing Page'],
-  });
+  const [assignedStudent, setAssignedStudent] = useState<AssignedStudent>(STUDENTS[0]);
 
   useEffect(() => {
     const prefs = loadLoginPrefs();
@@ -615,12 +608,41 @@ export default function App() {
 
   function ClientReviewTaskRoute() {
     if (!draftTask) return <Navigate to="/client/create-task" replace />;
+
     return (
       <ReviewTaskScreen
         task={draftTask}
         onBack={() => navigate('/client/create-task')}
         onEdit={() => navigate('/client/create-task')}
         onSubmit={() => {
+          const taskId = `client-task-${Date.now()}`;
+          const dueDate = formatDeadline(draftTask.deadline);
+          const dueInDays = Math.max(
+            1,
+            Math.round(
+              (new Date(draftTask.deadline).getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+            ),
+          );
+
+          TASKS.push({
+            id: taskId,
+            title: draftTask.title,
+            client: fullName || 'Client',
+            category: draftTask.category,
+            dueInDays,
+            dueDate,
+            budget: draftTask.budget,
+            status: 'open',
+            description: draftTask.description,
+            skills: draftTask.skills,
+            attachments: [],
+          });
+
+          const assigned = assignFirstAvailableStudent(taskId);
+          if (assigned) {
+            setAssignedStudent(assigned.assignedStudent ?? STUDENTS[0]);
+          }
+
           setOnHold(draftTask?.budget ?? 0);
           navigate('/client/task-under-review');
         }}

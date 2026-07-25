@@ -1,6 +1,19 @@
 /** Mock marketplace data used until a backend is connected. */
 
-export type TaskCategory = 'Design' | 'Development' | 'Writing';
+export type TaskCategory = string;
+
+export type TaskStatus = 'open' | 'assigned' | 'in_progress' | 'completed';
+
+export type AssignedStudent = {
+  id: string;
+  name: string;
+  role: string;
+  rating: number;
+  reviewCount: number;
+  school: string;
+  skills: string[];
+  avatarUrl?: string;
+};
 
 export type Task = {
   id: string;
@@ -10,11 +23,59 @@ export type Task = {
   dueInDays: number;
   dueDate: string;
   budget: number;
+  status: TaskStatus;
+  assignedStudentId?: string;
+  assignedStudent?: AssignedStudent;
   featured?: boolean;
   description: string;
   skills: string[];
   attachments: { name: string; size: string; kind: 'pdf' | 'image' }[];
 };
+
+export const STUDENTS: AssignedStudent[] = [
+  {
+    id: 'student-1',
+    name: 'Miracle Igboanusi',
+    role: 'UI/UX Designer',
+    rating: 4.8,
+    reviewCount: 32,
+    school: 'University of Lagos',
+    skills: ['UI/UX Design', 'Figma', 'Landing Page'],
+  },
+  {
+    id: 'student-2',
+    name: 'Amina Bello',
+    role: 'Front-End Developer',
+    rating: 4.9,
+    reviewCount: 28,
+    school: 'University of Ibadan',
+    skills: ['React', 'TypeScript', 'CSS'],
+  },
+];
+
+function findStudentById(studentId: string) {
+  return STUDENTS.find((student) => student.id === studentId) ?? null;
+}
+
+export function assignStudent(taskId: string, studentId: string) {
+  const task = TASKS.find((item) => item.id === taskId);
+  if (!task) return null;
+  if (task.status !== 'open') return null;
+
+  const student = findStudentById(studentId);
+  if (!student) return null;
+
+  task.status = 'assigned';
+  task.assignedStudentId = student.id;
+  task.assignedStudent = student;
+  return task;
+}
+
+export function assignFirstAvailableStudent(taskId: string) {
+  const student = STUDENTS[0] ?? null;
+  if (!student) return null;
+  return assignStudent(taskId, student.id);
+}
 
 export const TASKS: Task[] = [
   {
@@ -25,6 +86,7 @@ export const TASKS: Task[] = [
     dueInDays: 5,
     dueDate: 'August 20, 2026',
     budget: 10,
+    status: 'open',
     featured: true,
     description:
       'We need a clean and modern UI design for our mobile application. The app is for booking services across Nigeria and should feel friendly, fast and trustworthy. Deliver screens for onboarding, home, booking and payments.',
@@ -42,6 +104,7 @@ export const TASKS: Task[] = [
     dueInDays: 7,
     dueDate: 'August 22, 2026',
     budget: 25,
+    status: 'open',
     description:
       'Build a responsive marketing landing page from an existing Figma design. Should be fast, accessible and easy to update.',
     skills: ['React', 'HTML/CSS', 'Responsive'],
@@ -55,6 +118,7 @@ export const TASKS: Task[] = [
     dueInDays: 4,
     dueDate: 'August 19, 2026',
     budget: 15,
+    status: 'open',
     description:
       'Write four SEO-optimised blog articles (800–1000 words each) on sustainable living for a Nigerian audience.',
     skills: ['Writing', 'SEO', 'Research'],
