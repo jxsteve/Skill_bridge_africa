@@ -1,0 +1,49 @@
+.table-card{
+
+margin:35px 24px;
+
+background:#fff;
+
+border:1px solid #D8DDE8;
+
+border-radius:18px;
+
+overflow:hidden;
+
+}
+
+.table-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:18px 20px;
+
+}
+
+.table-header h3{
+
+font-size:22px;
+
+color:#1E2430;
+
+}
+
+.table-header button{
+
+background:none;
+
+border:none;
+
+color:#6D28D9;
+
+font-size:16px;
+
+cursor:pointer;
+
+font-weight:600;
+
+}
