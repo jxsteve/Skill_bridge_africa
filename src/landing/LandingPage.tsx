@@ -5,10 +5,14 @@
  * how-it-works, features, a clients band, a CTA, and a footer. CTAs enter the app.
  */
 import {
+  ActivityIcon,
+  BellIcon,
   BriefcaseBusinessIcon,
   CheckCircleIcon,
   ClipboardListIcon,
+  CopyIcon,
   DollarSignIcon,
+  EyeIcon,
   GraduationCapIcon,
   ShieldCheckIcon,
   WalletIcon,
@@ -112,33 +116,79 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
           <FloatingCard className={s.cardBottomRight} title="Payment released" body="$95 to your wallet" />
 
           <div className={s.phone}>
-            <div className={s.phoneNotch} />
             <div className={s.phoneScreen}>
-              <div className={s.appHeader}>
-                <span className={s.appBrand}>
-                  Skill<span style={{ color: 'var(--brand-green)' }}>Bridge</span>
+              <div className={s.phoneStatus}>
+                <span>9:41</span>
+                <span className={s.statusIcons}>
+                  <span className={s.statSignal} />
+                  <span className={s.statWifi} />
+                  <span className={s.statBatt} />
                 </span>
-                <span className={s.appBell} />
               </div>
-              <p className={s.appGreeting}>Welcome back, Amara</p>
-              <div className={s.appBalance}>
-                <span className={s.appBalanceLabel}>Wallet balance</span>
-                <span className={s.appBalanceValue}>$95.00</span>
-              </div>
-              <p className={s.appSection}>Available tasks</p>
-              {[
-                { t: 'Mobile App UI Design', c: 'TechNova Ltd', b: '$10' },
-                { t: 'SEO Blog Articles', c: 'GreenLeaf Media', b: '$15' },
-                { t: 'Website Landing Page', c: 'StartupBase', b: '$25' },
-              ].map((task) => (
-                <div key={task.t} className={s.appTask}>
+
+              <div className={s.dashHeader}>
+                <div className={s.dashLogo}>
+                  <img src={logoMark} className={s.dashLogoMark} alt="" />
                   <div>
-                    <p className={s.appTaskTitle}>{task.t}</p>
-                    <p className={s.appTaskClient}>{task.c}</p>
+                    <p className={s.dashWordmark}>
+                      Skill<span style={{ color: 'var(--brand-green)' }}>Bridge</span>
+                    </p>
+                    <p className={s.dashAfrica}>–AFRICA–</p>
                   </div>
-                  <span className={s.appTaskBudget}>{task.b}</span>
                 </div>
-              ))}
+                <span className={s.dashBell}>
+                  <BellIcon size={18} color="#111827" />
+                  <span className={s.dashBellDot} />
+                </span>
+              </div>
+
+              <div className={s.dashWelcome}>
+                <div>
+                  <p className={s.dashHi}>Welcome,</p>
+                  <p className={s.dashName}>Miracle Igboanusi</p>
+                </div>
+                <span className={s.dashAvatar}>M</span>
+              </div>
+
+              <div className={s.walletCard}>
+                <div className={s.walletTop}>
+                  <span className={s.walletLabel}>Wallet Balance</span>
+                  <EyeIcon size={16} color="#ffffff" />
+                </div>
+                <p className={s.walletBalance}>$0.00</p>
+                <div className={s.walletAddrRow}>
+                  <div>
+                    <p className={s.walletAddrLabel}>Wallet Address (Solana)</p>
+                    <p className={s.walletAddr}>6x1a7….x9kL2</p>
+                  </div>
+                  <CopyIcon size={15} color="#ffffff" />
+                </div>
+              </div>
+
+              <div className={s.statRow}>
+                {[
+                  { label: 'Active Bids', value: '0', bg: '#ede4fc', color: '#6014e0', Icon: ActivityIcon },
+                  { label: 'Earnings', value: '$0.00', bg: '#dcfce7', color: '#16a34a', Icon: DollarSignIcon },
+                  { label: 'Profile Views', value: '0', bg: '#fef3c7', color: '#d97706', Icon: EyeIcon },
+                ].map((st) => (
+                  <div key={st.label} className={s.statTile}>
+                    <span className={s.statTileLabel}>{st.label}</span>
+                    <div className={s.statTileRow}>
+                      <span className={s.statTileVal}>{st.value}</span>
+                      <span className={s.statTileIcon} style={{ background: st.bg }}>
+                        <st.Icon size={10} color={st.color} />
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className={s.emptyCard}>
+                <p className={s.emptyTitle}>No Active Tasks</p>
+                <span className={s.emptyIcon}><ClipboardListIcon size={30} color="#6014e0" /></span>
+                <p className={s.emptyText}>You don’t have any active tasks yet. Browse tasks and place a bid</p>
+                <div className={s.browseBtn}>Browse Tasks</div>
+              </div>
             </div>
           </div>
         </div>

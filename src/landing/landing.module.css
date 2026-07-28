@@ -159,53 +159,83 @@
   box-shadow: 0 30px 60px rgba(17, 24, 39, 0.22);
   z-index: 2;
 }
-.phoneNotch {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 22px;
-  background: #111827;
-  border-radius: 0 0 14px 14px;
-  z-index: 3;
-}
 .phoneScreen {
-  background: #f4f6f9;
+  background: #ffffff;
   border-radius: 32px;
-  padding: 26px 16px 20px;
-  height: 540px;
+  padding: 0 14px 20px;
+  height: 560px;
   overflow: hidden;
 }
-.appHeader { display: flex; align-items: center; justify-content: space-between; }
-.appBrand { font-size: 15px; font-weight: 800; color: var(--primary-blue); }
-.appBell { width: 30px; height: 30px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-.appGreeting { font-size: 13px; color: var(--body-grey); margin: 16px 0 10px; font-weight: 600; }
-.appBalance {
-  background: var(--primary-blue);
-  border-radius: 16px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  color: #fff;
-}
-.appBalanceLabel { font-size: 12px; opacity: 0.85; }
-.appBalanceValue { font-size: 24px; font-weight: 800; }
-.appSection { font-size: 13px; font-weight: 700; color: var(--title-dark); margin: 16px 0 8px; }
-.appTask {
-  background: #fff;
-  border-radius: 12px;
-  padding: 12px 14px;
+
+/* status bar */
+.phoneStatus {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  padding: 12px 6px 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
 }
-.appTaskTitle { font-size: 13px; font-weight: 700; color: var(--title-dark); }
-.appTaskClient { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
-.appTaskBudget { font-size: 13px; font-weight: 800; color: var(--brand-green); }
+.statusIcons { display: flex; align-items: center; gap: 5px; }
+.statSignal { width: 16px; height: 10px; border-radius: 2px; background: #111827; }
+.statWifi { width: 14px; height: 10px; border-radius: 2px; background: #111827; }
+.statBatt { width: 22px; height: 11px; border-radius: 3px; border: 1.5px solid #111827; }
+
+/* dashboard header */
+.dashHeader { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
+.dashLogo { display: flex; align-items: center; gap: 8px; }
+.dashLogoMark { width: 26px; height: 26px; object-fit: contain; }
+.dashWordmark { font-size: 15px; font-weight: 800; color: var(--primary-blue); line-height: 1; }
+.dashAfrica { font-size: 8px; font-weight: 700; letter-spacing: 0.15em; color: var(--gray-400); text-align: center; margin-top: 2px; }
+.dashBell { position: relative; }
+.dashBellDot { position: absolute; top: -1px; right: -1px; width: 7px; height: 7px; border-radius: 50%; background: #e0322f; border: 1.5px solid #fff; }
+
+/* welcome */
+.dashWelcome { display: flex; align-items: center; justify-content: space-between; margin: 16px 0 14px; }
+.dashHi { font-size: 15px; color: var(--body-grey); }
+.dashName { font-size: 20px; font-weight: 800; color: var(--title-dark); letter-spacing: -0.01em; }
+.dashAvatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--blue-50); color: var(--primary-blue);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 16px;
+}
+
+/* green wallet card */
+.walletCard {
+  background: linear-gradient(150deg, #17a34a, #0f8f3f);
+  border-radius: 18px;
+  padding: 16px 18px;
+  color: #fff;
+}
+.walletTop { display: flex; align-items: center; justify-content: space-between; }
+.walletLabel { font-size: 13px; opacity: 0.92; }
+.walletBalance { font-size: 30px; font-weight: 800; margin: 6px 0 14px; }
+.walletAddrRow { display: flex; align-items: flex-end; justify-content: space-between; }
+.walletAddrLabel { font-size: 11px; opacity: 0.82; }
+.walletAddr { font-size: 13px; font-weight: 600; margin-top: 2px; }
+
+/* stat tiles */
+.statRow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+.statTile { border: 1px solid #eceef1; border-radius: 12px; padding: 10px 11px; }
+.statTileLabel { font-size: 10px; color: var(--gray-400); }
+.statTileRow { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+.statTileVal { font-size: 15px; font-weight: 800; color: var(--title-dark); }
+.statTileIcon { width: 18px; height: 18px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+
+/* no active tasks */
+.emptyCard { border: 1px solid #eceef1; border-radius: 16px; padding: 16px; text-align: center; }
+.emptyTitle { font-size: 13px; font-weight: 700; color: var(--title-dark); text-align: left; }
+.emptyIcon {
+  width: 54px; height: 54px; border-radius: 12px; background: #f3eefe;
+  display: flex; align-items: center; justify-content: center; margin: 12px auto 10px;
+}
+.emptyText { font-size: 12px; color: var(--gray-400); line-height: 1.5; }
+.browseBtn {
+  margin-top: 12px; border: 1px solid var(--violet); color: var(--violet);
+  border-radius: 10px; padding: 10px; font-size: 13px; font-weight: 700; text-align: center;
+}
 
 .floatCard {
   position: absolute;
