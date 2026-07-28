@@ -6,10 +6,23 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 
-import { HomeIcon, ShieldCheckIcon, StarIcon, WalletIcon } from '../components/ui';
+import { ClipboardListIcon, HomeIcon, ShieldCheckIcon, StarIcon, WalletIcon } from '../components/ui';
 import logoMark from '../assets/images/logo_mark.png';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { projects as projectsRepo } from '../data/repo';
+import {
+  profiles as profilesRepo,
+  projects as projectsRepo,
+  tasks as tasksRepo,
+  type TaskWithClient,
+} from '../data/repo';
+import {
+  approveApplication,
+  assignTaskToStudent,
+  listTaskApplicants,
+  rejectApplication,
+  type Applicant,
+} from '../data/marketplace-service';
+import type { Profile } from '../data/db-types';
 import {
   computeOverview,
   listEscrows,
@@ -24,7 +37,7 @@ import {
 } from '../data/admin';
 import s from './admin.module.css';
 
-type Screen = 'dashboard' | 'verification' | 'escrow' | 'ratings';
+type Screen = 'dashboard' | 'verification' | 'tasks' | 'escrow' | 'ratings';
 
 type Props = {
   name: string;
@@ -82,10 +95,13 @@ export default function AdminPanel({ name, onExit }: Props) {
   const [unlocked, setUnlocked] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<VerificationRow | null>(null);
   const [selectedEscrow, setSelectedEscrow] = useState<EscrowRow | null>(null);
+  const [selectedTask, setSelectedTask] = useState<TaskWithClient | null>(null);
 
   const [verifs, setVerifs] = useState<VerificationRow[]>([]);
   const [escrows, setEscrows] = useState<EscrowRow[]>([]);
   const [reviews, setReviews] = useState<ReviewRow[]>([]);
+  const [allTasks, setAllTasks] = useState<TaskWithClient[]>([]);
+  const [people, setPeople] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
 
   const reload = useCallback(async () => {
@@ -95,10 +111,18 @@ export default function AdminPanel({ name, onExit }: Props) {
     }
     setLoading(true);
     try {
-      const [v, e, r] = await Promise.all([listVerifications(), listEscrows(), listReviews()]);
+      const [v, e, r, t, p] = await Promise.all([
+        listVerifications(),
+        listEscrows(),
+        listReviews(),
+        tasksRepo.listAll(),
+        profilesRepo.list(),
+      ]);
       setVerifs(v);
       setEscrows(e);
       setReviews(r);
+      setAllTasks(t);
+      setPeople(p);
     } finally {
       setLoading(false);
     }
@@ -127,6 +151,7 @@ export default function AdminPanel({ name, onExit }: Props) {
   const nav: { key: Screen; label: string; Icon: typeof HomeIcon }[] = [
     { key: 'dashboard', label: 'Dashboard', Icon: HomeIcon },
     { key: 'verification', label: 'Student Verification', Icon: ShieldCheckIcon },
+    { key: 'tasks', label: 'Tasks', Icon: ClipboardListIcon },
     { key: 'escrow', label: 'Escrow Monitoring', Icon: WalletIcon },
     { key: 'ratings', label: 'Ratings & Reviews', Icon: StarIcon },
   ];
@@ -140,7 +165,7 @@ export default function AdminPanel({ name, onExit }: Props) {
         </div>
         <nav className={s.nav}>
           {nav.map((n) => {
-            const active = screen === n.key && !selectedStudent && !selectedEscrow;
+            const active = screen === n.key && !selectedStudent && !selectedEscrow && !selectedTask;
             return (
               <button
                 key={n.key}
@@ -149,6 +174,7 @@ export default function AdminPanel({ name, onExit }: Props) {
                   setScreen(n.key);
                   setSelectedStudent(null);
                   setSelectedEscrow(null);
+                  setSelectedTask(null);
                 }}
               >
                 <n.Icon size={19} color={active ? '#124cc9' : '#b0c6f8'} />
@@ -176,6 +202,13 @@ export default function AdminPanel({ name, onExit }: Props) {
               await reload();
               setSelectedStudent(null);
             }}
+          />
+        ) : selectedTask ? (
+          <AdminTaskDetail
+            task={selectedTask}
+            people={people}
+            onBack={() => setSelectedTask(null)}
+            onChanged={reload}
           />
         ) : selectedEscrow ? (
           <EscrowDetail
@@ -217,6 +250,8 @@ export default function AdminPanel({ name, onExit }: Props) {
               await reload();
             }}
           />
+        ) : screen === 'tasks' ? (
+          <Tasks tasks={allTasks} loading={loading} onManage={(t) => setSelectedTask(t)} />
         ) : screen === 'escrow' ? (
           <Escrow overview={overview} escrows={escrows} loading={loading} onOpen={(e) => setSelectedEscrow(e)} />
         ) : (
@@ -782,6 +817,238 @@ function Ratings({
             ))
           )}
         </div>
+      </div>
+    </>
+  );
+}
+
+// ---- Tasks ----------------------------------------------------------------
+
+const TASK_TABS = ['All', 'Open', 'Assigned', 'Under review', 'Completed'] as const;
+
+function TaskStatusPill({ status }: { status: TaskWithClient['status'] }) {
+  const map: Record<string, string> = {
+    open: s.pillFunded,
+    assigned: s.pillReview,
+    in_progress: s.pillReview,
+    under_review: s.pillReview,
+    completed: s.pillVerified,
+    cancelled: s.pillDisputed,
+  };
+  return <span className={`${s.pill} ${map[status] ?? s.pillNeutral}`}>{status.replace('_', ' ')}</span>;
+}
+
+function Tasks({
+  tasks,
+  loading,
+  onManage,
+}: {
+  tasks: TaskWithClient[];
+  loading: boolean;
+  onManage: (t: TaskWithClient) => void;
+}) {
+  const [tab, setTab] = useState<(typeof TASK_TABS)[number]>('All');
+  const match = (t: TaskWithClient) => {
+    switch (tab) {
+      case 'Open': return t.status === 'open';
+      case 'Assigned': return t.status === 'assigned' || t.status === 'in_progress';
+      case 'Under review': return t.status === 'under_review';
+      case 'Completed': return t.status === 'completed';
+      default: return true;
+    }
+  };
+  const rows = tasks.filter(match);
+  const count = (t: (typeof TASK_TABS)[number]) =>
+    t === 'All' ? tasks.length : tasks.filter((x) => {
+      if (t === 'Open') return x.status === 'open';
+      if (t === 'Assigned') return x.status === 'assigned' || x.status === 'in_progress';
+      if (t === 'Under review') return x.status === 'under_review';
+      return x.status === 'completed';
+    }).length;
+
+  return (
+    <>
+      <Topbar title="Tasks" sub="Every task posted on the platform" />
+      <div className={s.content}>
+        <div className={s.toolbar}>
+          <div className={s.tabs}>
+            {TASK_TABS.map((t) => (
+              <button key={t} className={`${s.tab} ${tab === t ? s.tabActive : ''}`} onClick={() => setTab(t)}>
+                {t} {count(t) > 0 ? count(t) : ''}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={s.card}>
+          {loading ? (
+            <p className={s.muted}>Loading…</p>
+          ) : rows.length === 0 ? (
+            <p className={s.muted}>No tasks in “{tab}”.</p>
+          ) : (
+            <table className={s.table}>
+              <thead>
+                <tr><th>Task</th><th>Client</th><th>Category</th><th>Budget</th><th>Status</th><th></th></tr>
+              </thead>
+              <tbody>
+                {rows.map((t) => (
+                  <tr key={t.id}>
+                    <td className={s.name}>{t.title}</td>
+                    <td>{t.client?.full_name || t.client_id}</td>
+                    <td>{t.category}</td>
+                    <td className={s.name}>{money(Number(t.budget))}</td>
+                    <td><TaskStatusPill status={t.status} /></td>
+                    <td><button className={`${s.act} ${s.actView}`} onClick={() => onManage(t)}>Manage</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function AdminTaskDetail({
+  task,
+  people,
+  onBack,
+  onChanged,
+}: {
+  task: TaskWithClient;
+  people: Profile[];
+  onBack: () => void;
+  onChanged: () => Promise<void> | void;
+}) {
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [assignTo, setAssignTo] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const refresh = useCallback(async () => {
+    setApplicants(await listTaskApplicants(task.id));
+  }, [task.id]);
+
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
+
+  const doApprove = async (a: Applicant) => {
+    setBusy(true);
+    try {
+      await approveApplication({
+        bidId: a.bidId,
+        taskId: task.id,
+        studentId: a.studentId,
+        amount: a.amount,
+        clientId: task.client_id,
+        taskTitle: task.title,
+      });
+      await refresh();
+      await onChanged();
+    } finally {
+      setBusy(false);
+    }
+  };
+  const doReject = async (a: Applicant) => {
+    setBusy(true);
+    try {
+      await rejectApplication(a.bidId, { studentId: a.studentId, taskTitle: task.title });
+      await refresh();
+      await onChanged();
+    } finally {
+      setBusy(false);
+    }
+  };
+  const doAssign = async () => {
+    if (!assignTo) return;
+    setBusy(true);
+    try {
+      await assignTaskToStudent({
+        taskId: task.id,
+        studentId: assignTo,
+        clientId: task.client_id,
+        amount: Number(task.budget),
+        taskTitle: task.title,
+      });
+      await onChanged();
+      onBack();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <>
+      <Topbar title="Tasks › Detail" sub="Review requests and assign a student" />
+      <div className={s.content}>
+        <button className={s.backLink} onClick={onBack}>‹ Back to tasks</button>
+
+        <div className={s.detailHead}>
+          <div>
+            <div className={s.pageTitle} style={{ fontSize: 20 }}>{task.title}</div>
+            <div className={s.sub}>
+              {task.category} · {money(Number(task.budget))} · by {task.client?.full_name || task.client_id}
+            </div>
+          </div>
+          <TaskStatusPill status={task.status} />
+        </div>
+
+        {task.description && (
+          <div className={s.card}>
+            <div className={s.section}>
+              <span className={s.sub} style={{ color: '#374151' }}>{task.description}</span>
+              {task.skills?.length > 0 && (
+                <div className={s.chips} style={{ marginTop: 12 }}>
+                  {task.skills.map((sk) => <span key={sk} className={s.chip}>{sk}</span>)}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <p className={s.sectionTitle}>Requests to work on this task ({applicants.length})</p>
+        {applicants.length === 0 && <p className={s.muted}>No requests yet.</p>}
+        {applicants.map((a) => (
+          <div key={a.bidId} className={s.card}>
+            <div className={s.cardHead}>
+              <div>
+                <span className={s.name}>{a.studentName}</span>
+                <span className={s.sub} style={{ display: 'block' }}>
+                  {money(a.amount)} · {a.deliveryDays}d{a.message ? ` · “${a.message}”` : ''}
+                </span>
+              </div>
+              <div className={s.actions}>
+                <span className={s.pill + ' ' + (a.status === 'approved' ? s.pillVerified : a.status === 'rejected' ? s.pillRejected : s.pillPending)}>{a.status}</span>
+                {a.status === 'pending' && (
+                  <>
+                    <button className={`${s.act} ${s.actApprove}`} disabled={busy} onClick={() => void doApprove(a)}>Approve &amp; assign</button>
+                    <button className={`${s.act} ${s.actReject}`} disabled={busy} onClick={() => void doReject(a)}>Reject</button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {task.status === 'open' && (
+          <>
+            <p className={s.sectionTitle}>Or assign directly to a student</p>
+            <div className={s.card}>
+              <div className={s.section}>
+                <div className={s.actions}>
+                  <select className={s.select} value={assignTo} onChange={(e) => setAssignTo(e.target.value)}>
+                    <option value="">Select a student…</option>
+                    {people.map((p) => (
+                      <option key={p.id} value={p.id}>{p.full_name || p.email}</option>
+                    ))}
+                  </select>
+                  <button className={s.btnPrimary} disabled={busy || !assignTo} onClick={() => void doAssign()}>Assign task</button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </>
   );
