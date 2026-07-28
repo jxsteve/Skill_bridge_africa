@@ -7,8 +7,8 @@ import { BottomNav } from './components/ui';
 import { useAuth } from './auth/AuthProvider';
 import { isSupabaseConfigured, setSupabaseToken } from './lib/supabase';
 import { profiles, studentProfiles } from './data/repo';
-import { createTask, deliveryToDays, placeBid } from './data/marketplace-service';
-import { PROJECTS, TASKS } from './data/marketplace';
+import { createTask, getTask, requestTask } from './data/marketplace-service';
+import type { Task } from './data/marketplace';
 import {
   getCompletedProfile,
   loadLoginPrefs,
@@ -25,7 +25,6 @@ import MyBidsScreen from './screens/MyBidsScreen';
 import MyProjectsScreen from './screens/MyProjectsScreen';
 import NotificationsScreen from './screens/NotificationsScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
-import PlaceBidScreen from './screens/PlaceBidScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import ProfileSetupScreen from './screens/ProfileSetupScreen';
 import RegistrationScreen, {
@@ -36,6 +35,7 @@ import SplashScreen from './screens/SplashScreen';
 import StudentDashboardScreen from './screens/StudentDashboardScreen';
 import StudentHomeScreen from './screens/StudentHomeScreen';
 import SubmitWorkScreen from './screens/SubmitWorkScreen';
+import TaskDetailScreen from './screens/TaskDetailScreen';
 import VerificationProgressScreen from './screens/VerificationProgressScreen';
 import VerificationSuccessScreen from './screens/VerificationSuccessScreen';
 import VerifyEmailScreen from './screens/VerifyEmailScreen';
@@ -46,6 +46,7 @@ import ClientDashboardScreen, {
   type ClientAccountStatus,
 } from './screens/ClientDashboardScreen';
 import FundPlatformWalletScreen from './screens/FundPlatformWalletScreen';
+import ClientMyTasksScreen from './screens/ClientMyTasksScreen';
 import ClientVerificationProgressScreen from './screens/ClientVerificationProgressScreen';
 import ClientVerificationSuccessScreen from './screens/ClientVerificationSuccessScreen';
 import CreateTaskScreen, { type NewTaskDetails } from './screens/CreateTaskScreen';
@@ -370,6 +371,7 @@ export default function App() {
           path="/app/tasks"
           element={
             <BrowseTasksScreen
+              userId={auth.user?.id}
               onOpenTask={(id) => navigate(`/app/tasks/${id}`)}
               onOpenProject={(id) => navigate(`/app/projects/${id}/submit`)}
               onTab={goTab}
@@ -387,7 +389,6 @@ export default function App() {
           }
         />
         <Route path="/app/tasks/:taskId" element={<TaskDetailRoute />} />
-        <Route path="/app/tasks/:taskId/bid" element={<PlaceBidRoute />} />
         <Route path="/app/bid-accepted/:taskId" element={<BidAcceptedRoute />} />
         <Route
           path="/app/bids"
@@ -611,11 +612,18 @@ export default function App() {
           }
         />
 
-        {/* Not built yet */}
         <Route
           path="/client/tasks"
-          element={<ClientComingSoon title="Tasks" activeTab="tasks" onTab={goClientTab} />}
+          element={
+            <ClientMyTasksScreen
+              clientId={auth.user?.id}
+              onCreateTask={() => navigate('/client/create-task')}
+              onTab={goClientTab}
+            />
+          }
         />
+
+        {/* Not built yet */}
         <Route
           path="/client/wallet"
           element={<ClientComingSoon title="Wallet" activeTab="wallet" onTab={goClientTab} />}
@@ -639,31 +647,37 @@ export default function App() {
 
   function TaskDetailRoute() {
     const { taskId } = useParams();
-    const task = TASKS.find((t) => t.id === taskId);
-    if (!task) return <Navigate to="/app/tasks" replace />;
-    return (
-      <TaskDetailScreenLoader
-        taskId={task.id}
-        onBack={() => navigate(-1)}
-        onPlaceBid={() => navigate(`/app/tasks/${task.id}/bid`)}
-      />
-    );
-  }
+    const [task, setTask] = useState<Task | null | undefined>(undefined);
+    const [requesting, setRequesting] = useState(false);
 
-  function PlaceBidRoute() {
-    const { taskId } = useParams();
+    useEffect(() => {
+      let active = true;
+      if (!taskId) {
+        setTask(null);
+        return;
+      }
+      getTask(taskId)
+        .then((t) => active && setTask(t))
+        .catch(() => active && setTask(null));
+      return () => {
+        active = false;
+      };
+    }, [taskId]);
+
+    if (task === undefined) return <LoadingView />;
+    if (!task) return <Navigate to="/app/tasks" replace />;
+
     return (
-      <PlaceBidScreen
+      <TaskDetailScreen
+        task={task}
+        studentSkills={profile?.skills}
+        requesting={requesting}
         onBack={() => navigate(-1)}
-        onSubmit={(bid) => {
+        onPlaceBid={async () => {
           if (auth.user && taskId) {
-            void placeBid(
-              taskId,
-              auth.user.id,
-              bid.amount,
-              deliveryToDays(bid.delivery),
-              bid.note,
-            ).catch(() => {});
+            setRequesting(true);
+            await requestTask(taskId, auth.user.id, task.budget);
+            setRequesting(false);
           }
           navigate(`/app/bid-accepted/${taskId}`);
         }}
@@ -673,8 +687,25 @@ export default function App() {
 
   function BidAcceptedRoute() {
     const { taskId } = useParams();
-    const task = TASKS.find((t) => t.id === taskId);
-    if (!task) return <Navigate to="/app/tasks" replace />;
+    const [task, setTask] = useState<Task | null | undefined>(undefined);
+
+    useEffect(() => {
+      let active = true;
+      if (!taskId) {
+        setTask(null);
+        return;
+      }
+      getTask(taskId)
+        .then((t) => active && setTask(t))
+        .catch(() => active && setTask(null));
+      return () => {
+        active = false;
+      };
+    }, [taskId]);
+
+    if (task === undefined) return <LoadingView />;
+    if (!task) return <Navigate to="/app/projects" replace />;
+
     return (
       <BidAcceptedScreen
         task={task}
@@ -685,9 +716,6 @@ export default function App() {
   }
 
   function SubmitWorkRoute() {
-    const { projectId } = useParams();
-    const project = PROJECTS.find((p) => p.id === projectId);
-    if (!project) return <Navigate to="/app/projects" replace />;
     return <SubmitWorkScreen onBack={() => navigate(-1)} onSubmit={() => navigate('/app/projects')} />;
   }
 
@@ -721,20 +749,21 @@ export default function App() {
   }
 }
 
-// Small indirection so TaskDetail can look the task up by id.
-import TaskDetailScreen from './screens/TaskDetailScreen';
-
-function TaskDetailScreenLoader({
-  taskId,
-  onBack,
-  onPlaceBid,
-}: {
-  taskId: string;
-  onBack: () => void;
-  onPlaceBid: () => void;
-}) {
-  const task = TASKS.find((t) => t.id === taskId)!;
-  return <TaskDetailScreen task={task} onBack={onBack} onPlaceBid={onPlaceBid} />;
+function LoadingView() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        color: '#6b7280',
+        fontSize: 15,
+      }}
+    >
+      Loading…
+    </div>
+  );
 }
 
 function formatDeadline(deadline: string) {

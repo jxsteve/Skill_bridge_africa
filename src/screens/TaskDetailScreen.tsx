@@ -12,12 +12,27 @@ import styles from './TaskDetailScreen.module.css';
 
 type Props = {
   task: Task;
+  studentSkills?: string[];
+  requesting?: boolean;
   onBack: () => void;
   onPlaceBid: () => void;
 };
 
-export default function TaskDetailScreen({ task, onBack, onPlaceBid }: Props) {
+export default function TaskDetailScreen({
+  task,
+  studentSkills,
+  requesting,
+  onBack,
+  onPlaceBid,
+}: Props) {
   const [saved, setSaved] = useState(false);
+
+  const matched = studentSkills
+    ? task.skills.filter((s) =>
+        studentSkills.some((mine) => mine.toLowerCase() === s.toLowerCase()),
+      )
+    : [];
+  const hasSkills = studentSkills ? matched.length > 0 : true;
 
   return (
     <div className={styles.container}>
@@ -57,6 +72,16 @@ export default function TaskDetailScreen({ task, onBack, onPlaceBid }: Props) {
             </span>
           ))}
         </div>
+        {studentSkills && (
+          <p
+            className={styles.metaLabel}
+            style={{ color: hasSkills ? '#16A34A' : '#D97706', marginTop: 8 }}
+          >
+            {hasSkills
+              ? `You match ${matched.length} of ${task.skills.length} required skills.`
+              : 'This task needs skills not on your profile — you can still request it.'}
+          </p>
+        )}
 
         <p className={styles.sectionTitle}>Attachments ({task.attachments.length})</p>
         {task.attachments.map((file) => (
@@ -78,7 +103,13 @@ export default function TaskDetailScreen({ task, onBack, onPlaceBid }: Props) {
 
       <div className={styles.footer}>
         <div className={styles.footerButton}>
-          <PrimaryButton label="Place a Bid" showIcon={false} fullWidth onClick={onPlaceBid} />
+          <PrimaryButton
+            label={requesting ? 'Sending…' : 'Request This Task'}
+            showIcon={false}
+            fullWidth
+            disabled={requesting}
+            onClick={onPlaceBid}
+          />
         </div>
         <button type="button" className={styles.footerSave}>
           <BookmarkIcon size={20} />

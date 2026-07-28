@@ -3,10 +3,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { BottomNav, SearchIcon, SlidersIcon } from '../components/ui';
 import type { MainTab } from '../components/ui';
 import { PROJECTS, TASKS } from '../data/marketplace';
-import type { Task, TaskCategory } from '../data/marketplace';
+import type { Project, Task, TaskCategory } from '../data/marketplace';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { listOpenTasks } from '../data/marketplace-service';
+import { listMyProjects, listOpenTasks } from '../data/marketplace-service';
 import styles from './BrowseTasksScreen.module.css';
+
+// When connected to the backend, only real (client-created) data shows —
+// no seed tasks/projects. The mock arrays are just the offline dev fallback.
+const SEED_TASKS = isSupabaseConfigured ? [] : TASKS;
+const SEED_PROJECTS = isSupabaseConfigured ? [] : PROJECTS;
 
 const VIEWS = ['All', 'In Progress', 'Completed'] as const;
 const CATEGORIES: ('All categories' | TaskCategory)[] = [
@@ -17,25 +22,35 @@ const CATEGORIES: ('All categories' | TaskCategory)[] = [
 ];
 
 type Props = {
+  userId?: string;
   onOpenTask: (id: string) => void;
   onOpenProject: (id: string) => void;
   onTab: (tab: MainTab) => void;
 };
 
-export default function BrowseTasksScreen({ onOpenTask, onOpenProject, onTab }: Props) {
+export default function BrowseTasksScreen({ userId, onOpenTask, onOpenProject, onTab }: Props) {
   const [query, setQuery] = useState('');
   const [view, setView] = useState<(typeof VIEWS)[number]>('All');
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>('All categories');
   const [filterOpen, setFilterOpen] = useState(false);
-  const [allTasks, setAllTasks] = useState<Task[]>(TASKS);
+  const [allTasks, setAllTasks] = useState<Task[]>(SEED_TASKS);
+  const [allProjects, setAllProjects] = useState<Project[]>(SEED_PROJECTS);
 
-  // Load live tasks (including ones clients just posted); mock data otherwise.
+  // Load live open tasks (only real, client-created ones).
   useEffect(() => {
     if (!isSupabaseConfigured) return;
     listOpenTasks()
       .then(setAllTasks)
       .catch(() => {});
   }, []);
+
+  // Load this student's real projects for the In Progress / Completed tabs.
+  useEffect(() => {
+    if (!isSupabaseConfigured || !userId) return;
+    listMyProjects(userId)
+      .then(setAllProjects)
+      .catch(() => {});
+  }, [userId]);
 
   const matchesQuery = (title: string) =>
     query.trim() === '' || title.toLowerCase().includes(query.trim().toLowerCase());
@@ -53,13 +68,13 @@ export default function BrowseTasksScreen({ onOpenTask, onOpenProject, onTab }: 
 
   const projects = useMemo(
     () =>
-      PROJECTS.filter(
+      allProjects.filter(
         (p) =>
           p.status === (view === 'In Progress' ? 'In Progress' : 'Completed') &&
           matchesQuery(p.title),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, view],
+    [query, view, allProjects],
   );
 
   const categoryActive = category !== 'All categories';

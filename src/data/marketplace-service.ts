@@ -167,3 +167,98 @@ export async function placeBid(
     message,
   });
 }
+
+// ---- Task requests / assignment ------------------------------------------
+
+/** A student's request to work on a task (stored as a bid). */
+export type Applicant = {
+  bidId: string;
+  studentId: string;
+  studentName: string;
+  amount: number;
+  deliveryDays: number;
+  status: 'pending' | 'approved' | 'rejected';
+  message: string;
+};
+
+/** Student requests to work on a task (defaults the amount to the task budget). */
+export async function requestTask(
+  taskId: string,
+  studentId: string,
+  amount: number,
+  note = '',
+): Promise<{ ok: boolean; reason?: string }> {
+  if (!isSupabaseConfigured) return { ok: true };
+  try {
+    await repo.bids.create({ task_id: taskId, student_id: studentId, amount, delivery_days: 3, message: note });
+    return { ok: true };
+  } catch (e) {
+    // Unique violation => already requested.
+    const msg = e instanceof Error ? e.message : '';
+    return { ok: false, reason: /duplicate|unique/i.test(msg) ? 'already-requested' : 'failed' };
+  }
+}
+
+/** Applicants (requests) for a task. */
+export async function listTaskApplicants(taskId: string): Promise<Applicant[]> {
+  if (!isSupabaseConfigured) return [];
+  const rows = await repo.bids.listByTaskWithStudent(taskId);
+  return rows.map((b) => ({
+    bidId: b.id,
+    studentId: b.student_id,
+    studentName: b.student?.full_name || b.student_id,
+    amount: Number(b.amount),
+    deliveryDays: b.delivery_days,
+    status: b.status,
+    message: b.message,
+  }));
+}
+
+/** Admin approves a request: assigns the task, creates the project, rejects the rest. */
+export async function approveApplication(p: {
+  bidId: string;
+  taskId: string;
+  studentId: string;
+  amount: number;
+  clientId: string;
+}): Promise<void> {
+  await repo.projects.createDirect({
+    task_id: p.taskId,
+    student_id: p.studentId,
+    client_id: p.clientId,
+    amount: p.amount,
+  });
+  await repo.bids.setStatus(p.bidId, 'approved');
+  const others = await repo.bids.listByTask(p.taskId);
+  await Promise.all(
+    others
+      .filter((b) => b.id !== p.bidId && b.status === 'pending')
+      .map((b) => repo.bids.setStatus(b.id, 'rejected')),
+  );
+}
+
+/** Admin rejects a single request. */
+export async function rejectApplication(bidId: string): Promise<void> {
+  await repo.bids.setStatus(bidId, 'rejected');
+}
+
+/** Admin assigns a task directly to a student (no request needed). */
+export async function assignTaskToStudent(p: {
+  taskId: string;
+  studentId: string;
+  clientId: string;
+  amount: number;
+}): Promise<void> {
+  await repo.projects.createDirect({
+    task_id: p.taskId,
+    student_id: p.studentId,
+    client_id: p.clientId,
+    amount: p.amount,
+  });
+}
+
+/** Tasks a client created, with live status (empty until Supabase is configured). */
+export async function listClientTasks(clientId: string) {
+  if (!isSupabaseConfigured) return [];
+  return repo.tasks.listByClient(clientId);
+}

@@ -208,6 +208,18 @@ export const bids = {
       await db().from('bids').select('*').eq('task_id', taskId).order('created_at', { ascending: false }),
     );
   },
+  /** Applicants for a task, each with the requesting student's name. */
+  async listByTaskWithStudent(
+    taskId: string,
+  ): Promise<(BidRow & { student: Pick<Profile, 'id' | 'full_name'> | null })[]> {
+    return unwrap(
+      await db()
+        .from('bids')
+        .select('*, student:profiles!bids_student_id_fkey(id, full_name)')
+        .eq('task_id', taskId)
+        .order('created_at', { ascending: false }),
+    );
+  },
   async create(input: {
     task_id: string;
     student_id: string;
@@ -272,6 +284,19 @@ export const projects = {
     );
     await bids.setStatus(bid.id, 'approved');
     await tasks.setStatus(bid.task_id, 'assigned');
+    return project;
+  },
+  /** Admin directly assigns a task to a student (no application needed). */
+  async createDirect(input: {
+    task_id: string;
+    student_id: string;
+    client_id: string;
+    amount: number;
+  }): Promise<ProjectRow> {
+    const project = unwrap<ProjectRow>(
+      await db().from('projects').insert(input).select().single(),
+    );
+    await tasks.setStatus(input.task_id, 'assigned');
     return project;
   },
   async setStatus(id: string, status: ProjectStatus): Promise<void> {

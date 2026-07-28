@@ -18,6 +18,13 @@ import type {
   BidWithTask,
   TaskWithClient,
 } from '../data/repo';
+import {
+  approveApplication,
+  assignTaskToStudent,
+  listTaskApplicants,
+  rejectApplication,
+  type Applicant,
+} from '../data/marketplace-service';
 import type {
   Profile,
   ProjectRow,
@@ -40,6 +47,12 @@ export default function AdminScreen({ onExit }: { onExit: () => void }) {
   const [tasks, setTasks] = useState<TaskWithClient[]>([]);
   const [bids, setBids] = useState<BidWithTask[]>([]);
   const [projects, setProjects] = useState<ProjectRow[]>([]);
+
+  // Task detail (applicants + assignment)
+  const [selectedTask, setSelectedTask] = useState<TaskWithClient | null>(null);
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [assignTo, setAssignTo] = useState('');
+  const [busy, setBusy] = useState(false);
 
   const reload = useCallback(async () => {
     if (!isSupabaseConfigured) {
@@ -98,6 +111,56 @@ export default function AdminScreen({ onExit }: { onExit: () => void }) {
   const setProjectPayment = async (id: string, s: ProjectRow['payment_status']) => {
     await projectsRepo.setPaymentStatus(id, s);
     void reload();
+  };
+
+  const openTask = async (t: TaskWithClient) => {
+    setSelectedTask(t);
+    setAssignTo('');
+    setApplicants(await listTaskApplicants(t.id));
+  };
+  const refreshApplicants = async (t: TaskWithClient) => {
+    setApplicants(await listTaskApplicants(t.id));
+    void reload();
+  };
+  const doApprove = async (t: TaskWithClient, a: Applicant) => {
+    setBusy(true);
+    try {
+      await approveApplication({
+        bidId: a.bidId,
+        taskId: t.id,
+        studentId: a.studentId,
+        amount: a.amount,
+        clientId: t.client_id,
+      });
+      await refreshApplicants(t);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const doReject = async (t: TaskWithClient, a: Applicant) => {
+    setBusy(true);
+    try {
+      await rejectApplication(a.bidId);
+      await refreshApplicants(t);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const doAssign = async (t: TaskWithClient) => {
+    if (!assignTo) return;
+    setBusy(true);
+    try {
+      await assignTaskToStudent({
+        taskId: t.id,
+        studentId: assignTo,
+        clientId: t.client_id,
+        amount: Number(t.budget),
+      });
+      setSelectedTask(null);
+      void reload();
+    } finally {
+      setBusy(false);
+    }
   };
 
   const counts = {
@@ -170,6 +233,7 @@ export default function AdminScreen({ onExit }: { onExit: () => void }) {
           ))}
 
         {tab === 'tasks' &&
+          !selectedTask &&
           tasks.map((t) => (
             <div key={t.id} className={styles.card}>
               <div className={styles.cardMain}>
@@ -179,6 +243,7 @@ export default function AdminScreen({ onExit }: { onExit: () => void }) {
                 </span>
               </div>
               <div className={styles.cardControls}>
+                <span className={styles.pill}>{t.status}</span>
                 <select
                   className={styles.select}
                   value={t.status}
@@ -190,12 +255,78 @@ export default function AdminScreen({ onExit }: { onExit: () => void }) {
                     </option>
                   ))}
                 </select>
+                <button className={styles.smallBtn} onClick={() => void openTask(t)}>
+                  Manage
+                </button>
                 <button className={styles.dangerBtn} onClick={() => void removeTask(t.id)}>
                   Delete
                 </button>
               </div>
             </div>
           ))}
+
+        {tab === 'tasks' && selectedTask && (
+          <div className={styles.detail}>
+            <button className={styles.smallBtn} onClick={() => setSelectedTask(null)}>
+              ← Back to tasks
+            </button>
+
+            <div className={styles.card}>
+              <span className={styles.cardTitle}>{selectedTask.title}</span>
+              <span className={styles.cardMeta}>
+                {selectedTask.category} · ${Number(selectedTask.budget).toFixed(2)} · status {selectedTask.status}
+              </span>
+              <span className={styles.cardMetaSmall}>{selectedTask.description}</span>
+              {selectedTask.skills?.length > 0 && (
+                <span className={styles.cardMeta}>Skills: {selectedTask.skills.join(', ')}</span>
+              )}
+            </div>
+
+            <p className={styles.sectionTitle}>Requests to work on this task ({applicants.length})</p>
+            {applicants.length === 0 && <p className={styles.muted}>No requests yet.</p>}
+            {applicants.map((a) => (
+              <div key={a.bidId} className={styles.card}>
+                <div className={styles.cardMain}>
+                  <span className={styles.cardTitle}>{a.studentName}</span>
+                  <span className={styles.cardMeta}>
+                    ${a.amount.toFixed(2)} · {a.deliveryDays}d
+                    {a.message ? ` · “${a.message}”` : ''}
+                  </span>
+                </div>
+                <div className={styles.cardControls}>
+                  <span className={styles.pill}>{a.status}</span>
+                  {a.status === 'pending' && (
+                    <>
+                      <button className={styles.smallBtn} disabled={busy} onClick={() => void doApprove(selectedTask, a)}>
+                        Approve &amp; assign
+                      </button>
+                      <button className={styles.dangerBtn} disabled={busy} onClick={() => void doReject(selectedTask, a)}>
+                        Reject
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+
+            <p className={styles.sectionTitle}>Or assign directly to a student</p>
+            <div className={styles.card}>
+              <div className={styles.cardControls}>
+                <select className={styles.select} value={assignTo} onChange={(e) => setAssignTo(e.target.value)}>
+                  <option value="">Select a student…</option>
+                  {users.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.full_name || u.email}
+                    </option>
+                  ))}
+                </select>
+                <button className={styles.smallBtn} disabled={busy || !assignTo} onClick={() => void doAssign(selectedTask)}>
+                  Assign task
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {tab === 'bids' &&
           bids.map((b) => (

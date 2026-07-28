@@ -42,8 +42,11 @@ export default function BidAcceptedScreen({ task, onGoToTask, onViewProjects }: 
           </div>
         </div>
 
-        <p className={styles.title}>Congratulations!</p>
-        <p className={styles.subtitle}>Your Bid has been accepted</p>
+        <p className={styles.title}>Request Submitted!</p>
+        <p className={styles.subtitle}>
+          Your request is pending admin approval. You’ll be notified once it’s
+          reviewed.
+        </p>
 
         <div className={styles.card}>
           <p className={styles.cardTitle}>{task.title}</p>
