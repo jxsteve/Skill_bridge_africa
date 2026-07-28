@@ -6,7 +6,7 @@ import type { AccountType, MainTab } from './components/ui';
 import { BottomNav } from './components/ui';
 import { useAuth } from './auth/AuthProvider';
 import { isSupabaseConfigured, setSupabaseToken } from './lib/supabase';
-import { profiles, studentProfiles } from './data/repo';
+import { clientProfiles, profiles, studentProfiles } from './data/repo';
 import {
   createTask,
   deliveryToDays,
@@ -155,6 +155,12 @@ export default function App() {
             wallet_address: auth.user.walletAddress ?? null,
           });
           if (active) setIsAdmin(row.role === 'admin');
+          // Restore a client's saved verification status so they don't have to
+          // re-verify on every login.
+          const cp = await clientProfiles.get(auth.user.id);
+          if (active && (cp?.verification === 'verified' || cp?.verification === 'pending')) {
+            setClientAccountStatus(cp.verification);
+          }
         } catch {
           // Best-effort; screens still render.
         }
@@ -519,6 +525,12 @@ export default function App() {
             <ClientVerificationProgressScreen
               onDone={() => {
                 setClientAccountStatus('verified');
+                // Persist so the client stays verified across future logins.
+                if (auth.user && isSupabaseConfigured) {
+                  void clientProfiles
+                    .save({ user_id: auth.user.id, verification: 'verified' })
+                    .catch(() => {});
+                }
                 navigate('/client/verified');
               }}
             />
