@@ -68,6 +68,52 @@ const FEATURES = [
   },
 ];
 
+const STATS = [
+  { value: '500+', label: 'Students onboard' },
+  { value: '1,200+', label: 'Tasks posted' },
+  { value: '20+', label: 'Universities' },
+  { value: '100%', label: 'Escrow-protected' },
+];
+
+// Photo slots — drop matching files into /public/images to fill these.
+const SHOWCASE = ['/images/student-1.jpg', '/images/student-2.jpg', '/images/student-4.jpg'];
+
+const TESTIMONIALS = [
+  {
+    photo: '/images/student-3.jpg',
+    quote: 'I paid for my final-year project with SkillBridge gigs. Escrow meant I never had to chase a client for payment.',
+    name: 'Chidi Okeke',
+    detail: 'Student, University of Lagos',
+  },
+  {
+    photo: '/images/student-2.jpg',
+    quote: 'We hired three student designers here. Verified profiles made it easy to trust who we were working with.',
+    name: 'Ada Ventures',
+    detail: 'Client',
+  },
+  {
+    photo: '/images/student-1.jpg',
+    quote: 'Got my first paid job two days after verifying. Bidding on tasks is simple and the payout was fast.',
+    name: 'Ngozi Eze',
+    detail: 'Student, University of Nigeria',
+  },
+];
+
+function Photo({ src, className, alt = '' }: { src: string; className?: string; alt?: string }) {
+  return (
+    <div className={`${s.photo} ${className ?? ''}`}>
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onError={(e) => {
+          e.currentTarget.style.opacity = '0';
+        }}
+      />
+    </div>
+  );
+}
+
 export default function LandingPage({ onGetStarted, onLogin }: Props) {
   // Reveal sections as they scroll into view.
   useEffect(() => {
@@ -113,6 +159,10 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
           </div>
         </nav>
       </header>
+
+      {/* Decorative background glows */}
+      <div className={s.glowA} aria-hidden="true" />
+      <div className={s.glowB} aria-hidden="true" />
 
       {/* Hero */}
       <section className={s.hero}>
@@ -218,6 +268,16 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
         </div>
       </section>
 
+      {/* Stats band */}
+      <section className={`${s.statsBand} ${s.reveal}`}>
+        {STATS.map((st) => (
+          <div key={st.label} className={s.statBlock}>
+            <span className={s.statValue}>{st.value}</span>
+            <span className={s.statLabelBand}>{st.label}</span>
+          </div>
+        ))}
+      </section>
+
       {/* How it works */}
       <section id="how" className={`${s.section} ${s.reveal}`}>
         <p className={s.kicker}>For students</p>
@@ -249,6 +309,25 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
         </div>
       </section>
 
+      {/* Showcase */}
+      <section className={`${s.showcase} ${s.reveal}`}>
+        <div className={s.showcaseText}>
+          <p className={s.kicker}>Real students, real work</p>
+          <h2 className={s.h2} style={{ textAlign: 'left', margin: '0 0 14px' }}>
+            Talented students across the country
+          </h2>
+          <p className={s.showcaseBody}>
+            From design and development to writing, students on SkillBridge deliver real work for
+            real clients while they study.
+          </p>
+        </div>
+        <div className={s.showcaseGrid}>
+          <Photo src={SHOWCASE[0]} className={s.showcaseTall} alt="Students collaborating" />
+          <Photo src={SHOWCASE[1]} alt="Students studying together" />
+          <Photo src={SHOWCASE[2]} alt="Student working" />
+        </div>
+      </section>
+
       {/* For clients */}
       <section id="clients" className={`${s.clients} ${s.reveal}`}>
         <div className={s.clientsText}>
@@ -274,6 +353,26 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
           <MiniField label="Category" value="UI/UX Design" />
           <MiniField label="Budget" value="$25.00" />
           <div className={s.clientsCardBtn}>Post task</div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className={`${s.sectionAlt} ${s.reveal}`}>
+        <p className={s.kicker}>Testimonials</p>
+        <h2 className={s.h2}>Loved by students and clients</h2>
+        <div className={s.testimonials}>
+          {TESTIMONIALS.map((t) => (
+            <div key={t.name} className={s.testimonial}>
+              <p className={s.testimonialQuote}>“{t.quote}”</p>
+              <div className={s.testimonialWho}>
+                <Photo src={t.photo} className={s.testimonialAvatar} alt={t.name} />
+                <div>
+                  <p className={s.testimonialName}>{t.name}</p>
+                  <p className={s.testimonialDetail}>{t.detail}</p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
