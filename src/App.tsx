@@ -3,7 +3,6 @@ import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from 're
 
 import PhoneFrame from './components/PhoneFrame';
 import type { AccountType, MainTab } from './components/ui';
-import { BottomNav } from './components/ui';
 import { useAuth } from './auth/AuthProvider';
 import { isSupabaseConfigured, setSupabaseToken } from './lib/supabase';
 import { clientProfiles, profiles, studentProfiles } from './data/repo';
@@ -155,6 +154,9 @@ export default function App() {
             wallet_address: auth.user.walletAddress ?? null,
           });
           if (active) setIsAdmin(row.role === 'admin');
+          // Restore the saved display name (so returning users and clients see
+          // their name instead of a placeholder greeting).
+          if (active && !fullName && row.full_name) setFullName(row.full_name);
           // Restore a client's saved verification status so they don't have to
           // re-verify on every login.
           const cp = await clientProfiles.get(auth.user.id);
@@ -490,12 +492,12 @@ export default function App() {
               onSelectTab={goClientTab}
               onFundWallet={() => navigate('/client/fund-wallet')}
               onAddFunds={() => navigate('/client/fund-wallet')}
-              onNotificationsClick={() => navigate('/client/work-submitted')}
+              onNotificationsClick={() => navigate('/client/notifications')}
               onProfileClick={() => navigate('/client/profile')}
               onCreateTask={() => navigate('/client/create-task')}
               onMyTasks={() => navigate('/client/tasks')}
               onWallet={() => navigate('/client/fund-wallet')}
-              onProjects={() => navigate('/client/projects')}
+              onProjects={() => navigate('/client/tasks')}
             />
           }
         />
@@ -562,7 +564,7 @@ export default function App() {
         />
         <Route
           path="/client/task-under-review"
-          element={<TaskUnderReviewScreen onViewMyTasks={() => navigate('/client/student-assigned')} />}
+          element={<TaskUnderReviewScreen onViewMyTasks={() => navigate('/client/tasks')} />}
         />
         <Route
           path="/client/student-assigned"
@@ -675,15 +677,19 @@ export default function App() {
           }
         />
 
-        {/* Not built yet */}
         <Route
-          path="/client/wallet"
-          element={<ClientComingSoon title="Wallet" activeTab="wallet" onTab={goClientTab} />}
+          path="/client/notifications"
+          element={
+            <NotificationsScreen
+              verified
+              userId={auth.user?.id}
+              onBack={() => navigate('/client/app')}
+            />
+          }
         />
-        <Route
-          path="/client/projects"
-          element={<ClientComingSoon title="Projects" activeTab="tasks" onTab={goClientTab} />}
-        />
+        {/* Legacy paths — redirect to the real screens */}
+        <Route path="/client/wallet" element={<Navigate to="/client/fund-wallet" replace />} />
+        <Route path="/client/projects" element={<Navigate to="/client/tasks" replace />} />
         <Route
           path="/client/profile"
           element={
@@ -880,36 +886,4 @@ function formatDeadline(deadline: string) {
   const date = new Date(`${deadline}T00:00:00`);
   if (Number.isNaN(date.getTime())) return deadline;
   return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
-}
-
-// Temporary placeholder for client screens that haven't been built yet
-// (Profile). Replace each as it's completed.
-function ClientComingSoon({
-  title,
-  activeTab,
-  onTab,
-}: {
-  title: string;
-  activeTab: MainTab;
-  onTab: (tab: MainTab) => void;
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: 24,
-          textAlign: 'center',
-          color: '#6b7280',
-          fontSize: 15,
-        }}
-      >
-        {title} — coming soon
-      </div>
-      <BottomNav active={activeTab} onSelect={onTab} variant="client" />
-    </div>
-  );
 }

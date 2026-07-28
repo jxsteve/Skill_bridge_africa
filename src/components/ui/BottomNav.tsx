@@ -18,7 +18,7 @@ const ITEMS_BY_VARIANT: Record<BottomNavVariant, { tab: MainTab; label: string }
   client: [
     { tab: 'home', label: 'Home' },
     { tab: 'tasks', label: 'Tasks' },
-    { tab: 'wallet', label: 'wallet' },
+    { tab: 'wallet', label: 'Wallet' },
     { tab: 'profile', label: 'Profile' },
   ],
 };
