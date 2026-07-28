@@ -27,7 +27,6 @@ import s from './admin.module.css';
 type Screen = 'dashboard' | 'verification' | 'escrow' | 'ratings';
 
 type Props = {
-  isAdmin: boolean;
   name: string;
   onExit: () => void;
 };
@@ -78,7 +77,7 @@ function Stars({ n }: { n: number }) {
 
 // ---- root -----------------------------------------------------------------
 
-export default function AdminPanel({ isAdmin, name, onExit }: Props) {
+export default function AdminPanel({ name, onExit }: Props) {
   const [screen, setScreen] = useState<Screen>('dashboard');
   const [unlocked, setUnlocked] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<VerificationRow | null>(null);
@@ -105,13 +104,12 @@ export default function AdminPanel({ isAdmin, name, onExit }: Props) {
     }
   }, []);
 
-  const canView = isAdmin || unlocked;
-
+  // The credential login is always required (even for real admin accounts).
   useEffect(() => {
-    if (canView) void reload();
-  }, [canView, reload]);
+    if (unlocked) void reload();
+  }, [unlocked, reload]);
 
-  if (!canView) {
+  if (!unlocked) {
     return (
       <AdminLogin
         onSubmit={(user, pass) => {

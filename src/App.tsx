@@ -291,7 +291,6 @@ export default function App() {
   if (location.pathname.startsWith('/admin')) {
     return (
       <AdminPanel
-        isAdmin={isAdmin}
         name={fullName || auth.user?.email?.split('@')[0] || 'Admin'}
         onExit={() => navigate('/app')}
       />
