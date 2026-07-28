@@ -411,3 +411,60 @@
   .navCta { padding: 9px 14px; }
   .heroCtas { flex-direction: column; align-items: stretch; }
 }
+
+/* ============================ Animations ============================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes floatY   { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes floatYsm { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+
+/* Hero entrance (staggered on load) */
+.eyebrow, .headline, .subhead, .heroCtas, .mockup {
+  animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.headline  { animation-delay: 0.08s; }
+.subhead   { animation-delay: 0.16s; }
+.heroCtas  { animation-delay: 0.24s; }
+.mockup    { animation-delay: 0.34s; }
+
+/* Gentle continuous float */
+.phone { animation: floatY 6s ease-in-out infinite; }
+.floatCard { animation: floatYsm 5s ease-in-out infinite; }
+.cardTopLeft     { animation-delay: 0s; }
+.cardTopRight    { animation-delay: 0.7s; }
+.cardBottomLeft  { animation-delay: 1.4s; }
+.cardBottomRight { animation-delay: 2.1s; }
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.revealed { opacity: 1; transform: none; }
+
+/* Hover lifts */
+.step, .feature, .clientsCard {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.step:hover, .feature:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(17, 24, 39, 0.08);
+}
+.primaryBtn, .navCta, .ctaBtn, .secondaryBtn {
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+.primaryBtn:hover, .navCta:hover, .ctaBtn:hover { transform: translateY(-2px); }
+.primaryBtn:active, .navCta:active, .ctaBtn:active { transform: translateY(0); }
+
+/* Respect reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .eyebrow, .headline, .subhead, .heroCtas, .mockup,
+  .phone, .floatCard { animation: none; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .step:hover, .feature:hover, .primaryBtn:hover, .navCta:hover, .ctaBtn:hover { transform: none; }
+}

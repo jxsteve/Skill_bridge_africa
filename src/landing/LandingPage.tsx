@@ -4,6 +4,8 @@
  * nav, two-tone hero headline, a phone mockup ringed by "verified" cards, then
  * how-it-works, features, a clients band, a CTA, and a footer. CTAs enter the app.
  */
+import { useEffect } from 'react';
+
 import {
   ActivityIcon,
   BellIcon,
@@ -67,6 +69,28 @@ const FEATURES = [
 ];
 
 export default function LandingPage({ onGetStarted, onLogin }: Props) {
+  // Reveal sections as they scroll into view.
+  useEffect(() => {
+    const els = Array.from(document.querySelectorAll(`.${s.reveal}`));
+    if (!('IntersectionObserver' in window) || els.length === 0) {
+      els.forEach((el) => el.classList.add(s.revealed));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add(s.revealed);
+            io.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <div className={s.page}>
       {/* Nav */}
@@ -195,7 +219,7 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
       </section>
 
       {/* How it works */}
-      <section id="how" className={s.section}>
+      <section id="how" className={`${s.section} ${s.reveal}`}>
         <p className={s.kicker}>For students</p>
         <h2 className={s.h2}>How it works</h2>
         <div className={s.steps}>
@@ -211,7 +235,7 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
       </section>
 
       {/* Features */}
-      <section id="features" className={s.sectionAlt}>
+      <section id="features" className={`${s.sectionAlt} ${s.reveal}`}>
         <p className={s.kicker}>Why SkillBridge</p>
         <h2 className={s.h2}>How we keep work and payments safe</h2>
         <div className={s.features}>
@@ -226,7 +250,7 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
       </section>
 
       {/* For clients */}
-      <section id="clients" className={s.clients}>
+      <section id="clients" className={`${s.clients} ${s.reveal}`}>
         <div className={s.clientsText}>
           <p className={s.kicker}>For clients</p>
           <h2 className={s.h2} style={{ textAlign: 'left' }}>Need work done? Hire verified students.</h2>
@@ -254,7 +278,7 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
       </section>
 
       {/* CTA band */}
-      <section className={s.ctaBand}>
+      <section className={`${s.ctaBand} ${s.reveal}`}>
         <h2 className={s.ctaTitle}>Start earning with SkillBridge</h2>
         <p className={s.ctaSub}>Create your profile and start bidding on real work.</p>
         <button className={s.ctaBtn} onClick={onGetStarted}>Get started</button>
