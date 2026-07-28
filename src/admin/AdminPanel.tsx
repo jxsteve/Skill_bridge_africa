@@ -28,11 +28,13 @@ type Screen = 'dashboard' | 'verification' | 'escrow' | 'ratings';
 
 type Props = {
   isAdmin: boolean;
-  email: string;
   name: string;
   onExit: () => void;
-  onGoToLogin: () => void;
 };
+
+// Demo admin credentials (frontend-only — insecure, for the demo login).
+const ADMIN_USER = 'admin';
+const ADMIN_PASS = 'password';
 
 // ---- helpers --------------------------------------------------------------
 
@@ -76,8 +78,9 @@ function Stars({ n }: { n: number }) {
 
 // ---- root -----------------------------------------------------------------
 
-export default function AdminPanel({ isAdmin, email, name, onExit, onGoToLogin }: Props) {
+export default function AdminPanel({ isAdmin, name, onExit }: Props) {
   const [screen, setScreen] = useState<Screen>('dashboard');
+  const [unlocked, setUnlocked] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<VerificationRow | null>(null);
   const [selectedEscrow, setSelectedEscrow] = useState<EscrowRow | null>(null);
 
@@ -102,12 +105,23 @@ export default function AdminPanel({ isAdmin, email, name, onExit, onGoToLogin }
     }
   }, []);
 
-  useEffect(() => {
-    if (isAdmin) void reload();
-  }, [isAdmin, reload]);
+  const canView = isAdmin || unlocked;
 
-  if (!isAdmin) {
-    return <AdminLogin email={email} onGoToLogin={onGoToLogin} onExit={onExit} />;
+  useEffect(() => {
+    if (canView) void reload();
+  }, [canView, reload]);
+
+  if (!canView) {
+    return (
+      <AdminLogin
+        onSubmit={(user, pass) => {
+          const ok = user.trim().toLowerCase() === ADMIN_USER && pass === ADMIN_PASS;
+          if (ok) setUnlocked(true);
+          return ok;
+        }}
+        onExit={onExit}
+      />
+    );
   }
 
   const overview = computeOverview(verifs, escrows);
@@ -777,8 +791,22 @@ function Ratings({
 
 // ---- Login gate -----------------------------------------------------------
 
-function AdminLogin({ email, onGoToLogin, onExit }: { email: string; onGoToLogin: () => void; onExit: () => void }) {
-  const loggedInNotAdmin = Boolean(email);
+function AdminLogin({
+  onSubmit,
+  onExit,
+}: {
+  onSubmit: (user: string, password: string) => boolean;
+  onExit: () => void;
+}) {
+  const [user, setUser] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const submit = () => {
+    if (!onSubmit(user, password)) setError('Incorrect username or password.');
+    else setError('');
+  };
+
   return (
     <div className={s.loginWrap}>
       <div className={s.loginCard}>
@@ -792,21 +820,35 @@ function AdminLogin({ email, onGoToLogin, onExit }: { email: string; onGoToLogin
         <p className={s.loginTitle} style={{ fontSize: 18 }}>Admin Console</p>
         <p className={s.loginSub}>Sign in to manage the marketplace</p>
 
-        <label className={s.loginLabel}>Email</label>
-        <input className={s.loginInput} value={email} readOnly placeholder="you@skillbridge.africa" />
+        <label className={s.loginLabel}>Username</label>
+        <input
+          className={s.loginInput}
+          value={user}
+          onChange={(e) => setUser(e.target.value)}
+          placeholder="admin"
+          autoComplete="username"
+          onKeyDown={(e) => e.key === 'Enter' && submit()}
+        />
 
-        {loggedInNotAdmin ? (
-          <>
-            <p className={s.hintText} style={{ marginTop: 16, color: '#dc2626' }}>
-              This account doesn’t have admin access. Ask an admin to grant it.
-            </p>
-            <button className={s.btnGhost} style={{ width: '100%', marginTop: 8 }} onClick={onExit}>Back to app</button>
-          </>
-        ) : (
-          <button className={s.btnPrimary} style={{ width: '100%', marginTop: 18 }} onClick={onGoToLogin}>
-            Sign in
-          </button>
-        )}
+        <label className={s.loginLabel}>Password</label>
+        <input
+          className={s.loginInput}
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="••••••••"
+          autoComplete="current-password"
+          onKeyDown={(e) => e.key === 'Enter' && submit()}
+        />
+
+        {error && <p className={s.hintText} style={{ marginTop: 12, color: '#dc2626' }}>{error}</p>}
+
+        <button className={s.btnPrimary} style={{ width: '100%', marginTop: 18 }} onClick={submit}>
+          Sign in
+        </button>
+        <button className={s.btnGhost} style={{ width: '100%', marginTop: 8 }} onClick={onExit}>
+          Back to app
+        </button>
         <p className={s.loginFoot}>Authorized administrators only · Access is logged</p>
       </div>
     </div>

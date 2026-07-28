@@ -292,10 +292,8 @@ export default function App() {
     return (
       <AdminPanel
         isAdmin={isAdmin}
-        email={auth.user?.email ?? ''}
-        name={fullName || auth.user?.email?.split('@')[0] || ''}
+        name={fullName || auth.user?.email?.split('@')[0] || 'Admin'}
         onExit={() => navigate('/app')}
-        onGoToLogin={() => navigate('/login')}
       />
     );
   }
