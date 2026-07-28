@@ -35,7 +35,7 @@ const STEPS = [
   {
     icon: WalletIcon,
     title: 'Deliver & get paid',
-    body: 'Do the work and get paid — funds are held safely in escrow until the client approves.',
+    body: 'Do the work and get paid. Funds stay in escrow until the client approves.',
   },
 ];
 
@@ -53,12 +53,12 @@ const FEATURES = [
   {
     icon: DollarSignIcon,
     title: 'Built-in wallets',
-    body: 'Each user gets a secure embedded wallet at sign-up — no crypto experience needed.',
+    body: 'Each user gets a secure embedded wallet at sign-up, with no crypto experience needed.',
   },
   {
     icon: BriefcaseBusinessIcon,
-    title: 'Real work, real clients',
-    body: 'Design, development and writing gigs from startups and businesses that need great work.',
+    title: 'Real clients and tasks',
+    body: 'Design, development and writing work from startups and businesses across the country.',
   },
 ];
 
@@ -88,26 +88,19 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
 
       {/* Hero */}
       <section className={s.hero}>
-        <div className={s.eyebrow}>
-          <span className={s.avatars}>
-            <span className={s.av} style={{ background: '#124cc9' }}>A</span>
-            <span className={s.av} style={{ background: '#107535' }}>C</span>
-            <span className={s.av} style={{ background: '#6014e0' }}>N</span>
-          </span>
-          Built for African student talent
-        </div>
+        <div className={s.eyebrow}>Built for African student talent</div>
 
         <h1 className={s.headline}>
           Where student skills meet{' '}
           <span className={s.headlineAccent}>real work.</span>
         </h1>
         <p className={s.subhead}>
-          SkillBridge connects verified students with clients who need great work done —
-          with payments held safely in escrow until the job is complete.
+          SkillBridge connects verified students with clients who need great work done.
+          Payments stay in escrow until the job is complete.
         </p>
 
         <div className={s.heroCtas}>
-          <button className={s.primaryBtn} onClick={onGetStarted}>Get started — it’s free</button>
+          <button className={s.primaryBtn} onClick={onGetStarted}>Get started</button>
           <a className={s.secondaryBtn} href="#how">See how it works</a>
         </div>
 
@@ -127,7 +120,7 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
                 </span>
                 <span className={s.appBell} />
               </div>
-              <p className={s.appGreeting}>Welcome back, Amara 👋</p>
+              <p className={s.appGreeting}>Welcome back, Amara</p>
               <div className={s.appBalance}>
                 <span className={s.appBalanceLabel}>Wallet balance</span>
                 <span className={s.appBalanceValue}>$95.00</span>
@@ -153,8 +146,8 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
 
       {/* How it works */}
       <section id="how" className={s.section}>
-        <p className={s.kicker}>How it works</p>
-        <h2 className={s.h2}>Start earning in three steps</h2>
+        <p className={s.kicker}>For students</p>
+        <h2 className={s.h2}>How it works</h2>
         <div className={s.steps}>
           {STEPS.map((step, i) => (
             <div key={step.title} className={s.step}>
@@ -170,7 +163,7 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
       {/* Features */}
       <section id="features" className={s.sectionAlt}>
         <p className={s.kicker}>Why SkillBridge</p>
-        <h2 className={s.h2}>Trust built into every step</h2>
+        <h2 className={s.h2}>How we keep work and payments safe</h2>
         <div className={s.features}>
           {FEATURES.map((f) => (
             <div key={f.title} className={s.feature}>
@@ -191,7 +184,7 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
             {[
               'Post a task in minutes and set your budget',
               'Review bids from verified, skilled students',
-              'Fund escrow — pay only when you approve the work',
+              'Fund escrow and pay only when you approve the work',
             ].map((li) => (
               <li key={li} className={s.clientsItem}>
                 <CheckCircleIcon size={20} color="#107535" />
@@ -212,9 +205,9 @@ export default function LandingPage({ onGetStarted, onLogin }: Props) {
 
       {/* CTA band */}
       <section className={s.ctaBand}>
-        <h2 className={s.ctaTitle}>Ready to turn your skills into income?</h2>
-        <p className={s.ctaSub}>Join SkillBridge and start bidding on real work today.</p>
-        <button className={s.ctaBtn} onClick={onGetStarted}>Get started for free</button>
+        <h2 className={s.ctaTitle}>Start earning with SkillBridge</h2>
+        <p className={s.ctaSub}>Create your profile and start bidding on real work.</p>
+        <button className={s.ctaBtn} onClick={onGetStarted}>Get started</button>
       </section>
 
       {/* Footer */}
