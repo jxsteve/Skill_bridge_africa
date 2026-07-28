@@ -1,0 +1,159 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f7f8fa;
+}
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Hero */
+.hero {
+  background: #ffffff;
+  padding: 28px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-bottom: 1px solid #eef0f3;
+}
+.avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--blue-50);
+  color: var(--primary-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: 800;
+}
+.name {
+  margin-top: 12px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--title-dark);
+}
+.roleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.role {
+  font-size: 13px;
+  color: var(--gray-400);
+}
+.company {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--body-grey);
+}
+.badge {
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 3px 10px;
+}
+
+.body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Wallet card */
+.walletCard {
+  background: linear-gradient(150deg, #17a34a, #0f8f3f);
+  border-radius: 18px;
+  padding: 18px;
+  color: #fff;
+}
+.walletTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.walletLabel { font-size: 13px; opacity: 0.92; }
+.walletBalance { font-size: 30px; font-weight: 800; margin: 8px 0 16px; }
+.walletAddrRow { display: flex; align-items: flex-end; justify-content: space-between; }
+.walletAddrLabel { font-size: 11px; opacity: 0.82; }
+.walletAddr { font-size: 13px; font-weight: 600; margin-top: 2px; }
+
+/* Stats */
+.statsRow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.statTile {
+  background: #fff;
+  border: 1px solid #eef0f3;
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.statLabel { font-size: 11px; color: var(--gray-400); }
+.statValue { font-size: 16px; font-weight: 800; color: var(--title-dark); }
+
+/* Card / company details */
+.card {
+  background: #fff;
+  border: 1px solid #eef0f3;
+  border-radius: 16px;
+  padding: 16px;
+}
+.cardTitle { font-size: 15px; font-weight: 700; color: var(--title-dark); margin-bottom: 10px; }
+.fieldLabel { display: block; font-size: 13px; font-weight: 600; color: var(--text-secondary); margin: 12px 0 6px; }
+.input, .textarea {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 11px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--body-grey);
+}
+.textarea { resize: vertical; }
+.saveBtn {
+  margin-top: 14px;
+  width: 100%;
+  background: var(--primary-blue);
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.saveBtn:disabled { opacity: 0.6; }
+
+/* Rows */
+.row {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #eef0f3;
+  border-radius: 14px;
+  padding: 15px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+}
+.rowLeft { display: flex; align-items: center; gap: 12px; }
+.rowLabel { font-size: 15px; font-weight: 600; color: var(--title-dark); }
+
+.logout {
+  margin-top: 6px;
+  background: var(--primary-blue);
+  color: #fff;
+  border-radius: 12px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+}

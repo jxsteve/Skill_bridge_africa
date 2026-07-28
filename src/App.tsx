@@ -56,6 +56,7 @@ import ClientDashboardScreen, {
 } from './screens/ClientDashboardScreen';
 import FundPlatformWalletScreen from './screens/FundPlatformWalletScreen';
 import ClientMyTasksScreen from './screens/ClientMyTasksScreen';
+import ClientProfileScreen from './screens/ClientProfileScreen';
 import ClientVerificationProgressScreen from './screens/ClientVerificationProgressScreen';
 import ClientVerificationSuccessScreen from './screens/ClientVerificationSuccessScreen';
 import CreateTaskScreen, { type NewTaskDetails } from './screens/CreateTaskScreen';
@@ -666,7 +667,23 @@ export default function App() {
         />
         <Route
           path="/client/profile"
-          element={<ClientComingSoon title="Profile" activeTab="profile" onTab={goClientTab} />}
+          element={
+            <ClientProfileScreen
+              clientId={auth.user?.id}
+              name={fullName}
+              email={email}
+              walletAddress={clientWalletAddress}
+              accountStatus={clientAccountStatus}
+              walletBalance={clientWalletBalance}
+              totalFunded={totalFunded}
+              totalSpent={totalSpent}
+              onHold={onHold}
+              onMyTasks={() => navigate('/client/tasks')}
+              onFundWallet={() => navigate('/client/fund-wallet')}
+              onLogout={handleLogout}
+              onTab={goClientTab}
+            />
+          }
         />
 
         <Route path="*" element={<Navigate to="/" replace />} />
