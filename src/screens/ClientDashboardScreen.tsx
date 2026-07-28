@@ -24,13 +24,13 @@ export type ClientAccountStatus = 'unverified' | 'pending' | 'verified';
 type Props = {
   clientName: string;
   accountStatus: ClientAccountStatus;
+  hasTaskNotification: boolean;
   walletBalance: number;
   walletAddress?: string;
   totalFunded?: number;
   onHold?: number;
   totalSpent?: number;
   avatarUrl?: string;
-  hasUnreadNotifications?: boolean;
   activeTab: MainTab;
   onSelectTab: (tab: MainTab) => void;
   onFundWallet: () => void;
@@ -75,13 +75,13 @@ function formatCurrency(value: number) {
 export default function ClientDashboardScreen({
   clientName,
   accountStatus,
+  hasTaskNotification,
   walletBalance,
   walletAddress = '',
   totalFunded = 0,
   onHold = 0,
   totalSpent = 0,
   avatarUrl,
-  hasUnreadNotifications = false,
   activeTab,
   onSelectTab,
   onFundWallet,
@@ -112,9 +112,17 @@ export default function ClientDashboardScreen({
             <p className={styles.brandAfrica}>–AFRICA–</p>
           </div>
         </div>
-        <button className={styles.bell} onClick={onNotificationsClick} aria-label="Notifications">
+        <button 
+          className={styles.bell}
+          disabled={!hasTaskNotification} 
+          onClick={() => {
+            if (!isVerified) return;
+            onNotificationsClick?.();
+          }}
+          aria-label="Notifications"
+        >
           <BellIcon size={22} />
-          {hasUnreadNotifications && <span className={styles.bellDot} />}
+          {hasTaskNotification && <span className={styles.bellDot} />}
         </button>
       </div>
 
@@ -124,7 +132,15 @@ export default function ClientDashboardScreen({
           <p className={styles.welcomeName}>{clientName}</p>
           <p className={styles.roleTag}>Client</p>
         </div>
-        <button className={styles.avatarButton} onClick={onProfileClick} aria-label="Profile">
+        <button 
+          className={styles.avatarButton} 
+          disabled={!isVerified}
+          onClick={() => {
+            if (!isVerified) return;
+            onProfileClick?.();
+          }}
+          aria-label="Profile"
+        >
           {avatarUrl ? (
             <img className={styles.avatarImage} src={avatarUrl} alt="" />
           ) : (
@@ -214,7 +230,14 @@ export default function ClientDashboardScreen({
           </div>
         </div>
 
-        <BottomNav active={activeTab} onSelect={onSelectTab} variant="client" />
+        <BottomNav 
+          active={activeTab} 
+          onSelect={(tab) => {
+            if (!isVerified) return;
+            onSelectTab(tab);
+          }} 
+          variant="client" 
+        />
       </div>
     );
   }
@@ -289,7 +312,12 @@ export default function ClientDashboardScreen({
         </div>
       </div>
 
-      <BottomNav active={activeTab} onSelect={onSelectTab} variant="client" />
+      <BottomNav 
+        active={activeTab}
+        disabled={!isVerified} 
+        onSelect={onSelectTab}
+        variant="client" 
+      />
     </div>
   );
 }

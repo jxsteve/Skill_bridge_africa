@@ -42,10 +42,12 @@ export function BottomNav({
   active,
   onSelect,
   variant = 'student',
+  disabled = false,
 }: {
   active: MainTab;
   onSelect: (tab: MainTab) => void;
   variant?: BottomNavVariant;
+  disabled?: boolean;
 }) {
   const items = ITEMS_BY_VARIANT[variant];
 
@@ -54,7 +56,12 @@ export function BottomNav({
       {items.map(({ tab, label }) => {
         const color = active === tab ? violet : inactive;
         return (
-          <button key={tab} className={styles.item} onClick={() => onSelect(tab)}>
+          <button 
+          key={tab} 
+            className={styles.item} 
+            onClick={() => onSelect(tab)} 
+            disabled={disabled}
+          >
             <TabIcon tab={tab} color={color} />
             <span className={styles.label} style={{ color }}>
               {label}

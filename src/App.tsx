@@ -99,7 +99,7 @@ export default function App() {
   const [onHold, setOnHold] = useState(0);
   const [clientWalletAddress] = useState('9x4a6vQeUZ9pM2tRwYbN4KcHjD8sXx3kw1');
   const [draftTask, setDraftTask] = useState<NewTaskDetails | null>(null);
-
+  const [hasTaskNotification, setHasTaskNotification] = useState(false);
   // Mock assigned-student data. Replace with a real API response once the
   // backend can tell us who was assigned to a given task.
   const [assignedStudent] = useState<AssignedStudent>({
@@ -370,6 +370,7 @@ export default function App() {
             <ClientDashboardScreen
               clientName={fullName || 'there'}
               accountStatus={clientAccountStatus}
+              hasTaskNotification={hasTaskNotification}
               walletBalance={clientWalletBalance}
               walletAddress={clientWalletAddress}
               totalFunded={totalFunded}
@@ -379,7 +380,10 @@ export default function App() {
               onSelectTab={goClientTab}
               onFundWallet={() => navigate('/client/fund-wallet')}
               onAddFunds={() => navigate('/client/fund-wallet')}
-              onNotificationsClick={() => navigate('/client/work-submitted')}
+              onNotificationsClick={() => {
+                setHasTaskNotification(false);
+                navigate('/client/work-submitted');
+              }}
               onProfileClick={() => navigate('/client/profile')}
               onCreateTask={() => navigate('/client/create-task')}
               onMyTasks={() => navigate('/client/tasks')}
@@ -445,8 +449,16 @@ export default function App() {
         />
         <Route
           path="/client/task-under-review"
-          element={<TaskUnderReviewScreen onViewMyTasks={() => navigate('/client/student-assigned')} />}
+          element={
+          <TaskUnderReviewScreen 
+            onViewMyTasks={() => {
+              setHasTaskNotification(true);
+              navigate('/client/student-assigned');
+            }}
+          />
+          }
         />
+
         <Route
           path="/client/student-assigned"
           element={
@@ -464,7 +476,10 @@ export default function App() {
               deadline={draftTask ? formatDeadline(draftTask.deadline) : '24 August, 2026'}
               onBack={() => navigate('/client/student-assigned')}
               onGoBackToDashboard={() => navigate('/client/app')}
-              onCardClick={() => navigate('/client/work-submitted')}
+              onCardClick={() =>  {
+                setHasTaskNotification(true);
+                navigate('/client/work-submitted');
+              }}
             />
           }
         />
@@ -530,6 +545,8 @@ export default function App() {
                 setTotalSpent((prev) =>
                   prev + totalPayment
                 );
+
+                setHasTaskNotification(false);
 
                 navigate('/client/rate-experience');
               }}
