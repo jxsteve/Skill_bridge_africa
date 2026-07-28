@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import PhoneFrame from './components/PhoneFrame';
 import type { AccountType, MainTab } from './components/ui';
@@ -38,7 +38,7 @@ import ProfileSetupScreen from './screens/ProfileSetupScreen';
 import RegistrationScreen, {
   type RegistrationDetails,
 } from './screens/RegistrationScreen';
-import AdminScreen from './screens/AdminScreen';
+import AdminPanel from './admin/AdminPanel';
 import SplashScreen from './screens/SplashScreen';
 import StudentDashboardScreen from './screens/StudentDashboardScreen';
 import StudentHomeScreen from './screens/StudentHomeScreen';
@@ -91,6 +91,7 @@ const CLIENT_TAB_PATH: Record<MainTab, string> = {
 export default function App() {
   const auth = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [accountType, setAccountType] = useState<AccountType>('student');
   const [intent, setIntent] = useState<'signup' | 'login'>('signup');
@@ -285,6 +286,19 @@ export default function App() {
   }, [email, fullName, navigate]);
 
   const common = { name: fullName, email, walletAddress };
+
+  // Admin panel is a full-screen desktop app — rendered outside the phone frame.
+  if (location.pathname.startsWith('/admin')) {
+    return (
+      <AdminPanel
+        isAdmin={isAdmin}
+        email={auth.user?.email ?? ''}
+        name={fullName || auth.user?.email?.split('@')[0] || ''}
+        onExit={() => navigate('/app')}
+        onGoToLogin={() => navigate('/login')}
+      />
+    );
+  }
 
   return (
     <PhoneFrame>
@@ -646,9 +660,6 @@ export default function App() {
           path="/client/profile"
           element={<ClientComingSoon title="Profile" activeTab="profile" onTab={goClientTab} />}
         />
-
-        {/* Admin console — reachable at /admin */}
-        <Route path="/admin" element={<AdminScreen onExit={() => navigate('/app')} />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
