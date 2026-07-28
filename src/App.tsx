@@ -39,6 +39,7 @@ import RegistrationScreen, {
   type RegistrationDetails,
 } from './screens/RegistrationScreen';
 import AdminPanel from './admin/AdminPanel';
+import LandingPage from './landing/LandingPage';
 import SplashScreen from './screens/SplashScreen';
 import StudentDashboardScreen from './screens/StudentDashboardScreen';
 import StudentHomeScreen from './screens/StudentHomeScreen';
@@ -286,6 +287,16 @@ export default function App() {
   }, [email, fullName, navigate]);
 
   const common = { name: fullName, email, walletAddress };
+
+  // Marketing landing page — full-screen web page, outside the phone frame.
+  if (location.pathname === '/') {
+    return (
+      <LandingPage
+        onGetStarted={() => navigate('/onboarding')}
+        onLogin={() => navigate('/login')}
+      />
+    );
+  }
 
   // Admin panel is a full-screen desktop app — rendered outside the phone frame.
   if (location.pathname.startsWith('/admin')) {
