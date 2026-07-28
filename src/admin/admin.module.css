@@ -104,6 +104,11 @@
   font-weight: 700;
   flex-shrink: 0;
 }
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
 .userName {
   font-size: 13px;
   font-weight: 700;
