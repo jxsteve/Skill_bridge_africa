@@ -245,6 +245,16 @@ export const projects = {
       await db().from('projects').select('*').eq('client_id', clientId).order('created_at', { ascending: false }),
     );
   },
+  /** Projects where the user is either the student or the client, with task title. */
+  async listForUser(userId: string): Promise<(ProjectRow & { task: { title: string } | null })[]> {
+    return unwrap(
+      await db()
+        .from('projects')
+        .select('*, task:tasks(title)')
+        .or(`student_id.eq.${userId},client_id.eq.${userId}`)
+        .order('created_at', { ascending: false }),
+    );
+  },
   /** Approve a bid -> create the project and flip task + bid status. */
   async createFromBid(bid: BidRow, clientId: string): Promise<ProjectRow> {
     const project = unwrap<ProjectRow>(

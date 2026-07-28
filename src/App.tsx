@@ -93,6 +93,7 @@ export default function App() {
   const [postWelcome, setPostWelcome] = useState<'app' | 'home'>('home');
   const [rememberedEmail, setRememberedEmail] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // --- Client-flow specific state ---
   const [clientAccountStatus, setClientAccountStatus] =
@@ -135,12 +136,13 @@ export default function App() {
       setSupabaseToken(token);
       if (isSupabaseConfigured) {
         try {
-          await profiles.upsert({
+          const row = await profiles.upsert({
             id: auth.user.id,
             email: auth.user.email,
             full_name: fullName || undefined,
             wallet_address: auth.user.walletAddress ?? null,
           });
+          if (active) setIsAdmin(row.role === 'admin');
         } catch {
           // Best-effort; screens still render.
         }
@@ -261,6 +263,7 @@ export default function App() {
     setProfile(null);
     setVerified(false);
     setFullName('');
+    setIsAdmin(false);
     navigate('/login');
   }, [auth, navigate]);
 
@@ -375,7 +378,13 @@ export default function App() {
         />
         <Route
           path="/app/notifications"
-          element={<NotificationsScreen verified={verified} onBack={() => navigate(-1)} />}
+          element={
+            <NotificationsScreen
+              verified={verified}
+              userId={auth.user?.id}
+              onBack={() => navigate(-1)}
+            />
+          }
         />
         <Route path="/app/tasks/:taskId" element={<TaskDetailRoute />} />
         <Route path="/app/tasks/:taskId/bid" element={<PlaceBidRoute />} />
@@ -388,6 +397,7 @@ export default function App() {
           path="/app/projects"
           element={
             <MyProjectsScreen
+              userId={auth.user?.id}
               onOpenProject={(id) => navigate(`/app/projects/${id}/submit`)}
               onTab={goTab}
             />
@@ -400,7 +410,9 @@ export default function App() {
             <ProfileScreen
               {...common}
               profile={profile}
+              isAdmin={isAdmin}
               onEditProfile={() => navigate('/profile-setup')}
+              onOpenAdmin={() => navigate('/admin')}
               onLogout={handleLogout}
               onTab={goTab}
             />

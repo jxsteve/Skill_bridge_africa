@@ -8,11 +8,14 @@ import * as repo from './repo';
 import type { NewTaskDetails } from '../screens/CreateTaskScreen';
 import {
   BIDS,
+  PROJECTS,
   TASKS,
   type Bid,
+  type Project,
   type Task,
   type TaskCategory,
 } from './marketplace';
+import { buildNotifications, type AppNotification, type NotificationKind } from './notifications';
 import type { BidWithTask, TaskWithClient } from './repo';
 
 // UI CreateTask categories collapse into the three DB buckets.
@@ -116,6 +119,35 @@ export function deliveryToDays(label: string): number {
   if (!m) return 3;
   const n = parseInt(m[1], 10);
   return /week/i.test(m[2]) ? n * 7 : n;
+}
+
+/** A user's projects (as student or client), shaped for the UI. */
+export async function listMyProjects(userId: string): Promise<Project[]> {
+  if (!isSupabaseConfigured) return PROJECTS;
+  const rows = await repo.projects.listForUser(userId);
+  return rows.map((p) => ({
+    id: p.id,
+    title: p.task?.title ?? 'Project',
+    client: '',
+    dueInDays: 0,
+    budget: Number(p.amount),
+    status: p.status === 'completed' ? 'Completed' : 'In Progress',
+  }));
+}
+
+const NOTIF_KINDS: NotificationKind[] = ['verification', 'bid', 'job', 'payment'];
+
+/** A user's notifications, shaped for the UI (falls back to the mock feed). */
+export async function listMyNotifications(userId: string, verified: boolean): Promise<AppNotification[]> {
+  if (!isSupabaseConfigured) return buildNotifications(verified);
+  const rows = await repo.notifications.listByUser(userId);
+  return rows.map((n) => ({
+    id: n.id,
+    kind: (NOTIF_KINDS.includes(n.type as NotificationKind) ? n.type : 'job') as NotificationKind,
+    title: n.title,
+    body: n.body,
+    time: new Date(n.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
+  }));
 }
 
 /** Place a bid on a task. */

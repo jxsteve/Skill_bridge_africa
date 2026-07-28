@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import {
   ActivityIcon,
   BellIcon,
@@ -6,11 +8,18 @@ import {
   ClipboardListIcon,
   DollarSignIcon,
 } from '../components/ui';
-import { buildNotifications, type NotificationKind } from '../data/notifications';
+import {
+  buildNotifications,
+  type AppNotification,
+  type NotificationKind,
+} from '../data/notifications';
+import { isSupabaseConfigured } from '../lib/supabase';
+import { listMyNotifications } from '../data/marketplace-service';
 import styles from './NotificationsScreen.module.css';
 
 type Props = {
   verified: boolean;
+  userId?: string;
   onBack: () => void;
 };
 
@@ -34,8 +43,17 @@ function KindIcon({ kind, color }: { kind: NotificationKind; color: string }) {
   }
 }
 
-export default function NotificationsScreen({ verified, onBack }: Props) {
-  const notifications = buildNotifications(verified);
+export default function NotificationsScreen({ verified, userId, onBack }: Props) {
+  const [notifications, setNotifications] = useState<AppNotification[]>(() =>
+    buildNotifications(verified),
+  );
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !userId) return;
+    listMyNotifications(userId, verified)
+      .then(setNotifications)
+      .catch(() => {});
+  }, [userId, verified]);
 
   return (
     <div className={styles.container}>

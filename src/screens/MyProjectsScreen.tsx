@@ -1,25 +1,37 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { BottomNav, MainTab, SegmentedTabs } from '../components/ui';
-import { PROJECTS } from '../data/marketplace';
+import { PROJECTS, type Project } from '../data/marketplace';
+import { isSupabaseConfigured } from '../lib/supabase';
+import { listMyProjects } from '../data/marketplace-service';
 import styles from './MyProjectsScreen.module.css';
 
 const STATUSES = ['In Progress', 'Completed'] as const;
-const TABS = STATUSES.map(
-  (status) => `${status} (${PROJECTS.filter((p) => p.status === status).length})`,
-);
 
 type Props = {
+  userId?: string;
   onOpenProject: (id: string) => void;
   onTab: (tab: MainTab) => void;
 };
 
-export default function MyProjectsScreen({ onOpenProject, onTab }: Props) {
+export default function MyProjectsScreen({ userId, onOpenProject, onTab }: Props) {
   const [active, setActive] = useState(0);
+  const [allProjects, setAllProjects] = useState<Project[]>(PROJECTS);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !userId) return;
+    listMyProjects(userId)
+      .then(setAllProjects)
+      .catch(() => {});
+  }, [userId]);
+
+  const TABS = STATUSES.map(
+    (status) => `${status} (${allProjects.filter((p) => p.status === status).length})`,
+  );
 
   const projects = useMemo(
-    () => PROJECTS.filter((p) => p.status === STATUSES[active]),
-    [active],
+    () => allProjects.filter((p) => p.status === STATUSES[active]),
+    [active, allProjects],
   );
 
   return (

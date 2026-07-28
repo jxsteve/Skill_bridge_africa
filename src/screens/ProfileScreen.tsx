@@ -17,7 +17,9 @@ type Props = {
   name: string;
   email: string;
   profile: StudentProfile | null;
+  isAdmin?: boolean;
   onEditProfile: () => void;
+  onOpenAdmin?: () => void;
   onLogout: () => void;
   onTab: (tab: MainTab) => void;
 };
@@ -30,7 +32,9 @@ export default function ProfileScreen({
   name,
   email,
   profile,
+  isAdmin,
   onEditProfile,
+  onOpenAdmin,
   onLogout,
   onTab,
 }: Props) {
@@ -118,6 +122,14 @@ export default function ProfileScreen({
             <span className={styles.rowLabel}>Edit profile</span>
             <ChevronRightIcon size={18} color="#9CA3AF" />
           </button>
+
+          {/* Admin console (admins only) */}
+          {isAdmin && onOpenAdmin && (
+            <button className={styles.row} onClick={onOpenAdmin}>
+              <span className={styles.rowLabel}>Admin console</span>
+              <ChevronRightIcon size={18} color="#9CA3AF" />
+            </button>
+          )}
 
           {/* Log out */}
           <button className={styles.logout} onClick={onLogout}>
