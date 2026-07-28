@@ -84,7 +84,7 @@ const TAB_PATH: Record<MainTab, string> = {
 
 const CLIENT_TAB_PATH: Record<MainTab, string> = {
   home: '/client/app',
-  tasks: '/client/create-task',
+  tasks: '/client/tasks', // client's "My Tasks" list (create is a button there)
   bids: '/client/app', // not used on the client flow
   wallet: '/client/fund-wallet',
   profile: '/client/profile',
