@@ -199,8 +199,9 @@ export default function App() {
   );
 
   const handleLogin = useCallback(
-    (enteredEmail: string, remember: boolean) => {
+    (enteredEmail: string, remember: boolean, type: AccountType) => {
       setIntent('login');
+      setAccountType(type);
       setEmail(enteredEmail);
       setRememberMe(remember);
       saveLoginPrefs(enteredEmail, remember);
@@ -226,6 +227,12 @@ export default function App() {
   );
 
   const handleVerifiedContinue = useCallback(() => {
+    // A client logging in goes straight to the client dashboard.
+    if (intent === 'login' && accountType === 'client') {
+      setVerified(true);
+      navigate('/client/app');
+      return;
+    }
     if (intent === 'login' && loginCompleted) {
       setVerified(true);
       setPostWelcome('app');
@@ -233,7 +240,7 @@ export default function App() {
       setPostWelcome('home');
     }
     navigate('/welcome');
-  }, [intent, loginCompleted, navigate]);
+  }, [intent, accountType, loginCompleted, navigate]);
 
   const finishWelcome = useCallback(() => {
     // Client accounts see two explainer screens (How It Works, and whatever

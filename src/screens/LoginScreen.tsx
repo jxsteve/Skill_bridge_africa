@@ -1,6 +1,13 @@
 import { useState } from 'react';
 
-import { Checkbox, MailIcon, PrimaryButton, TextField } from '../components/ui';
+import {
+  Checkbox,
+  MailIcon,
+  PrimaryButton,
+  SegmentedTabs,
+  TextField,
+  type AccountType,
+} from '../components/ui';
 import styles from './LoginScreen.module.css';
 
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
@@ -8,7 +15,7 @@ const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
 type Props = {
   initialEmail?: string;
   initialRememberMe?: boolean;
-  onSubmit: (email: string, rememberMe: boolean) => void;
+  onSubmit: (email: string, rememberMe: boolean, accountType: AccountType) => void;
   onSignUp: () => void;
 };
 
@@ -20,12 +27,13 @@ export default function LoginScreen({
 }: Props) {
   const [email, setEmail] = useState(initialEmail);
   const [rememberMe, setRememberMe] = useState(initialRememberMe);
+  const [accountType, setAccountType] = useState<AccountType>('student');
 
   const canSubmit = EMAIL_PATTERN.test(email.trim());
 
   const handleSubmit = () => {
     if (!canSubmit) return;
-    onSubmit(email.trim(), rememberMe);
+    onSubmit(email.trim(), rememberMe, accountType);
   };
 
   return (
@@ -33,8 +41,15 @@ export default function LoginScreen({
       <div className={styles.content}>
         <p className={styles.title}>Welcome Back</p>
         <p className={styles.subtitle}>
-          Login with your email — we’ll send you{'\n'}a 6-digit code
+          Login with your email and we’ll send you{'\n'}a 6-digit code
         </p>
+
+        <p className={styles.toggleLabel}>I’m logging in as</p>
+        <SegmentedTabs
+          tabs={['Student', 'Client']}
+          active={accountType === 'client' ? 1 : 0}
+          onChange={(i) => setAccountType(i === 1 ? 'client' : 'student')}
+        />
 
         <div className={styles.form}>
           <TextField

@@ -28,8 +28,15 @@
   line-height: 25px;
   white-space: pre-line;
 }
+.toggleLabel {
+  margin-top: 28px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--body-grey);
+}
 .form {
-  margin-top: 34px;
+  margin-top: 20px;
 }
 .rememberRow {
   margin-top: 16px;
