@@ -26,6 +26,13 @@ export default function VerifyEmailScreen({
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState(false);
   const verifyingRef = useRef(false);
+  const continuedRef = useRef(false);
+
+  const goContinue = () => {
+    if (continuedRef.current) return;
+    continuedRef.current = true;
+    onContinue();
+  };
 
   const handleVerify = async () => {
     if (verifyingRef.current || verified || code.length !== 6) return;
@@ -37,9 +44,13 @@ export default function VerifyEmailScreen({
     verifyingRef.current = false;
     if (ok) {
       setVerified(true);
+      // Advance automatically once the code is confirmed.
+      window.setTimeout(goContinue, 800);
     } else {
+      // Keep the entered code visible so the error message actually shows and
+      // the user can correct it. (Clearing it here used to instantly re-hide the
+      // error via the effect below, making a rejected code look like a no-op.)
       setError(true);
-      setCode('');
     }
   };
 
@@ -74,10 +85,14 @@ export default function VerifyEmailScreen({
         <OtpInput
           value={code}
           onChange={setCode}
-          status={verified ? 'success' : 'default'}
+          status={verified ? 'success' : error ? 'error' : 'default'}
         />
       </div>
-      {error && <p className={styles.error}>Invalid code. Please try again.</p>}
+      {error && (
+        <p className={styles.error}>
+          That code is incorrect or has expired. Try again or resend a new one.
+        </p>
+      )}
       {verified ? (
         <div className={styles.successRow}>
           <div className={styles.successBadge}>
@@ -105,7 +120,7 @@ export default function VerifyEmailScreen({
         fullWidth
         loading={verifying}
         disabled={!verified && code.length !== 6}
-        onClick={verified ? onContinue : handleVerify}
+        onClick={verified ? goContinue : handleVerify}
       />
       {!verified && (
         <button className={styles.changeEmail} onClick={onChangeEmail}>

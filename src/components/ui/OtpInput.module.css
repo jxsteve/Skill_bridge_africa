@@ -27,6 +27,12 @@
   background: #e9fbf0;
   color: var(--green-500);
 }
+.error {
+  border-width: 2px;
+  border-color: #dc2626;
+  background: #fef2f2;
+  color: #dc2626;
+}
 .hidden {
   position: absolute;
   opacity: 0;

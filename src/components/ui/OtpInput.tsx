@@ -6,12 +6,13 @@ type Props = {
   length?: number;
   value: string;
   onChange: (code: string) => void;
-  status?: 'default' | 'success';
+  status?: 'default' | 'success' | 'error';
 };
 
 export function OtpInput({ length = 6, value, onChange, status = 'default' }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const success = status === 'success';
+  const error = status === 'error';
 
   return (
     <div className={styles.row} onClick={() => inputRef.current?.focus()}>
@@ -19,7 +20,7 @@ export function OtpInput({ length = 6, value, onChange, status = 'default' }: Pr
         <div
           key={i}
           className={`${styles.box} ${
-            success ? styles.success : i === value.length ? styles.active : ''
+            success ? styles.success : error ? styles.error : i === value.length ? styles.active : ''
           }`}
         >
           {value[i] ?? ''}
