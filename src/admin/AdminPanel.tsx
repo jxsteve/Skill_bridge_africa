@@ -6,6 +6,7 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 
+import { HomeIcon, ShieldCheckIcon, StarIcon, WalletIcon } from '../components/ui';
 import logoMark from '../assets/images/logo_mark.png';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { projects as projectsRepo } from '../data/repo';
@@ -111,11 +112,11 @@ export default function AdminPanel({ isAdmin, email, name, onExit, onGoToLogin }
 
   const overview = computeOverview(verifs, escrows);
 
-  const nav: { key: Screen; label: string }[] = [
-    { key: 'dashboard', label: 'Dashboard' },
-    { key: 'verification', label: 'Student Verification' },
-    { key: 'escrow', label: 'Escrow Monitoring' },
-    { key: 'ratings', label: 'Ratings & Reviews' },
+  const nav: { key: Screen; label: string; Icon: typeof HomeIcon }[] = [
+    { key: 'dashboard', label: 'Dashboard', Icon: HomeIcon },
+    { key: 'verification', label: 'Student Verification', Icon: ShieldCheckIcon },
+    { key: 'escrow', label: 'Escrow Monitoring', Icon: WalletIcon },
+    { key: 'ratings', label: 'Ratings & Reviews', Icon: StarIcon },
   ];
 
   return (
@@ -126,20 +127,23 @@ export default function AdminPanel({ isAdmin, email, name, onExit, onGoToLogin }
           <span className={s.brandText}>Skill<span style={{ color: 'var(--brand-green)' }}>Bridge</span></span>
         </div>
         <nav className={s.nav}>
-          {nav.map((n) => (
-            <button
-              key={n.key}
-              className={`${s.navItem} ${screen === n.key && !selectedStudent && !selectedEscrow ? s.navItemActive : ''}`}
-              onClick={() => {
-                setScreen(n.key);
-                setSelectedStudent(null);
-                setSelectedEscrow(null);
-              }}
-            >
-              <span className={s.navSquare} />
-              <span className={s.navLabel}>{n.label}</span>
-            </button>
-          ))}
+          {nav.map((n) => {
+            const active = screen === n.key && !selectedStudent && !selectedEscrow;
+            return (
+              <button
+                key={n.key}
+                className={`${s.navItem} ${active ? s.navItemActive : ''}`}
+                onClick={() => {
+                  setScreen(n.key);
+                  setSelectedStudent(null);
+                  setSelectedEscrow(null);
+                }}
+              >
+                <n.Icon size={19} color={active ? '#124cc9' : '#b0c6f8'} />
+                <span className={s.navLabel}>{n.label}</span>
+              </button>
+            );
+          })}
         </nav>
         <button className={s.userCard} onClick={onExit} title="Exit admin">
           <span className={s.userAvatar}>{initials(name, 'A')}</span>
