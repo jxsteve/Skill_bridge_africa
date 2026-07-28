@@ -27,6 +27,8 @@ export type Auth = {
   sendCode: (email: string, opts?: { disableSignup?: boolean }) => Promise<boolean>;
   verifyCode: (email: string, code: string) => Promise<AuthUser | null>;
   logout: () => Promise<void>;
+  /** Current access token, forwarded to Supabase for row-level security. */
+  getToken: () => Promise<string | null>;
 };
 
 // Embedded wallets require a secure context (https or localhost). On plain-HTTP
@@ -60,7 +62,7 @@ export function useAuth(): Auth {
 }
 
 function usePrivyAuth(): Auth {
-  const { ready, authenticated, user, logout } = usePrivy();
+  const { ready, authenticated, user, logout, getAccessToken } = usePrivy();
   const { sendCode: privySendCode, loginWithCode } = useLoginWithEmail();
   const { wallets } = useWallets();
 
@@ -103,6 +105,13 @@ function usePrivyAuth(): Auth {
     logout: async () => {
       await logout();
     },
+    getToken: async () => {
+      try {
+        return await getAccessToken();
+      } catch {
+        return null;
+      }
+    },
   };
 }
 
@@ -123,7 +132,7 @@ function MockAuthProvider({ children }: PropsWithChildren) {
   const logout = useCallback(async () => setUser(null), []);
 
   const value = useMemo<Auth>(
-    () => ({ isReady: true, user, sendCode, verifyCode, logout }),
+    () => ({ isReady: true, user, sendCode, verifyCode, logout, getToken: async () => null }),
     [user, sendCode, verifyCode, logout],
   );
   return <MockCtx.Provider value={value}>{children}</MockCtx.Provider>;

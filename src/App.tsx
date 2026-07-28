@@ -5,6 +5,9 @@ import PhoneFrame from './components/PhoneFrame';
 import type { AccountType, MainTab } from './components/ui';
 import { BottomNav } from './components/ui';
 import { useAuth } from './auth/AuthProvider';
+import { isSupabaseConfigured, setSupabaseToken } from './lib/supabase';
+import { profiles, studentProfiles } from './data/repo';
+import { createTask, deliveryToDays, placeBid } from './data/marketplace-service';
 import { PROJECTS, TASKS } from './data/marketplace';
 import {
   getCompletedProfile,
@@ -28,6 +31,7 @@ import ProfileSetupScreen from './screens/ProfileSetupScreen';
 import RegistrationScreen, {
   type RegistrationDetails,
 } from './screens/RegistrationScreen';
+import AdminScreen from './screens/AdminScreen';
 import SplashScreen from './screens/SplashScreen';
 import StudentDashboardScreen from './screens/StudentDashboardScreen';
 import StudentHomeScreen from './screens/StudentHomeScreen';
@@ -117,6 +121,37 @@ export default function App() {
     setRememberMe(prefs.rememberMe);
   }, []);
 
+  // On login: forward the Privy token to Supabase (for row-level security) and
+  // ensure this user has a profiles row. No-op until Supabase is configured.
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      if (!auth.user) {
+        setSupabaseToken(null);
+        return;
+      }
+      const token = await auth.getToken();
+      if (!active) return;
+      setSupabaseToken(token);
+      if (isSupabaseConfigured) {
+        try {
+          await profiles.upsert({
+            id: auth.user.id,
+            email: auth.user.email,
+            full_name: fullName || undefined,
+            wallet_address: auth.user.walletAddress ?? null,
+          });
+        } catch {
+          // Best-effort; screens still render.
+        }
+      }
+    })();
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.user?.id]);
+
   const walletAddress = auth.user?.walletAddress;
   const isClient = accountType === 'client';
 
@@ -199,9 +234,26 @@ export default function App() {
   const handleProfileComplete = useCallback(
     (completed: StudentProfile) => {
       setProfile(completed);
+      if (auth.user && isSupabaseConfigured) {
+        void studentProfiles
+          .save({
+            user_id: auth.user.id,
+            avatar_url: completed.avatarUri,
+            bio: completed.bio,
+            university: completed.university,
+            department: completed.department,
+            reg_number: completed.regNumber,
+            linkedin: completed.linkedin,
+            student_id_url: completed.studentIdUri,
+            skills: completed.skills,
+            portfolio: completed.portfolio,
+            available: completed.available,
+          })
+          .catch(() => {});
+      }
       navigate(verified ? '/app' : '/verifying');
     },
-    [verified, navigate],
+    [auth.user, verified, navigate],
   );
 
   const handleLogout = useCallback(() => {
@@ -330,7 +382,7 @@ export default function App() {
         <Route path="/app/bid-accepted/:taskId" element={<BidAcceptedRoute />} />
         <Route
           path="/app/bids"
-          element={<MyBidsScreen onTab={goTab} />}
+          element={<MyBidsScreen studentId={auth.user?.id} onTab={goTab} />}
         />
         <Route
           path="/app/projects"
@@ -565,6 +617,9 @@ export default function App() {
           element={<ClientComingSoon title="Profile" activeTab="profile" onTab={goClientTab} />}
         />
 
+        {/* Admin console — reachable at /admin */}
+        <Route path="/admin" element={<AdminScreen onExit={() => navigate('/app')} />} />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </PhoneFrame>
@@ -588,7 +643,18 @@ export default function App() {
     return (
       <PlaceBidScreen
         onBack={() => navigate(-1)}
-        onSubmit={() => navigate(`/app/bid-accepted/${taskId}`)}
+        onSubmit={(bid) => {
+          if (auth.user && taskId) {
+            void placeBid(
+              taskId,
+              auth.user.id,
+              bid.amount,
+              deliveryToDays(bid.delivery),
+              bid.note,
+            ).catch(() => {});
+          }
+          navigate(`/app/bid-accepted/${taskId}`);
+        }}
       />
     );
   }
@@ -622,6 +688,7 @@ export default function App() {
         onEdit={() => navigate('/client/create-task')}
         onSubmit={() => {
           setOnHold(draftTask?.budget ?? 0);
+          if (auth.user && draftTask) void createTask(auth.user.id, draftTask);
           navigate('/client/task-under-review');
         }}
       />

@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { BottomNav, SearchIcon, SlidersIcon } from '../components/ui';
 import type { MainTab } from '../components/ui';
 import { PROJECTS, TASKS } from '../data/marketplace';
-import type { TaskCategory } from '../data/marketplace';
+import type { Task, TaskCategory } from '../data/marketplace';
+import { isSupabaseConfigured } from '../lib/supabase';
+import { listOpenTasks } from '../data/marketplace-service';
 import styles from './BrowseTasksScreen.module.css';
 
 const VIEWS = ['All', 'In Progress', 'Completed'] as const;
@@ -25,19 +27,28 @@ export default function BrowseTasksScreen({ onOpenTask, onOpenProject, onTab }: 
   const [view, setView] = useState<(typeof VIEWS)[number]>('All');
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>('All categories');
   const [filterOpen, setFilterOpen] = useState(false);
+  const [allTasks, setAllTasks] = useState<Task[]>(TASKS);
+
+  // Load live tasks (including ones clients just posted); mock data otherwise.
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    listOpenTasks()
+      .then(setAllTasks)
+      .catch(() => {});
+  }, []);
 
   const matchesQuery = (title: string) =>
     query.trim() === '' || title.toLowerCase().includes(query.trim().toLowerCase());
 
   const tasks = useMemo(
     () =>
-      TASKS.filter(
+      allTasks.filter(
         (t) =>
           (category === 'All categories' || t.category === category) &&
           matchesQuery(t.title),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [query, category],
+    [query, category, allTasks],
   );
 
   const projects = useMemo(

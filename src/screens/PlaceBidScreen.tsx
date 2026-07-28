@@ -9,9 +9,11 @@ import {
 import { DELIVERY_OPTIONS } from '../data/marketplace';
 import styles from './PlaceBidScreen.module.css';
 
+export type BidDetails = { amount: number; delivery: string; note: string };
+
 type Props = {
   onBack: () => void;
-  onSubmit: () => void;
+  onSubmit: (bid: BidDetails) => void;
 };
 
 export default function PlaceBidScreen({ onBack, onSubmit }: Props) {
@@ -94,7 +96,9 @@ export default function PlaceBidScreen({ onBack, onSubmit }: Props) {
           showIcon={false}
           fullWidth
           disabled={!canSubmit}
-          onClick={onSubmit}
+          onClick={() =>
+            onSubmit({ amount: parseFloat(amount) || 0, delivery, note })
+          }
         />
       </div>
     </div>

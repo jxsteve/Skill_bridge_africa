@@ -1,13 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { BottomNav, MainTab, SegmentedTabs } from '../components/ui';
-import { BIDS, BidStatus } from '../data/marketplace';
+import { BIDS, type Bid, BidStatus } from '../data/marketplace';
+import { isSupabaseConfigured } from '../lib/supabase';
+import { listMyBids } from '../data/marketplace-service';
 import styles from './MyBidsScreen.module.css';
 
 const GROUPS = ['Active', 'Pending', 'Won'] as const;
-const TABS = GROUPS.map(
-  (group) => `${group} (${BIDS.filter((b) => b.group === group).length})`,
-);
 
 const STATUS_STYLE: Record<BidStatus, { bg: string; color: string }> = {
   Approved: { bg: '#93F0B6', color: '#107535' },
@@ -16,13 +15,29 @@ const STATUS_STYLE: Record<BidStatus, { bg: string; color: string }> = {
 };
 
 type Props = {
+  studentId?: string;
   onTab: (tab: MainTab) => void;
 };
 
-export default function MyBidsScreen({ onTab }: Props) {
+export default function MyBidsScreen({ studentId, onTab }: Props) {
   const [active, setActive] = useState(0);
+  const [allBids, setAllBids] = useState<Bid[]>(BIDS);
 
-  const bids = useMemo(() => BIDS.filter((b) => b.group === GROUPS[active]), [active]);
+  useEffect(() => {
+    if (!isSupabaseConfigured || !studentId) return;
+    listMyBids(studentId)
+      .then(setAllBids)
+      .catch(() => {});
+  }, [studentId]);
+
+  const TABS = GROUPS.map(
+    (group) => `${group} (${allBids.filter((b) => b.group === group).length})`,
+  );
+
+  const bids = useMemo(
+    () => allBids.filter((b) => b.group === GROUPS[active]),
+    [active, allBids],
+  );
 
   return (
     <div className={styles.container}>
