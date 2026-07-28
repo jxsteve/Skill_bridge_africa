@@ -73,13 +73,18 @@ function usePrivyAuth(): Auth {
   const sendCode = useCallback(
     async (email: string, opts?: { disableSignup?: boolean }) => {
       try {
+        // Privy rejects a new login while a session is already active. Clear any
+        // existing session first so verifying the new code isn't blocked.
+        if (authenticated) {
+          await logout();
+        }
         await privySendCode({ email, disableSignup: opts?.disableSignup });
         return true;
       } catch {
         return false;
       }
     },
-    [privySendCode],
+    [privySendCode, authenticated, logout],
   );
 
   const verifyCode = useCallback(
@@ -88,10 +93,18 @@ function usePrivyAuth(): Auth {
         await loginWithCode({ code });
         return { id: user?.id ?? 'web-user', email, walletAddress };
       } catch {
+        // If a stale session blocked the login, clear it so the next attempt is clean.
+        if (authenticated) {
+          try {
+            await logout();
+          } catch {
+            /* ignore */
+          }
+        }
         return null;
       }
     },
-    [loginWithCode, user, walletAddress],
+    [loginWithCode, user, walletAddress, authenticated, logout],
   );
 
   return {
