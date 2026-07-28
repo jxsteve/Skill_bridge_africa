@@ -6,6 +6,7 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 
+import logoMark from '../assets/images/logo_mark.png';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { projects as projectsRepo } from '../data/repo';
 import {
@@ -120,6 +121,10 @@ export default function AdminPanel({ isAdmin, email, name, onExit, onGoToLogin }
   return (
     <div className={s.shell}>
       <aside className={s.sidebar}>
+        <div className={s.brand}>
+          <img src={logoMark} className={s.brandMark} alt="" />
+          <span className={s.brandText}>Skill<span style={{ color: 'var(--brand-green)' }}>Bridge</span></span>
+        </div>
         <nav className={s.nav}>
           {nav.map((n) => (
             <button
@@ -774,8 +779,11 @@ function AdminLogin({ email, onGoToLogin, onExit }: { email: string; onGoToLogin
     <div className={s.loginWrap}>
       <div className={s.loginCard}>
         <div className={s.loginBrand}>
-          <span className={s.loginMark} />
-          <span className={s.loginTitle}>SkillBridge</span>
+          <img src={logoMark} className={s.loginMark} alt="" />
+          <span className={s.loginTitle}>
+            <span style={{ color: 'var(--primary-blue)' }}>Skill</span>
+            <span style={{ color: 'var(--brand-green)' }}>Bridge</span>
+          </span>
         </div>
         <p className={s.loginTitle} style={{ fontSize: 18 }}>Admin Console</p>
         <p className={s.loginSub}>Sign in to manage the marketplace</p>
