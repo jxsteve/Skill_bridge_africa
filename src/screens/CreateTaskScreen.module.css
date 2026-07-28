@@ -1,0 +1,134 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 18px 20px 28px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  padding: 4px;
+  display: flex;
+  cursor: pointer;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.fieldLabel {
+  display: block;
+  margin: 20px 0 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.textInput {
+  width: 100%;
+  height: 52px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #d5dbe3;
+  background: var(--gray-50);
+  font-size: 15px;
+  color: var(--title-dark);
+}
+
+.textInput::placeholder {
+  color: var(--gray-400);
+}
+
+.textInput:focus,
+.dateInput:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+}
+
+.dateInput {
+  width: 100%;
+  height: 52px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid #d5dbe3;
+  background: var(--gray-50);
+  font-size: 15px;
+  color: var(--title-dark);
+  font-family: inherit;
+}
+
+.textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #d5dbe3;
+  background: var(--gray-50);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--title-dark);
+  font-family: inherit;
+  resize: vertical;
+}
+
+.textarea::placeholder {
+  color: var(--gray-400);
+}
+
+.chipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.addSkillButton {
+  background: none;
+  border: none;
+  padding: 6px 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-blue);
+  cursor: pointer;
+}
+
+.skillInput {
+  width: 110px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 16px;
+  border: 1px solid var(--blue-500);
+  background: var(--blue-50);
+  font-size: 13px;
+  color: var(--title-dark);
+}
+
+.skillInput:focus {
+  outline: none;
+}
+
+.submit {
+  margin-top: 28px;
+}
+
+.submit :global(button) {
+  background-color: var(--primary-blue) !important;
+}

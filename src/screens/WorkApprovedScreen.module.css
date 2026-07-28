@@ -1,0 +1,118 @@
+.container {
+  flex: 1;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 32px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  margin: 20px 0 0;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.subtitle {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.amountCard {
+  margin-top: 24px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--gray-200);
+  text-align: left;
+}
+
+.amountLabel {
+  margin: 0;
+  font-size: 13px;
+  color: var(--gray-400);
+}
+
+.amountValue {
+  margin: 4px 0 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--title-dark);
+}
+
+.spacer {
+  flex: 1;
+  min-height: 32px;
+}
+
+.submit {
+  width: 100%;
+}
+
+.submit :global(button) {
+  background-color: #16a34a !important;
+}
+
+.amountRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.rowLabel {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.rowValue {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--title-dark);
+}
+
+.feeValue {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f59e0b;
+}
+
+.divider {
+  border: none;
+  border-top: 1px dashed var(--gray-200);
+  margin: 18px 0;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+
+.note {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border-left: 4px solid var(--primary-blue);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-align: left;
+}
