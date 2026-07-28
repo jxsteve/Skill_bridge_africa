@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import {
   ActivityIcon,
@@ -12,6 +12,9 @@ import {
   type MainTab,
 } from '../components/ui';
 import logoMark from '../assets/images/logo_mark.png';
+import { isSupabaseConfigured } from '../lib/supabase';
+import { listMyBids, listMyProjects } from '../data/marketplace-service';
+import type { Project } from '../data/marketplace';
 import styles from './StudentDashboardScreen.module.css';
 
 const violet = '#6014E0';
@@ -19,6 +22,7 @@ const violet = '#6014E0';
 type Props = {
   name: string;
   email: string;
+  userId?: string;
   walletAddress?: string;
   avatarUri?: string;
   onImproveProfile: () => void;
@@ -37,6 +41,7 @@ function shortAddress(address?: string) {
 export default function StudentDashboardScreen({
   name,
   email,
+  userId,
   walletAddress,
   avatarUri,
   onImproveProfile,
@@ -45,8 +50,20 @@ export default function StudentDashboardScreen({
   onTab,
 }: Props) {
   const [balanceHidden, setBalanceHidden] = useState(false);
+  const [activeBids, setActiveBids] = useState(0);
+  const [activeProjects, setActiveProjects] = useState<Project[]>([]);
   const displayName = name || email.split('@')[0] || 'Student';
   const initial = displayName.charAt(0).toUpperCase();
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !userId) return;
+    listMyBids(userId)
+      .then((bids) => setActiveBids(bids.filter((b) => b.status === 'Pending').length))
+      .catch(() => {});
+    listMyProjects(userId)
+      .then((projects) => setActiveProjects(projects.filter((p) => p.status === 'In Progress')))
+      .catch(() => {});
+  }, [userId]);
 
   return (
     <div className={styles.container}>
@@ -120,7 +137,7 @@ export default function StudentDashboardScreen({
 
         {/* Stats */}
         <div className={styles.statsRow}>
-          <Stat label="Active Bids" value="0" chip="#EDE4FC">
+          <Stat label="Active Bids" value={String(activeBids)} chip="#EDE4FC">
             <ActivityIcon size={12} color={violet} />
           </Stat>
           <Stat label="Earnings" value="$0.00" chip="#DCFCE7">
@@ -131,21 +148,36 @@ export default function StudentDashboardScreen({
           </Stat>
         </div>
 
-        {/* No active tasks */}
-        <div className={styles.card}>
-          <span className={styles.cardTitle}>No Active Tasks</span>
-          <div className={styles.tasksEmpty}>
-            <div className={styles.tasksIcon}>
-              <ClipboardListIcon size={44} color={violet} />
-            </div>
-            <p className={styles.tasksEmptyText}>
-              {'You don’t have any active tasks yet.\nBrowse tasks and place a bid'}
-            </p>
-            <button className={styles.outlineButton} onClick={onBrowseTasks}>
-              Browse Tasks
+        {/* Active tasks */}
+        {activeProjects.length > 0 ? (
+          <div className={styles.card}>
+            <span className={styles.cardTitle}>Active Tasks ({activeProjects.length})</span>
+            {activeProjects.map((p) => (
+              <div key={p.id} className={styles.activeTaskRow}>
+                <span className={styles.activeTaskTitle}>{p.title}</span>
+                <span className={styles.activeTaskBudget}>${p.budget.toFixed(2)}</span>
+              </div>
+            ))}
+            <button className={styles.outlineButton} onClick={() => onTab('tasks')}>
+              View Tasks
             </button>
           </div>
-        </div>
+        ) : (
+          <div className={styles.card}>
+            <span className={styles.cardTitle}>No Active Tasks</span>
+            <div className={styles.tasksEmpty}>
+              <div className={styles.tasksIcon}>
+                <ClipboardListIcon size={44} color={violet} />
+              </div>
+              <p className={styles.tasksEmptyText}>
+                {'You don’t have any active tasks yet.\nBrowse tasks and place a bid'}
+              </p>
+              <button className={styles.outlineButton} onClick={onBrowseTasks}>
+                Browse Tasks
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Stand out */}
         <div className={styles.standOut}>

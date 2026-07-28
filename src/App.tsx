@@ -7,7 +7,14 @@ import { BottomNav } from './components/ui';
 import { useAuth } from './auth/AuthProvider';
 import { isSupabaseConfigured, setSupabaseToken } from './lib/supabase';
 import { profiles, studentProfiles } from './data/repo';
-import { createTask, getTask, requestTask } from './data/marketplace-service';
+import {
+  createTask,
+  deliveryToDays,
+  getTask,
+  hasApplied,
+  placeBid,
+  requestTask,
+} from './data/marketplace-service';
 import type { Task } from './data/marketplace';
 import {
   getCompletedProfile,
@@ -25,6 +32,7 @@ import MyBidsScreen from './screens/MyBidsScreen';
 import MyProjectsScreen from './screens/MyProjectsScreen';
 import NotificationsScreen from './screens/NotificationsScreen';
 import OnboardingScreen from './screens/OnboardingScreen';
+import PlaceBidScreen from './screens/PlaceBidScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import ProfileSetupScreen from './screens/ProfileSetupScreen';
 import RegistrationScreen, {
@@ -359,6 +367,7 @@ export default function App() {
           element={
             <StudentDashboardScreen
               {...common}
+              userId={auth.user?.id}
               avatarUri={profile?.avatarUri}
               onImproveProfile={() => navigate('/profile-setup')}
               onBrowseTasks={() => navigate('/app/tasks')}
@@ -389,6 +398,7 @@ export default function App() {
           }
         />
         <Route path="/app/tasks/:taskId" element={<TaskDetailRoute />} />
+        <Route path="/app/tasks/:taskId/bid" element={<PlaceBidRoute />} />
         <Route path="/app/bid-accepted/:taskId" element={<BidAcceptedRoute />} />
         <Route
           path="/app/bids"
@@ -649,6 +659,7 @@ export default function App() {
     const { taskId } = useParams();
     const [task, setTask] = useState<Task | null | undefined>(undefined);
     const [requesting, setRequesting] = useState(false);
+    const [applied, setApplied] = useState(false);
 
     useEffect(() => {
       let active = true;
@@ -659,6 +670,11 @@ export default function App() {
       getTask(taskId)
         .then((t) => active && setTask(t))
         .catch(() => active && setTask(null));
+      if (auth.user) {
+        hasApplied(taskId, auth.user.id)
+          .then((a) => active && setApplied(a))
+          .catch(() => {});
+      }
       return () => {
         active = false;
       };
@@ -672,15 +688,54 @@ export default function App() {
         task={task}
         studentSkills={profile?.skills}
         requesting={requesting}
+        alreadyApplied={applied}
         onBack={() => navigate(-1)}
-        onPlaceBid={async () => {
+        onBid={() => navigate(`/app/tasks/${taskId}/bid`)}
+        onRequest={async () => {
           if (auth.user && taskId) {
             setRequesting(true);
-            await requestTask(taskId, auth.user.id, task.budget);
+            const res = await requestTask(taskId, auth.user.id, task.budget);
             setRequesting(false);
+            if (!res.ok) {
+              setApplied(true);
+              return;
+            }
           }
           navigate(`/app/bid-accepted/${taskId}`);
         }}
+      />
+    );
+  }
+
+  function PlaceBidRoute() {
+    const { taskId } = useParams();
+    const [submitting, setSubmitting] = useState(false);
+    return (
+      <PlaceBidScreen
+        onBack={() => navigate(-1)}
+        onSubmit={async (bid) => {
+          if (auth.user && taskId) {
+            setSubmitting(true);
+            const res = await placeBid(
+              taskId,
+              auth.user.id,
+              bid.amount,
+              deliveryToDays(bid.delivery),
+              bid.note,
+            );
+            setSubmitting(false);
+            if (!res.ok) {
+              window.alert(
+                res.reason === 'already-applied'
+                  ? 'You have already applied to this task.'
+                  : 'Could not submit your bid. Please try again.',
+              );
+              return;
+            }
+          }
+          navigate(`/app/bid-accepted/${taskId}`);
+        }}
+        submitting={submitting}
       />
     );
   }

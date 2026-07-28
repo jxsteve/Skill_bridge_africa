@@ -131,6 +131,7 @@ export default function AdminScreen({ onExit }: { onExit: () => void }) {
         studentId: a.studentId,
         amount: a.amount,
         clientId: t.client_id,
+        taskTitle: t.title,
       });
       await refreshApplicants(t);
     } finally {
@@ -140,7 +141,7 @@ export default function AdminScreen({ onExit }: { onExit: () => void }) {
   const doReject = async (t: TaskWithClient, a: Applicant) => {
     setBusy(true);
     try {
-      await rejectApplication(a.bidId);
+      await rejectApplication(a.bidId, { studentId: a.studentId, taskTitle: t.title });
       await refreshApplicants(t);
     } finally {
       setBusy(false);
@@ -155,6 +156,7 @@ export default function AdminScreen({ onExit }: { onExit: () => void }) {
         studentId: assignTo,
         clientId: t.client_id,
         amount: Number(t.budget),
+        taskTitle: t.title,
       });
       setSelectedTask(null);
       void reload();

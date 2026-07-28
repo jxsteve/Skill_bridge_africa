@@ -6,7 +6,12 @@ import { isSupabaseConfigured } from '../lib/supabase';
 import { listMyBids } from '../data/marketplace-service';
 import styles from './MyBidsScreen.module.css';
 
-const GROUPS = ['Active', 'Pending', 'Won'] as const;
+// Tabs map to the real bid statuses so students can see exactly where each
+// request/bid stands after the admin reviews it.
+const STATUSES: BidStatus[] = ['Pending', 'Approved', 'Rejected'];
+
+// Only real bids show once the backend is connected; mock is the offline fallback.
+const SEED_BIDS = isSupabaseConfigured ? [] : BIDS;
 
 const STATUS_STYLE: Record<BidStatus, { bg: string; color: string }> = {
   Approved: { bg: '#93F0B6', color: '#107535' },
@@ -21,7 +26,7 @@ type Props = {
 
 export default function MyBidsScreen({ studentId, onTab }: Props) {
   const [active, setActive] = useState(0);
-  const [allBids, setAllBids] = useState<Bid[]>(BIDS);
+  const [allBids, setAllBids] = useState<Bid[]>(SEED_BIDS);
 
   useEffect(() => {
     if (!isSupabaseConfigured || !studentId) return;
@@ -30,12 +35,12 @@ export default function MyBidsScreen({ studentId, onTab }: Props) {
       .catch(() => {});
   }, [studentId]);
 
-  const TABS = GROUPS.map(
-    (group) => `${group} (${allBids.filter((b) => b.group === group).length})`,
+  const TABS = STATUSES.map(
+    (status) => `${status} (${allBids.filter((b) => b.status === status).length})`,
   );
 
   const bids = useMemo(
-    () => allBids.filter((b) => b.group === GROUPS[active]),
+    () => allBids.filter((b) => b.status === STATUSES[active]),
     [active, allBids],
   );
 

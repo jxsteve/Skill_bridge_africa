@@ -14,16 +14,20 @@ type Props = {
   task: Task;
   studentSkills?: string[];
   requesting?: boolean;
+  alreadyApplied?: boolean;
   onBack: () => void;
-  onPlaceBid: () => void;
+  onBid: () => void;
+  onRequest: () => void;
 };
 
 export default function TaskDetailScreen({
   task,
   studentSkills,
   requesting,
+  alreadyApplied,
   onBack,
-  onPlaceBid,
+  onBid,
+  onRequest,
 }: Props) {
   const [saved, setSaved] = useState(false);
 
@@ -102,15 +106,24 @@ export default function TaskDetailScreen({
       </div>
 
       <div className={styles.footer}>
-        <div className={styles.footerButton}>
-          <PrimaryButton
-            label={requesting ? 'Sending…' : 'Request This Task'}
-            showIcon={false}
-            fullWidth
-            disabled={requesting}
-            onClick={onPlaceBid}
-          />
-        </div>
+        {alreadyApplied ? (
+          <div className={styles.footerButton}>
+            <PrimaryButton label="Already applied" showIcon={false} fullWidth disabled onClick={() => {}} />
+          </div>
+        ) : (
+          <div className={styles.footerButton} style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <PrimaryButton
+              label="Place a Bid"
+              showIcon={false}
+              fullWidth
+              disabled={requesting}
+              onClick={onBid}
+            />
+            <button type="button" className={styles.requestLink} onClick={onRequest} disabled={requesting}>
+              {requesting ? 'Sending…' : `Request at listed budget ($${task.budget.toFixed(2)})`}
+            </button>
+          </div>
+        )}
         <button type="button" className={styles.footerSave}>
           <BookmarkIcon size={20} />
         </button>

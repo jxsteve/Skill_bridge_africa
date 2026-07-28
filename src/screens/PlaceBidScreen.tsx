@@ -14,9 +14,10 @@ export type BidDetails = { amount: number; delivery: string; note: string };
 type Props = {
   onBack: () => void;
   onSubmit: (bid: BidDetails) => void;
+  submitting?: boolean;
 };
 
-export default function PlaceBidScreen({ onBack, onSubmit }: Props) {
+export default function PlaceBidScreen({ onBack, onSubmit, submitting }: Props) {
   const [amount, setAmount] = useState('');
   const [delivery, setDelivery] = useState('');
   const [note, setNote] = useState('');
@@ -92,10 +93,10 @@ export default function PlaceBidScreen({ onBack, onSubmit }: Props) {
 
       <div className={styles.footer}>
         <PrimaryButton
-          label="Submit Bid"
+          label={submitting ? 'Submitting…' : 'Submit Bid'}
           showIcon={false}
           fullWidth
-          disabled={!canSubmit}
+          disabled={!canSubmit || submitting}
           onClick={() =>
             onSubmit({ amount: parseFloat(amount) || 0, delivery, note })
           }

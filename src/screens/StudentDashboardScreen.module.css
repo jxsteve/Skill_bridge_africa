@@ -289,3 +289,21 @@
   align-items: center;
   justify-content: center;
 }
+
+.activeTaskRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid #f0f1f3;
+}
+.activeTaskTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+.activeTaskBudget {
+  font-size: 14px;
+  font-weight: 700;
+  color: #16a34a;
+}

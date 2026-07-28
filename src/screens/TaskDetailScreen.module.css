@@ -164,6 +164,20 @@
   cursor: pointer;
 }
 
+.requestLink {
+  background: none;
+  border: none;
+  color: var(--primary-blue, #124cc9);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px;
+}
+.requestLink:disabled {
+  color: #9ca3af;
+  cursor: default;
+}
+
 /* Keep natural heights so short screens scroll instead of squashing. */
 .content > * {
   flex-shrink: 0;

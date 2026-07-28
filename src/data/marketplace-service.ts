@@ -150,22 +150,28 @@ export async function listMyNotifications(userId: string, verified: boolean): Pr
   }));
 }
 
-/** Place a bid on a task. */
+/** Place a bid on a task (student sets their own amount/delivery/note). */
 export async function placeBid(
   taskId: string,
   studentId: string,
   amount: number,
   deliveryDays: number,
   message = '',
-): Promise<void> {
-  if (!isSupabaseConfigured) return;
-  await repo.bids.create({
-    task_id: taskId,
-    student_id: studentId,
-    amount,
-    delivery_days: deliveryDays,
-    message,
-  });
+): Promise<{ ok: boolean; reason?: string }> {
+  if (!isSupabaseConfigured) return { ok: true };
+  try {
+    await repo.bids.create({
+      task_id: taskId,
+      student_id: studentId,
+      amount,
+      delivery_days: deliveryDays,
+      message,
+    });
+    return { ok: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : '';
+    return { ok: false, reason: /duplicate|unique/i.test(msg) ? 'already-applied' : 'failed' };
+  }
 }
 
 // ---- Task requests / assignment ------------------------------------------
@@ -199,6 +205,13 @@ export async function requestTask(
   }
 }
 
+/** Whether a student has already requested/bid on a task (one allowed per task). */
+export async function hasApplied(taskId: string, studentId: string): Promise<boolean> {
+  if (!isSupabaseConfigured) return false;
+  const rows = await repo.bids.listByTask(taskId);
+  return rows.some((b) => b.student_id === studentId);
+}
+
 /** Applicants (requests) for a task. */
 export async function listTaskApplicants(taskId: string): Promise<Applicant[]> {
   if (!isSupabaseConfigured) return [];
@@ -214,6 +227,14 @@ export async function listTaskApplicants(taskId: string): Promise<Applicant[]> {
   }));
 }
 
+async function notify(userId: string, title: string, body: string, type: string) {
+  try {
+    await repo.notifications.create({ user_id: userId, title, body, type });
+  } catch {
+    // Best-effort — never block the admin action on a notification write.
+  }
+}
+
 /** Admin approves a request: assigns the task, creates the project, rejects the rest. */
 export async function approveApplication(p: {
   bidId: string;
@@ -221,6 +242,7 @@ export async function approveApplication(p: {
   studentId: string;
   amount: number;
   clientId: string;
+  taskTitle?: string;
 }): Promise<void> {
   await repo.projects.createDirect({
     task_id: p.taskId,
@@ -235,11 +257,28 @@ export async function approveApplication(p: {
       .filter((b) => b.id !== p.bidId && b.status === 'pending')
       .map((b) => repo.bids.setStatus(b.id, 'rejected')),
   );
+  await notify(
+    p.studentId,
+    'Request approved',
+    `You’ve been assigned “${p.taskTitle ?? 'a task'}”. It’s now in your projects.`,
+    'job',
+  );
 }
 
 /** Admin rejects a single request. */
-export async function rejectApplication(bidId: string): Promise<void> {
+export async function rejectApplication(
+  bidId: string,
+  opts?: { studentId?: string; taskTitle?: string },
+): Promise<void> {
   await repo.bids.setStatus(bidId, 'rejected');
+  if (opts?.studentId) {
+    await notify(
+      opts.studentId,
+      'Request declined',
+      `Your request for “${opts.taskTitle ?? 'a task'}” was not approved this time.`,
+      'bid',
+    );
+  }
 }
 
 /** Admin assigns a task directly to a student (no request needed). */
@@ -248,6 +287,7 @@ export async function assignTaskToStudent(p: {
   studentId: string;
   clientId: string;
   amount: number;
+  taskTitle?: string;
 }): Promise<void> {
   await repo.projects.createDirect({
     task_id: p.taskId,
@@ -255,6 +295,12 @@ export async function assignTaskToStudent(p: {
     client_id: p.clientId,
     amount: p.amount,
   });
+  await notify(
+    p.studentId,
+    'Task assigned to you',
+    `An admin assigned you “${p.taskTitle ?? 'a task'}”. Check your projects.`,
+    'job',
+  );
 }
 
 /** Tasks a client created, with live status (empty until Supabase is configured). */
