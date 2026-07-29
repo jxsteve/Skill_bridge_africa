@@ -39,7 +39,6 @@ import RegistrationScreen, {
 } from './screens/RegistrationScreen';
 import AdminPanel from './admin/AdminPanel';
 import LandingPage from './landing/LandingPage';
-import SplashScreen from './screens/SplashScreen';
 import StudentDashboardScreen from './screens/StudentDashboardScreen';
 import StudentHomeScreen from './screens/StudentHomeScreen';
 import SubmitWorkScreen from './screens/SubmitWorkScreen';
@@ -327,7 +326,6 @@ export default function App() {
   return (
     <PhoneFrame>
       <Routes>
-        <Route path="/" element={<SplashScreen onDone={() => navigate('/onboarding')} />} />
         <Route
           path="/onboarding"
           element={<OnboardingScreen onFinish={() => navigate('/account-type')} />}
