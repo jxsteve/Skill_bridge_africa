@@ -22,6 +22,7 @@ import type {
   TaskRow,
   TaskStatus,
   UserRole,
+  WalletTransactionRow,
 } from './db-types';
 
 function unwrap<T>({ data, error }: { data: T | null; error: unknown }): T {
@@ -278,6 +279,7 @@ export const projects = {
           student_id: bid.student_id,
           client_id: clientId,
           amount: bid.amount,
+          payment_status: 'funded', // escrow funded on assignment (demo mirror)
         })
         .select()
         .single(),
@@ -294,10 +296,31 @@ export const projects = {
     amount: number;
   }): Promise<ProjectRow> {
     const project = unwrap<ProjectRow>(
-      await db().from('projects').insert(input).select().single(),
+      await db()
+        .from('projects')
+        .insert({ ...input, payment_status: 'funded' }) // escrow funded on assignment
+        .select()
+        .single(),
     );
     await tasks.setStatus(input.task_id, 'assigned');
     return project;
+  },
+  async get(id: string): Promise<ProjectRow | null> {
+    const { data, error } = await db().from('projects').select('*').eq('id', id).maybeSingle();
+    if (error) throw error;
+    return data;
+  },
+  /** The (latest) project for a task, if one has been assigned. */
+  async getByTask(taskId: string): Promise<ProjectRow | null> {
+    const { data, error } = await db()
+      .from('projects')
+      .select('*')
+      .eq('task_id', taskId)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
   },
   async setStatus(id: string, status: ProjectStatus): Promise<void> {
     const { error } = await db().from('projects').update({ status }).eq('id', id);
@@ -355,5 +378,57 @@ export const storage = {
     const { error } = await db().storage.from(bucket).upload(path, file, { upsert: true });
     if (error) throw error;
     return db().storage.from(bucket).getPublicUrl(path).data.publicUrl;
+  },
+};
+
+// ---- wallets (simulated in-app balance for the demo) ----------------------
+// Real money lives on-chain; these back the wallet figures shown in the UI so
+// the end-to-end flow (fund → assign → pay → get paid) is demonstrable.
+
+export const wallets = {
+  /** Current simulated balance for a user (0 if no profile yet). */
+  async balance(userId: string): Promise<number> {
+    const { data, error } = await db()
+      .from('profiles')
+      .select('wallet_balance')
+      .eq('id', userId)
+      .maybeSingle();
+    if (error) throw error;
+    return Number(data?.wallet_balance ?? 0);
+  },
+  async transactions(userId: string): Promise<WalletTransactionRow[]> {
+    return unwrap(
+      await db()
+        .from('wallet_transactions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false }),
+    );
+  },
+  /** Top up a wallet; returns the new balance. */
+  async fund(userId: string, amount: number): Promise<number> {
+    const { data, error } = await db().rpc('fund_wallet', { p_user_id: userId, p_amount: amount });
+    if (error) throw error;
+    return Number(data);
+  },
+  /** Release payment for a project (debit client, credit student, complete task). */
+  async release(projectId: string): Promise<{
+    amount: number;
+    fee: number;
+    total: number;
+    client_balance: number;
+    student_balance: number;
+    already_released: boolean;
+  }> {
+    const { data, error } = await db().rpc('release_payment', { p_project_id: projectId });
+    if (error) throw error;
+    return data as {
+      amount: number;
+      fee: number;
+      total: number;
+      client_balance: number;
+      student_balance: number;
+      already_released: boolean;
+    };
   },
 };

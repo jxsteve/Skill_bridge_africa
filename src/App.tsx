@@ -9,10 +9,16 @@ import { clientProfiles, profiles, studentProfiles } from './data/repo';
 import {
   createTask,
   deliveryToDays,
+  fundWallet,
+  getClientTaskDetail,
+  getClientWallet,
   getTask,
   hasApplied,
   placeBid,
+  releasePayment,
   requestTask,
+  submitWork,
+  type ClientTaskDetail,
 } from './data/marketplace-service';
 import type { Task } from './data/marketplace';
 import {
@@ -60,11 +66,7 @@ import ClientVerificationSuccessScreen from './screens/ClientVerificationSuccess
 import CreateTaskScreen, { type NewTaskDetails } from './screens/CreateTaskScreen';
 import ReviewTaskScreen from './screens/ReviewTaskScreen';
 import TaskUnderReviewScreen from './screens/TaskUnderReviewScreen';
-import StudentAssignedScreen, { type AssignedStudent } from './screens/StudentAssignedScreen';
-import TaskInProgressScreen from './screens/TaskInProgressScreen';
-import WorkSubmittedScreen from './screens/WorkSubmittedScreen';
-import SubmissionUnderReviewScreen from './screens/SubmissionUnderReviewScreen';
-import WorkReadyForReviewScreen from './screens/WorkReadyForReviewScreen';
+import ClientTaskDetailScreen from './screens/ClientTaskDetailScreen';
 import ReviewWorkScreen from './screens/ReviewWorkScreen';
 import WorkApprovedScreen from './screens/WorkApprovedScreen';
 import PaymentReleasedScreen from './screens/PaymentReleasedScreen';
@@ -115,22 +117,37 @@ export default function App() {
   const [clientWalletAddress] = useState('9x4a6vQeUZ9pM2tRwYbN4KcHjD8sXx3kw1');
   const [draftTask, setDraftTask] = useState<NewTaskDetails | null>(null);
   const [hasTaskNotification, setHasTaskNotification] = useState(false);
-  // Mock assigned-student data. Replace with a real API response once the
-  // backend can tell us who was assigned to a given task.
-  const [assignedStudent] = useState<AssignedStudent>({
-    name: 'Miracle Igboanusi',
-    role: 'UI/UX Designer',
-    rating: 4.8,
-    reviewCount: 32,
-    school: 'University of Lagos',
-    skills: ['UI/UX Design', 'Figma', 'Landing Page'],
-  });
+  // The project the client is currently reviewing/approving. Populated from real
+  // data when they open an admin-approved task, and consumed by the
+  // review → approve → release-payment screens.
+  const [activeReview, setActiveReview] = useState<{
+    projectId: string;
+    taskTitle: string;
+    studentName: string;
+    amount: number;
+    files: { name: string; sizeLabel: string }[];
+  } | null>(null);
 
   useEffect(() => {
     const prefs = loadLoginPrefs();
     setRememberedEmail(prefs.email);
     setRememberMe(prefs.rememberMe);
   }, []);
+
+  // Pull the client's real wallet figures (balance / funded / spent / on-hold).
+  const refreshClientWallet = useCallback(async () => {
+    if (!auth.user || !isSupabaseConfigured) return;
+    try {
+      const w = await getClientWallet(auth.user.id);
+      setClientWalletBalance(w.balance);
+      setTotalFunded(w.totalFunded);
+      setTotalSpent(w.totalSpent);
+      setOnHold(w.onHold);
+    } catch {
+      // Best-effort; the dashboard still renders with the last-known figures.
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth.user?.id]);
 
   // On login: forward the Privy token to Supabase (for row-level security) and
   // ensure this user has a profiles row. No-op until Supabase is configured.
@@ -162,6 +179,7 @@ export default function App() {
           if (active && (cp?.verification === 'verified' || cp?.verification === 'pending')) {
             setClientAccountStatus(cp.verification);
           }
+          if (active) void refreshClientWallet();
         } catch {
           // Best-effort; screens still render.
         }
@@ -493,7 +511,7 @@ export default function App() {
               onAddFunds={() => navigate('/client/fund-wallet')}
               onNotificationsClick={() => {
                 setHasTaskNotification(false);
-                navigate('/client/work-submitted');
+                navigate('/client/notifications');
               }}
               onProfileClick={() => navigate('/client/profile')}
               onCreateTask={() => navigate('/client/create-task')}
@@ -510,9 +528,17 @@ export default function App() {
             <FundPlatformWalletScreen
               walletAddress="7xLk3vQeUZ9pM2tRwYbN4KcHjD8sX6uD9K"
               onBack={() => navigate('/client/app')}
-              onPaymentSent={(amount) => {
-                setClientWalletBalance((prev) => prev + amount);
-                setTotalFunded((prev) => prev + amount);
+              onPaymentSent={async (amount) => {
+                if (auth.user) {
+                  try {
+                    await fundWallet(auth.user.id, amount);
+                    await refreshClientWallet();
+                  } catch {
+                    // Optimistic fallback so the demo still advances.
+                    setClientWalletBalance((prev) => prev + amount);
+                    setTotalFunded((prev) => prev + amount);
+                  }
+                }
 
                 if (clientAccountStatus === 'verified') {
                   navigate('/client/app');
@@ -569,106 +595,43 @@ export default function App() {
           element={
             <TaskUnderReviewScreen
               onBack={() => navigate('/client/app')}
-              onViewMyTasks={() => {
-                setHasTaskNotification(true);
-                navigate('/client/student-assigned');
-              }}
+              onViewMyTasks={() => navigate('/client/tasks')}
             />
           }
         />
 
-        <Route
-          path="/client/student-assigned"
-          element={
-            <StudentAssignedScreen
-              student={assignedStudent}
-              onBack={() => navigate('/client/app')}
-              onViewTaskDetails={() => navigate('/client/task-in-progress')}
-            />
-          }
-        />
-        <Route
-          path="/client/task-in-progress"
-          element={
-            <TaskInProgressScreen
-              student={{ name: assignedStudent.name, role: assignedStudent.role, online: true }}
-              deadline={draftTask ? formatDeadline(draftTask.deadline) : '24 August, 2026'}
-              onBack={() => navigate('/client/student-assigned')}
-              onGoBackToDashboard={() => navigate('/client/app')}
-              onCardClick={() =>  {
-                setHasTaskNotification(true);
-                navigate('/client/work-submitted');
-              }}
-            />
-          }
-        />
-        <Route
-          path="/client/work-submitted"
-          element={
-            <WorkSubmittedScreen
-              studentName={assignedStudent.name.split(' ')[0]}
-              submittedOn="20 August, 2026 · 03:45PM"
-              files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
-              onDone={() => navigate('/client/submission-under-review')}
-            />
-          }
-        />
-        <Route
-          path="/client/submission-under-review"
-          element={
-            <SubmissionUnderReviewScreen
-              studentName={assignedStudent.name}
-              submittedDate="20 August, 2026"
-              files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
-              onDone={() => navigate('/client/work-ready')}
-            />
-          }
-        />
-        <Route
-          path="/client/work-ready"
-          element={
-            <WorkReadyForReviewScreen
-              studentName={assignedStudent.name}
-              submittedDate="20 August, 2026"
-              files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
-              onBack={() => navigate('/client/app')}
-              onReviewWork={() => navigate('/client/review-work')}
-            />
-          }
-        />
+        {/* Adaptive detail: reflects the real project lifecycle for one task. */}
+        <Route path="/client/task/:taskId" element={<ClientTaskDetailRoute />} />
+
         <Route path="/client/review-work" element={<ClientReviewWorkRoute />} />
         <Route
           path="/client/work-approved"
           element={
             <WorkApprovedScreen
-              amount={draftTask?.budget ?? 10}
-              onBack={() => navigate('/client/app')}
-              onReleasePayment={() => navigate('/client/payment-released')}
+              amount={activeReview?.amount ?? 0}
+              onBack={() => navigate('/client/tasks')}
+              onReleasePayment={async () => {
+                if (activeReview) {
+                  try {
+                    await releasePayment(activeReview.projectId);
+                  } catch {
+                    // Fall through to the confirmation screen regardless.
+                  }
+                }
+                navigate('/client/payment-released');
+              }}
             />
           }
         />
         <Route
           path="/client/payment-released"
           element={
-            <PaymentReleasedScreen 
-              recipientName={assignedStudent.name} 
-              amount={(draftTask?.budget ?? 10) * 1.05}
-              onDone={() => {
-                const payment = draftTask?.budget ?? 10;
-                const totalPayment = payment * 1.05; // Add 5% platform fee
-
-                setOnHold(0);
-
-                setClientWalletBalance((prev) =>
-                  Math.max(0, prev - totalPayment)
-                );
-
-                setTotalSpent((prev) =>
-                  prev + totalPayment
-                );
-
+            <PaymentReleasedScreen
+              recipientName={activeReview?.studentName ?? 'the student'}
+              amount={activeReview?.amount ?? 0}
+              onDone={async () => {
+                await refreshClientWallet();
                 setHasTaskNotification(false);
-
                 navigate('/client/rate-experience');
               }}
             />
@@ -678,9 +641,15 @@ export default function App() {
           path="/client/rate-experience"
           element={
             <RateExperienceScreen
-              studentName={assignedStudent.name.split(' ')[0]}
-              onSubmit={() => navigate('/client/app')}
-              onSkip={() => navigate('/client/app')}
+              studentName={(activeReview?.studentName ?? 'the student').split(' ')[0]}
+              onSubmit={() => {
+                setActiveReview(null);
+                navigate('/client/tasks');
+              }}
+              onSkip={() => {
+                setActiveReview(null);
+                navigate('/client/tasks');
+              }}
             />
           }
         />
@@ -692,6 +661,7 @@ export default function App() {
               clientId={auth.user?.id}
               onBack={() => navigate('/client/app')}
               onCreateTask={() => navigate('/client/create-task')}
+              onOpenTask={(taskId) => navigate(`/client/task/${taskId}`)}
               onTab={goClientTab}
             />
           }
@@ -853,7 +823,26 @@ export default function App() {
   }
 
   function SubmitWorkRoute() {
-    return <SubmitWorkScreen onBack={() => navigate(-1)} onSubmit={() => navigate('/app/projects')} />;
+    const { projectId } = useParams();
+    const [submitting, setSubmitting] = useState(false);
+    return (
+      <SubmitWorkScreen
+        submitting={submitting}
+        onBack={() => navigate(-1)}
+        onSubmit={async (files, message) => {
+          if (projectId) {
+            setSubmitting(true);
+            const res = await submitWork(projectId, files, message);
+            setSubmitting(false);
+            if (!res.ok) {
+              window.alert('Could not submit your work. Please try again.');
+              return;
+            }
+          }
+          navigate('/app/projects');
+        }}
+      />
+    );
   }
 
   function ClientReviewTaskRoute() {
@@ -864,7 +853,6 @@ export default function App() {
         onBack={() => navigate('/client/create-task')}
         onEdit={() => navigate('/client/create-task')}
         onSubmit={() => {
-          setOnHold(draftTask?.budget ?? 0);
           if (auth.user && draftTask) void createTask(auth.user.id, draftTask);
           navigate('/client/task-under-review');
         }}
@@ -872,14 +860,58 @@ export default function App() {
     );
   }
 
+  // Client opens one of their tasks; the screen reflects the real project state.
+  function ClientTaskDetailRoute() {
+    const { taskId } = useParams();
+    const [detail, setDetail] = useState<ClientTaskDetail | null | undefined>(undefined);
+
+    useEffect(() => {
+      let active = true;
+      if (!taskId) {
+        setDetail(null);
+        return;
+      }
+      getClientTaskDetail(taskId)
+        .then((d) => active && setDetail(d))
+        .catch(() => active && setDetail(null));
+      return () => {
+        active = false;
+      };
+    }, [taskId]);
+
+    if (detail === undefined) return <LoadingView />;
+    if (!detail) return <Navigate to="/client/tasks" replace />;
+
+    return (
+      <ClientTaskDetailScreen
+        detail={detail}
+        onBack={() => navigate('/client/tasks')}
+        onReview={() => {
+          if (detail.project && detail.submission) {
+            setActiveReview({
+              projectId: detail.project.id,
+              taskTitle: detail.title,
+              studentName: detail.project.studentName,
+              amount: detail.project.amount,
+              files: detail.submission.files.map((f) => ({ name: f.name, sizeLabel: f.sizeLabel })),
+            });
+          }
+          navigate('/client/review-work');
+        }}
+        onTab={goClientTab}
+      />
+    );
+  }
+
   function ClientReviewWorkRoute() {
+    if (!activeReview) return <Navigate to="/client/tasks" replace />;
     return (
       <ReviewWorkScreen
-        taskTitle={draftTask?.title ?? 'Design a Landing Page for a Fintech Startup'}
-        studentName={assignedStudent.name}
-        files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
-        onBack={() => navigate('/client/work-ready')}
-        onRequestChanges={() => navigate('/client/app')}
+        taskTitle={activeReview.taskTitle}
+        studentName={activeReview.studentName}
+        files={activeReview.files}
+        onBack={() => navigate('/client/tasks')}
+        onRequestChanges={() => navigate('/client/tasks')}
         onApproveWork={() => navigate('/client/work-approved')}
       />
     );
@@ -901,10 +933,4 @@ function LoadingView() {
       Loading…
     </div>
   );
-}
-
-function formatDeadline(deadline: string) {
-  const date = new Date(`${deadline}T00:00:00`);
-  if (Number.isNaN(date.getTime())) return deadline;
-  return date.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 }

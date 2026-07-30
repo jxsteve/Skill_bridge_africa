@@ -28,8 +28,21 @@ export type Profile = {
   role: UserRole;
   full_name: string;
   wallet_address: string | null;
+  /** Simulated in-app wallet balance (demo). Real funds live on-chain. */
+  wallet_balance: number;
   created_at: string;
   updated_at: string;
+};
+
+/** A single movement in a user's simulated wallet. */
+export type WalletTransactionRow = {
+  id: string;
+  user_id: string;
+  project_id: string | null;
+  kind: 'funding' | 'payment' | 'earning' | 'fee' | 'refund';
+  amount: number; // signed: + credit, − debit
+  description: string;
+  created_at: string;
 };
 
 export type StudentProfileRow = {

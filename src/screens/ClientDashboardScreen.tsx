@@ -112,9 +112,9 @@ export default function ClientDashboardScreen({
             <p className={styles.brandAfrica}>–AFRICA–</p>
           </div>
         </div>
-        <button 
+        <button
           className={styles.bell}
-          disabled={!hasTaskNotification} 
+          disabled={!isVerified}
           onClick={() => {
             if (!isVerified) return;
             onNotificationsClick?.();

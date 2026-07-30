@@ -34,11 +34,16 @@
 }
 
 .card {
+  display: block;
+  width: 100%;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   margin-bottom: 10px;
   overflow: hidden;
+  padding: 14px;
+  text-align: left;
+  cursor: pointer;
 }
 .cardHead {
   width: 100%;
@@ -46,11 +51,20 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px;
-  background: none;
-  border: none;
-  text-align: left;
-  cursor: pointer;
+}
+.viewRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f1f3;
+}
+.viewText {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
 }
 .cardMain {
   display: flex;

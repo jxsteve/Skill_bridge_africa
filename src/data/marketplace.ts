@@ -111,6 +111,8 @@ export type Project = {
   dueInDays: number;
   budget: number;
   status: 'In Progress' | 'Completed';
+  /** Fine-grained lifecycle label for the badge (Submitted, Under Review, …). */
+  stage?: string;
 };
 
 export const PROJECTS: Project[] = [

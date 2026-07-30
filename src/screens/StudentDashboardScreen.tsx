@@ -13,9 +13,11 @@ import {
 } from '../components/ui';
 import logoMark from '../assets/images/logo_mark.png';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { listMyBids, listMyProjects } from '../data/marketplace-service';
+import { getStudentWallet, listMyBids, listMyProjects } from '../data/marketplace-service';
 import type { Project } from '../data/marketplace';
 import styles from './StudentDashboardScreen.module.css';
+
+const money = (n: number) => `$${Number(n || 0).toFixed(2)}`;
 
 const violet = '#6014E0';
 
@@ -52,6 +54,8 @@ export default function StudentDashboardScreen({
   const [balanceHidden, setBalanceHidden] = useState(false);
   const [activeBids, setActiveBids] = useState(0);
   const [activeProjects, setActiveProjects] = useState<Project[]>([]);
+  const [balance, setBalance] = useState(0);
+  const [earnings, setEarnings] = useState(0);
   const displayName = name || email.split('@')[0] || 'Student';
   const initial = displayName.charAt(0).toUpperCase();
 
@@ -62,6 +66,12 @@ export default function StudentDashboardScreen({
       .catch(() => {});
     listMyProjects(userId)
       .then((projects) => setActiveProjects(projects.filter((p) => p.status === 'In Progress')))
+      .catch(() => {});
+    getStudentWallet(userId)
+      .then((w) => {
+        setBalance(w.balance);
+        setEarnings(w.totalEarned);
+      })
       .catch(() => {});
   }, [userId]);
 
@@ -118,7 +128,7 @@ export default function StudentDashboardScreen({
             </button>
           </div>
           <p className={styles.walletBalance}>
-            {balanceHidden ? '••••••' : '$0.00'}
+            {balanceHidden ? '••••••' : money(balance)}
           </p>
           <div className={styles.walletAddressRow}>
             <div className={styles.walletAddressText}>
@@ -140,7 +150,7 @@ export default function StudentDashboardScreen({
           <Stat label="Active Bids" value={String(activeBids)} chip="#EDE4FC">
             <ActivityIcon size={12} color={violet} />
           </Stat>
-          <Stat label="Earnings" value="$0.00" chip="#DCFCE7">
+          <Stat label="Earnings" value={money(earnings)} chip="#DCFCE7">
             <DollarSignIcon size={12} color="#16A34A" />
           </Stat>
           <Stat label="Profile Views" value="0" chip="#FEF3C7">

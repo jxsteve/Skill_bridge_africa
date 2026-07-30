@@ -132,8 +132,19 @@ export async function listMyProjects(userId: string): Promise<Project[]> {
     dueInDays: 0,
     budget: Number(p.amount),
     status: p.status === 'completed' ? 'Completed' : 'In Progress',
+    stage: PROJECT_STAGE_LABEL[p.status] ?? 'In Progress',
   }));
 }
+
+// Fine-grained stage label (for the badge) vs the coarse In Progress/Completed tab.
+const PROJECT_STAGE_LABEL: Record<string, string> = {
+  in_progress: 'In Progress',
+  submitted: 'Submitted',
+  under_review: 'Under Admin Review',
+  approved: 'Awaiting Client Approval',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+};
 
 const NOTIF_KINDS: NotificationKind[] = ['verification', 'bid', 'job', 'payment'];
 
@@ -307,4 +318,204 @@ export async function assignTaskToStudent(p: {
 export async function listClientTasks(clientId: string) {
   if (!isSupabaseConfigured) return [];
   return repo.tasks.listByClient(clientId);
+}
+
+// ---- Submissions (student delivers work) ---------------------------------
+
+/** A file attached to a submission, shaped for display. */
+export type SubmissionFile = { name: string; sizeLabel: string; url: string; isImage: boolean };
+
+function fileNameFromUrl(url: string): string {
+  try {
+    const last = decodeURIComponent(url.split('/').pop() ?? 'file');
+    // Paths are stored as `<ts>-<original name>`; strip the timestamp prefix.
+    return last.replace(/^\d+-/, '');
+  } catch {
+    return 'file';
+  }
+}
+
+function isImageUrl(url: string): boolean {
+  return /\.(png|jpe?g|gif|webp)$/i.test(url.split('?')[0]);
+}
+
+function sanitizeName(name: string): string {
+  return name.replace(/[^a-zA-Z0-9._-]/g, '_');
+}
+
+/**
+ * Student submits work on a project: uploads each file to Storage, records the
+ * submission (moves the project to under_review), flips the task to under_review,
+ * and notifies the client. Returns the public URLs.
+ */
+export async function submitWork(
+  projectId: string,
+  files: File[],
+  note = '',
+): Promise<{ ok: boolean; reason?: string }> {
+  if (!isSupabaseConfigured) return { ok: true };
+  try {
+    const urls: string[] = [];
+    for (const f of files) {
+      const path = `${projectId}/${Date.now()}-${sanitizeName(f.name)}`;
+      urls.push(await repo.storage.upload('submissions', path, f));
+    }
+    await repo.submissions.create({ project_id: projectId, note, files: urls });
+    const project = await repo.projects.get(projectId);
+    if (project) {
+      await repo.tasks.setStatus(project.task_id, 'under_review');
+      await notify(
+        project.client_id,
+        'Work submitted',
+        'A student submitted work on your task. It’s now under review.',
+        'job',
+      );
+    }
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, reason: e instanceof Error ? e.message : 'failed' };
+  }
+}
+
+// ---- Client task detail (drives the client review flow off real data) -----
+
+export type ClientTaskDetail = {
+  taskId: string;
+  title: string;
+  budget: number;
+  taskStatus: string;
+  applicantCount: number;
+  project: {
+    id: string;
+    status: string;
+    paymentStatus: string;
+    amount: number;
+    studentId: string;
+    studentName: string;
+  } | null;
+  submission: { note: string; submittedAt: string; files: SubmissionFile[] } | null;
+};
+
+/** Everything the client needs to see one of their tasks through the whole flow. */
+export async function getClientTaskDetail(taskId: string): Promise<ClientTaskDetail | null> {
+  if (!isSupabaseConfigured) return null;
+  const task = await repo.tasks.get(taskId);
+  if (!task) return null;
+
+  const project = await repo.projects.getByTask(taskId);
+  let studentName = '';
+  let submission: ClientTaskDetail['submission'] = null;
+
+  if (project) {
+    const prof = await repo.profiles.get(project.student_id);
+    studentName = prof?.full_name || 'Assigned student';
+    const subs = await repo.submissions.listByProject(project.id);
+    if (subs.length) {
+      const latest = subs[0];
+      submission = {
+        note: latest.note,
+        submittedAt: new Date(latest.created_at).toLocaleString('en-US', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+        }),
+        files: (latest.files ?? []).map((url) => ({
+          name: fileNameFromUrl(url),
+          sizeLabel: 'File',
+          url,
+          isImage: isImageUrl(url),
+        })),
+      };
+    }
+  }
+
+  const bidRows = await repo.bids.listByTask(taskId);
+
+  return {
+    taskId,
+    title: task.title,
+    budget: Number(task.budget),
+    taskStatus: task.status,
+    applicantCount: bidRows.length,
+    project: project
+      ? {
+          id: project.id,
+          status: project.status,
+          paymentStatus: project.payment_status,
+          amount: Number(project.amount),
+          studentId: project.student_id,
+          studentName,
+        }
+      : null,
+    submission,
+  };
+}
+
+// ---- Admin: approve a student's submission (hand off to the client) -------
+
+/** Admin approves submitted work → project 'approved', client can now review. */
+export async function approveSubmission(p: {
+  projectId: string;
+  clientId: string;
+  taskTitle?: string;
+}): Promise<void> {
+  await repo.projects.setStatus(p.projectId, 'approved');
+  await notify(
+    p.clientId,
+    'Work ready for your review',
+    `The submitted work for “${p.taskTitle ?? 'your task'}” passed admin review. Approve it to release payment.`,
+    'job',
+  );
+}
+
+// ---- Wallets (simulated, for the demo) ------------------------------------
+
+export type ClientWallet = { balance: number; totalFunded: number; totalSpent: number; onHold: number };
+export type StudentWallet = { balance: number; totalEarned: number };
+
+/** Client wallet figures: balance, lifetime funded/spent, and funds committed to active work. */
+export async function getClientWallet(clientId: string): Promise<ClientWallet> {
+  if (!isSupabaseConfigured) return { balance: 0, totalFunded: 0, totalSpent: 0, onHold: 0 };
+  const [balance, txns, projects] = await Promise.all([
+    repo.wallets.balance(clientId),
+    repo.wallets.transactions(clientId),
+    repo.projects.listByClient(clientId),
+  ]);
+  const totalFunded = txns.filter((t) => t.kind === 'funding').reduce((s, t) => s + Number(t.amount), 0);
+  const totalSpent = txns
+    .filter((t) => t.kind === 'payment')
+    .reduce((s, t) => s + Math.abs(Number(t.amount)), 0);
+  // "On hold" = amount committed to assigned-but-not-yet-paid work (+5% fee).
+  const active = ['in_progress', 'submitted', 'under_review', 'approved'];
+  const onHold = projects
+    .filter((p) => active.includes(p.status))
+    .reduce((s, p) => s + Number(p.amount) * 1.05, 0);
+  return { balance, totalFunded, totalSpent, onHold };
+}
+
+/** Student wallet figures: balance and lifetime earnings. */
+export async function getStudentWallet(studentId: string): Promise<StudentWallet> {
+  if (!isSupabaseConfigured) return { balance: 0, totalEarned: 0 };
+  const [balance, txns] = await Promise.all([
+    repo.wallets.balance(studentId),
+    repo.wallets.transactions(studentId),
+  ]);
+  const totalEarned = txns.filter((t) => t.kind === 'earning').reduce((s, t) => s + Number(t.amount), 0);
+  return { balance, totalEarned };
+}
+
+/** Top up the client's simulated wallet. */
+export async function fundWallet(userId: string, amount: number): Promise<number> {
+  if (!isSupabaseConfigured) return amount;
+  return repo.wallets.fund(userId, amount);
+}
+
+/** Release payment for a project (client approval). Returns the amounts + new balances. */
+export async function releasePayment(projectId: string) {
+  if (!isSupabaseConfigured) {
+    return { amount: 0, fee: 0, total: 0, client_balance: 0, student_balance: 0, already_released: false };
+  }
+  return repo.wallets.release(projectId);
 }

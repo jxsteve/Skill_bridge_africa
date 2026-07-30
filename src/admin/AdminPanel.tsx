@@ -17,9 +17,11 @@ import {
 } from '../data/repo';
 import {
   approveApplication,
+  approveSubmission,
   assignTaskToStudent,
   listTaskApplicants,
   rejectApplication,
+  releasePayment,
   type Applicant,
 } from '../data/marketplace-service';
 import type { Profile } from '../data/db-types';
@@ -214,8 +216,18 @@ export default function AdminPanel({ name, onExit }: Props) {
           <EscrowDetail
             escrow={selectedEscrow}
             onBack={() => setSelectedEscrow(null)}
+            onApproveSubmission={async () => {
+              await approveSubmission({
+                projectId: selectedEscrow.id,
+                clientId: selectedEscrow.client_id,
+                taskTitle: selectedEscrow.task?.title,
+              });
+              await reload();
+              setSelectedEscrow(null);
+            }}
             onRelease={async () => {
-              await setEscrowPayment(selectedEscrow.id, 'released');
+              // Real payout: debit client, credit student, complete the task.
+              await releasePayment(selectedEscrow.id);
               await reload();
               setSelectedEscrow(null);
             }}
@@ -673,18 +685,23 @@ function Escrow({
 function EscrowDetail({
   escrow,
   onBack,
+  onApproveSubmission,
   onRelease,
   onRefund,
   onFlag,
 }: {
   escrow: EscrowRow;
   onBack: () => void;
+  onApproveSubmission: () => void;
   onRelease: () => void;
   onRefund: () => void;
   onFlag: () => void;
 }) {
   const amount = Number(escrow.amount);
   const fee = amount * 0.05;
+  const total = amount + fee;
+  const released = escrow.payment_status === 'released';
+  const awaitingAdmin = escrow.status === 'under_review' || escrow.status === 'submitted';
   return (
     <>
       <Topbar title="Escrow Monitoring › Detail" sub="Reviewing a single escrow contract" />
@@ -721,9 +738,16 @@ function EscrowDetail({
             <div className={s.card}>
               <div className={s.cardHead}><span className={s.cardTitle}>Payment breakdown</span></div>
               <div className={s.section}>
-                <div className={s.field}><span className={s.fieldLabel}>Project amount</span><span className={s.fieldValue}>{money(amount)}</span></div>
-                <div className={s.field}><span className={s.fieldLabel}>Platform fee (5%)</span><span className={s.fieldValue}>− {money(fee)}</span></div>
-                <div className={s.field}><span className={s.fieldLabel}>Student receives</span><span className={s.fieldValue}>{money(amount - fee)}</span></div>
+                <div className={s.field}><span className={s.fieldLabel}>Task amount</span><span className={s.fieldValue}>{money(amount)}</span></div>
+                <div className={s.field}><span className={s.fieldLabel}>Platform fee (5%)</span><span className={s.fieldValue}>{money(fee)}</span></div>
+                <div className={s.field}><span className={s.fieldLabel}>Client pays (total)</span><span className={s.fieldValue}>{money(total)}</span></div>
+                <div className={s.field}><span className={s.fieldLabel}>Student receives</span><span className={s.fieldValue}>{money(amount)}</span></div>
+                {released && (
+                  <div className={s.field}>
+                    <span className={s.fieldLabel}>Settlement</span>
+                    <span className={`${s.pill} ${s.pillVerified}`}>Paid · transaction completed</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -740,12 +764,29 @@ function EscrowDetail({
           <div className={s.card}>
             <div className={s.cardHead}><span className={s.cardTitle}>Admin actions</span></div>
             <div className={s.section}>
-              <div className={s.btnRow} style={{ flexDirection: 'column' }}>
-                <button className={s.btnPrimary} disabled={escrow.payment_status === 'released'} onClick={onRelease}>Release funds to student</button>
-                <button className={s.btnGhost} onClick={onRefund}>Refund client</button>
-                <button className={s.btnDanger} onClick={onFlag}>Flag dispute</button>
-              </div>
-              <p className={s.hintText}>Manual release is only for resolving disputes. Normal payouts release automatically on client approval.</p>
+              {released ? (
+                <p className={s.hintText}>
+                  ✓ Payment of {money(amount)} was released to {escrow.student?.full_name || 'the student'} and the
+                  task is completed. Nothing further to do.
+                </p>
+              ) : (
+                <>
+                  <div className={s.btnRow} style={{ flexDirection: 'column' }}>
+                    {awaitingAdmin && (
+                      <button className={s.btnPrimary} onClick={onApproveSubmission}>
+                        Approve submission → send to client
+                      </button>
+                    )}
+                    <button className={s.btnGhost} onClick={onRelease}>Release funds to student</button>
+                    <button className={s.btnGhost} onClick={onRefund}>Refund client</button>
+                    <button className={s.btnDanger} onClick={onFlag}>Flag dispute</button>
+                  </div>
+                  <p className={s.hintText}>
+                    Approve a submission to hand it to the client for final review. Payment releases when the
+                    client approves; manual release here is a dispute override.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>
