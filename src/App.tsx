@@ -242,13 +242,31 @@ export default function App() {
       const user = await auth.verifyCode(email, code);
       if (!user) return false;
       if (intent === 'login') {
-        const done = getCompletedProfile(email);
+        let done = getCompletedProfile(email);
+        // Fall back to the database so a returning student on a fresh device (or
+        // after clearing storage) isn't sent back through profile setup +
+        // verification. A saved student_profiles row means setup is complete.
+        if (!done && isSupabaseConfigured && accountType !== 'client') {
+          try {
+            const [sp, prof] = await Promise.all([
+              studentProfiles.get(user.id),
+              profiles.get(user.id),
+            ]);
+            if (sp || prof?.full_name) {
+              const name = prof?.full_name || '';
+              markProfileCompleted(email, name);
+              done = { name };
+            }
+          } catch {
+            // Best-effort; fall back to the local flag.
+          }
+        }
         setLoginCompleted(done !== null);
-        if (done) setFullName(done.name);
+        if (done?.name) setFullName(done.name);
       }
       return true;
     },
-    [auth, email, intent],
+    [auth, email, intent, accountType],
   );
 
   const handleVerifiedContinue = useCallback(() => {
