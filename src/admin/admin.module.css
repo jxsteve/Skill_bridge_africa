@@ -307,6 +307,44 @@
 .actReject { color: #dc2626; }
 .actView { color: var(--primary-blue); }
 
+/* ---- Dashboard action / activity list ---- */
+.actionList { display: flex; flex-direction: column; }
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid #f0f1f3;
+}
+.actionRow:last-child { border-bottom: none; }
+.activityRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 14px 20px;
+  border: none;
+  border-bottom: 1px solid #f0f1f3;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+.activityRow:last-child { border-bottom: none; }
+.activityRow:hover { background: #f8fafc; }
+.actionMain { flex: 1; min-width: 0; }
+.actionTag {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 4px 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+.actionTagBlue { background: var(--blue-50); color: var(--primary-blue); }
+.actionTagAmber { background: #fef3c7; color: #b45309; }
+
 /* ---- Filter tabs + controls ---- */
 .toolbar {
   display: flex;

@@ -37,7 +37,10 @@ export type AdminOverview = {
   activeEscrows: number;
   heldAmount: number;
   releasedAmount: number;
-  awaitingApproval: number;
+  /** Submissions waiting for the admin to approve and hand to the client. */
+  needsReview: number;
+  /** Approved by admin, waiting on the client to approve & release payment. */
+  awaitingClient: number;
   disputed: number;
 };
 
@@ -78,9 +81,10 @@ export async function listReviews(): Promise<ReviewRow[]> {
 
 /** Dashboard counters, computed from the verification + escrow lists. */
 export function computeOverview(verifs: VerificationRow[], escrows: EscrowRow[]): AdminOverview {
-  const isFunded = (p: EscrowRow) => p.payment_status === 'funded';
+  const isFunded = (p: EscrowRow) => p.payment_status === 'funded' && p.status !== 'cancelled';
   const isReleased = (p: EscrowRow) => p.payment_status === 'released';
-  const awaiting = (p: EscrowRow) => p.status === 'under_review' || p.status === 'submitted';
+  const needsReview = (p: EscrowRow) => p.status === 'under_review' || p.status === 'submitted';
+  const awaitingClient = (p: EscrowRow) => p.status === 'approved';
   return {
     verifiedStudents: verifs.filter((v) => v.verification === 'verified').length,
     pendingVerifications: verifs.filter((v) => v.verification === 'pending').length,
@@ -88,7 +92,8 @@ export function computeOverview(verifs: VerificationRow[], escrows: EscrowRow[])
     activeEscrows: escrows.filter(isFunded).length,
     heldAmount: escrows.filter(isFunded).reduce((s, p) => s + Number(p.amount), 0),
     releasedAmount: escrows.filter(isReleased).reduce((s, p) => s + Number(p.amount), 0),
-    awaitingApproval: escrows.filter(awaiting).length,
+    needsReview: escrows.filter(needsReview).length,
+    awaitingClient: escrows.filter(awaitingClient).length,
     disputed: escrows.filter((p) => p.status === 'cancelled').length,
   };
 }

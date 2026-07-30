@@ -78,12 +78,13 @@ function VerifPill({ v }: { v: VerificationRow['verification'] }) {
 }
 
 function EscrowPill({ p }: { p: EscrowRow }) {
-  if (p.payment_status === 'released') return <span className={`${s.pill} ${s.pillReleased}`}>Released</span>;
+  if (p.payment_status === 'released') return <span className={`${s.pill} ${s.pillReleased}`}>Paid</span>;
   if (p.payment_status === 'refunded') return <span className={`${s.pill} ${s.pillNeutral}`}>Refunded</span>;
   if (p.status === 'cancelled') return <span className={`${s.pill} ${s.pillDisputed}`}>Disputed</span>;
   if (p.status === 'under_review' || p.status === 'submitted')
-    return <span className={`${s.pill} ${s.pillReview}`}>Awaiting approval</span>;
-  return <span className={`${s.pill} ${s.pillFunded}`}>Funded</span>;
+    return <span className={`${s.pill} ${s.pillReview}`}>Needs review</span>;
+  if (p.status === 'approved') return <span className={`${s.pill} ${s.pillPending}`}>Awaiting client</span>;
+  return <span className={`${s.pill} ${s.pillFunded}`}>In escrow</span>;
 }
 
 function Stars({ n }: { n: number }) {
@@ -244,13 +245,15 @@ export default function AdminPanel({ name, onExit }: Props) {
           />
         ) : screen === 'dashboard' ? (
           <Dashboard
+            name={name}
             overview={overview}
             verifs={verifs}
             escrows={escrows}
-            reviews={reviews}
             loading={loading}
             onReview={(v) => setSelectedStudent(v)}
-            onViewAll={() => setScreen('verification')}
+            onOpenEscrow={(e) => setSelectedEscrow(e)}
+            onViewVerifications={() => setScreen('verification')}
+            onViewEscrows={() => setScreen('escrow')}
           />
         ) : screen === 'verification' ? (
           <Verification
@@ -283,7 +286,6 @@ function Topbar({ title, sub }: { title: string; sub: string }) {
         <p className={s.pageTitle}>{title}</p>
         <p className={s.pageSub}>{sub}</p>
       </div>
-      <input className={s.search} placeholder="Search…" />
     </div>
   );
 }
@@ -301,112 +303,109 @@ function Stat({ label, value, hint, hintCls }: { label: string; value: string; h
 // ---- Dashboard ------------------------------------------------------------
 
 function Dashboard({
+  name,
   overview,
   verifs,
   escrows,
-  reviews,
   loading,
   onReview,
-  onViewAll,
+  onOpenEscrow,
+  onViewVerifications,
+  onViewEscrows,
 }: {
+  name: string;
   overview: ReturnType<typeof computeOverview>;
   verifs: VerificationRow[];
   escrows: EscrowRow[];
-  reviews: ReviewRow[];
   loading: boolean;
   onReview: (v: VerificationRow) => void;
-  onViewAll: () => void;
+  onOpenEscrow: (e: EscrowRow) => void;
+  onViewVerifications: () => void;
+  onViewEscrows: () => void;
 }) {
-  const pending = verifs.filter((v) => verifDisplay(v.verification) === 'pending').slice(0, 5);
-  const recentEscrows = escrows.slice(0, 4);
-  const latestReviews = reviews.slice(0, 4);
+  // One unified to-do list: everything that needs an admin decision right now.
+  const pendingVerifs = verifs.filter((v) => verifDisplay(v.verification) === 'pending');
+  const needsReview = escrows.filter((e) => e.status === 'under_review' || e.status === 'submitted');
+  const recent = escrows.slice(0, 5);
+
+  const firstName = (name || 'Admin').split(/\s+/)[0];
 
   return (
     <>
-      <Topbar title="Dashboard" sub="Overview of platform activity" />
+      <Topbar title={`Welcome back, ${firstName}`} sub="Here’s what needs your attention today." />
       <div className={s.content}>
         <div className={s.statGrid}>
           <Stat label="Verified students" value={String(overview.verifiedStudents)} hint={`${overview.totalStudents} total`} />
-          <Stat label="Pending verifications" value={String(overview.pendingVerifications)} hint="awaiting review" hintCls={s.statHintWarn} />
-          <Stat label="Active escrows" value={String(overview.activeEscrows)} hint={`${money(overview.heldAmount)} held`} />
-          <Stat label="Released" value={money(overview.releasedAmount)} hint="paid out" hintCls={s.statHintUp} />
+          <Stat label="Pending verifications" value={String(overview.pendingVerifications)} hint="awaiting review" hintCls={overview.pendingVerifications ? s.statHintWarn : ''} />
+          <Stat label="Held in escrow" value={money(overview.heldAmount)} hint={`${overview.activeEscrows} active`} />
+          <Stat label="Paid out" value={money(overview.releasedAmount)} hint="released to students" hintCls={s.statHintUp} />
         </div>
 
+        {/* Single action list — verifications + submissions awaiting the admin */}
         <div className={s.card}>
           <div className={s.cardHead}>
-            <span className={s.cardTitle}>Pending verification requests</span>
-            <button className={s.linkBtn} onClick={onViewAll}>View all</button>
+            <span className={s.cardTitle}>Needs your attention</span>
+            <span className={s.sub}>{pendingVerifs.length + needsReview.length} item{pendingVerifs.length + needsReview.length === 1 ? '' : 's'}</span>
           </div>
+
           {loading ? (
             <p className={s.muted}>Loading…</p>
-          ) : pending.length === 0 ? (
-            <p className={s.muted}>No pending verification requests.</p>
+          ) : pendingVerifs.length === 0 && needsReview.length === 0 ? (
+            <p className={s.muted}>You’re all caught up — nothing needs review right now. 🎉</p>
           ) : (
-            <table className={s.table}>
-              <thead>
-                <tr>
-                  <th>Student</th><th>University</th><th>Primary skill</th><th>Submitted</th><th>Status</th><th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {pending.map((v) => (
-                  <tr key={v.user_id}>
-                    <td>
-                      <div className={s.nameCell}>
-                        <span className={s.avatar}>{initials(v.profile?.full_name)}</span>
-                        <div>
-                          <div className={s.name}>{v.profile?.full_name || 'Unnamed'}</div>
-                          <div className={s.sub}>{v.reg_number || v.profile?.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>{v.university || '—'}</td>
-                    <td>{v.skills?.[0] || '—'}</td>
-                    <td className={s.rowMeta}>{ago(v.updated_at)}</td>
-                    <td><VerifPill v={v.verification} /></td>
-                    <td><button className={`${s.act} ${s.actView}`} onClick={() => onReview(v)}>Review</button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div className={s.actionList}>
+              {needsReview.map((e) => (
+                <div key={e.id} className={s.actionRow}>
+                  <span className={`${s.actionTag} ${s.actionTagBlue}`}>Submission</span>
+                  <div className={s.actionMain}>
+                    <div className={s.name}>{e.task?.title || 'Project'}</div>
+                    <div className={s.sub}>{e.student?.full_name || 'Student'} submitted work · {money(Number(e.amount))}</div>
+                  </div>
+                  <button className={`${s.act} ${s.actApprove}`} onClick={() => onOpenEscrow(e)}>Review</button>
+                </div>
+              ))}
+              {pendingVerifs.map((v) => (
+                <div key={v.user_id} className={s.actionRow}>
+                  <span className={`${s.actionTag} ${s.actionTagAmber}`}>Verification</span>
+                  <div className={s.actionMain}>
+                    <div className={s.name}>{v.profile?.full_name || 'Unnamed student'}</div>
+                    <div className={s.sub}>{v.university || 'Student verification'} · submitted {ago(v.updated_at)}</div>
+                  </div>
+                  <button className={`${s.act} ${s.actView}`} onClick={() => onReview(v)}>Review</button>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
-        <div className={s.twoCol}>
-          <div className={s.card}>
-            <div className={s.cardHead}><span className={s.cardTitle}>Recent escrow activity</span></div>
-            {recentEscrows.length === 0 ? (
-              <p className={s.muted}>No escrow activity yet.</p>
-            ) : (
-              recentEscrows.map((e) => (
-                <div key={e.id} className={s.reviewCard}>
-                  <div className={s.reviewTop}>
-                    <div>
-                      <div className={s.name}>{e.task?.title || 'Project'} · {e.student?.full_name || '—'}</div>
-                      <div className={s.sub}>{money(Number(e.amount))} held in escrow</div>
-                    </div>
-                    <EscrowPill p={e} />
+        {/* Compact recent activity — the money flow at a glance */}
+        <div className={s.card}>
+          <div className={s.cardHead}>
+            <span className={s.cardTitle}>Recent escrow activity</span>
+            <button className={s.linkBtn} onClick={onViewEscrows}>View all</button>
+          </div>
+          {recent.length === 0 ? (
+            <p className={s.muted}>No escrow activity yet. Assign a task to a student to open one.</p>
+          ) : (
+            <div className={s.actionList}>
+              {recent.map((e) => (
+                <button key={e.id} className={s.activityRow} onClick={() => onOpenEscrow(e)}>
+                  <div className={s.actionMain}>
+                    <div className={s.name}>{e.task?.title || 'Project'}</div>
+                    <div className={s.sub}>{e.client?.full_name || 'Client'} → {e.student?.full_name || 'Student'} · {money(Number(e.amount))}</div>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          <div className={s.card}>
-            <div className={s.cardHead}><span className={s.cardTitle}>Latest reviews</span></div>
-            {latestReviews.length === 0 ? (
-              <p className={s.muted}>No reviews yet.</p>
-            ) : (
-              latestReviews.map((r) => (
-                <div key={r.id} className={s.reviewCard}>
-                  <Stars n={r.rating} />
-                  <p className={s.reviewQuote}>“{r.comment}”</p>
-                  <div className={s.sub}>{r.reviewer_name || 'Client'} → {r.student_name || 'Student'}</div>
-                </div>
-              ))
-            )}
-          </div>
+                  <EscrowPill p={e} />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+
+        {pendingVerifs.length > 0 && (
+          <button className={s.linkBtn} style={{ alignSelf: 'flex-start' }} onClick={onViewVerifications}>
+            Go to full verification queue →
+          </button>
+        )}
       </div>
     </>
   );
@@ -442,10 +441,6 @@ function Verification({
                 {t} {count(t) > 0 ? count(t) : ''}
               </button>
             ))}
-          </div>
-          <div className={s.filters}>
-            <button className={s.filterBtn}>University ▾</button>
-            <button className={s.filterBtn}>Skill ▾</button>
           </div>
         </div>
 
@@ -604,7 +599,7 @@ function StudentDetail({
 
 // ---- Escrow Monitoring ----------------------------------------------------
 
-const ESCROW_TABS = ['All', 'Funded', 'Awaiting approval', 'Released', 'Disputed'] as const;
+const ESCROW_TABS = ['All', 'In escrow', 'Needs review', 'Awaiting client', 'Released', 'Disputed'] as const;
 
 function Escrow({
   overview,
@@ -620,8 +615,9 @@ function Escrow({
   const [tab, setTab] = useState<(typeof ESCROW_TABS)[number]>('All');
   const match = (e: EscrowRow) => {
     switch (tab) {
-      case 'Funded': return e.payment_status === 'funded' && e.status !== 'cancelled';
-      case 'Awaiting approval': return e.status === 'under_review' || e.status === 'submitted';
+      case 'In escrow': return e.payment_status === 'funded' && e.status === 'in_progress';
+      case 'Needs review': return e.status === 'under_review' || e.status === 'submitted';
+      case 'Awaiting client': return e.status === 'approved';
       case 'Released': return e.payment_status === 'released';
       case 'Disputed': return e.status === 'cancelled';
       default: return true;
@@ -631,13 +627,13 @@ function Escrow({
 
   return (
     <>
-      <Topbar title="Escrow Monitoring" sub="Track funded, released and disputed payments" />
+      <Topbar title="Escrow Monitoring" sub="Funds are held on assignment and released when the client approves." />
       <div className={s.content}>
         <div className={s.statGrid}>
-          <Stat label="Total held in escrow" value={money(overview.heldAmount)} hint={`across ${overview.activeEscrows} contracts`} />
-          <Stat label="Active escrows" value={String(overview.activeEscrows)} hint="funded & in progress" />
-          <Stat label="Awaiting approval" value={String(overview.awaitingApproval)} hint="client action needed" hintCls={s.statHintWarn} />
-          <Stat label="Disputed" value={String(overview.disputed)} hint="needs admin review" hintCls={overview.disputed ? s.statHintWarn : ''} />
+          <Stat label="Held in escrow" value={money(overview.heldAmount)} hint={`${overview.activeEscrows} active`} />
+          <Stat label="Needs your review" value={String(overview.needsReview)} hint="submissions to approve" hintCls={overview.needsReview ? s.statHintWarn : ''} />
+          <Stat label="Awaiting client" value={String(overview.awaitingClient)} hint="approved, pending payout" />
+          <Stat label="Paid out" value={money(overview.releasedAmount)} hint="released to students" hintCls={s.statHintUp} />
         </div>
 
         <div className={s.toolbar}>
@@ -646,7 +642,6 @@ function Escrow({
               <button key={t} className={`${s.tab} ${tab === t ? s.tabActive : ''}`} onClick={() => setTab(t)}>{t}</button>
             ))}
           </div>
-          <div className={s.filters}><button className={s.filterBtn}>Date range ▾</button><button className={s.filterBtn}>Export</button></div>
         </div>
 
         <div className={s.card}>
