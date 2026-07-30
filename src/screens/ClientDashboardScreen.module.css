@@ -54,6 +54,12 @@
   display: flex;
 }
 
+.bell:disabled, 
+.avatarButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .welcomeRow {
   display: flex;
   align-items: flex-start;
