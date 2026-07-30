@@ -299,21 +299,33 @@ export default function App() {
     (completed: StudentProfile) => {
       setProfile(completed);
       if (auth.user && isSupabaseConfigured) {
-        void studentProfiles
-          .save({
-            user_id: auth.user.id,
-            avatar_url: completed.avatarUri,
-            bio: completed.bio,
-            university: completed.university,
-            department: completed.department,
-            reg_number: completed.regNumber,
-            linkedin: completed.linkedin,
-            student_id_url: completed.studentIdUri,
-            skills: completed.skills,
-            portfolio: completed.portfolio,
-            available: completed.available,
-          })
-          .catch(() => {});
+        const uid = auth.user.id;
+        void (async () => {
+          try {
+            // Submitting profile setup files a verification request. Set it to
+            // 'pending' the first time so it shows in the admin queue — but never
+            // downgrade a student an admin has already decided on (edits re-save).
+            const existing = await studentProfiles.get(uid);
+            const keepDecision =
+              existing?.verification === 'verified' || existing?.verification === 'rejected';
+            await studentProfiles.save({
+              user_id: uid,
+              avatar_url: completed.avatarUri,
+              bio: completed.bio,
+              university: completed.university,
+              department: completed.department,
+              reg_number: completed.regNumber,
+              linkedin: completed.linkedin,
+              student_id_url: completed.studentIdUri,
+              skills: completed.skills,
+              portfolio: completed.portfolio,
+              available: completed.available,
+              ...(keepDecision ? {} : { verification: 'pending' }),
+            });
+          } catch {
+            // Best-effort; the screens still render.
+          }
+        })();
       }
       navigate(verified ? '/app' : '/verifying');
     },
