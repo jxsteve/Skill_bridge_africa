@@ -1,4 +1,4 @@
-import { CelebrationCheck, Chip, PrimaryButton, StarIcon, UserIcon } from '../components/ui';
+import { BackButton, CelebrationCheck, Chip, PrimaryButton, StarIcon, UserIcon } from '../components/ui';
 import styles from './StudentAssignedScreen.module.css';
 
 export type AssignedStudent = {
@@ -13,13 +13,15 @@ export type AssignedStudent = {
 
 type Props = {
   student: AssignedStudent;
+  onBack: () => void;
   onViewTaskDetails: () => void;
 };
 
-export default function StudentAssignedScreen({ student, onViewTaskDetails }: Props) {
+export default function StudentAssignedScreen({ student, onBack, onViewTaskDetails }: Props) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
+        <BackButton onClick={onBack} />
         <CelebrationCheck />
 
         <p className={styles.title}>Student Assigned!</p>

@@ -5,7 +5,7 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 
-import { BottomNav, type MainTab } from '../components/ui';
+import { BackButton, BottomNav, type MainTab } from '../components/ui';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { listClientTasks, listTaskApplicants, type Applicant } from '../data/marketplace-service';
 import type { TaskWithClient } from '../data/repo';
@@ -13,6 +13,7 @@ import styles from './ClientMyTasksScreen.module.css';
 
 type Props = {
   clientId?: string;
+  onBack: () => void;
   onCreateTask: () => void;
   onTab: (tab: MainTab) => void;
 };
@@ -26,7 +27,7 @@ const STATUS_LABEL: Record<string, string> = {
   cancelled: 'Cancelled',
 };
 
-export default function ClientMyTasksScreen({ clientId, onCreateTask, onTab }: Props) {
+export default function ClientMyTasksScreen({ clientId, onBack, onCreateTask, onTab }: Props) {
   const [tasks, setTasks] = useState<TaskWithClient[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -64,6 +65,7 @@ export default function ClientMyTasksScreen({ clientId, onCreateTask, onTab }: P
   return (
     <div className={styles.container}>
       <div className={styles.scroll}>
+        <BackButton onClick={onBack} />
         <div className={styles.headerRow}>
           <p className={styles.title}>My Tasks</p>
           <button className={styles.newBtn} onClick={onCreateTask}>

@@ -1,14 +1,16 @@
-import { FileClockIcon, PrimaryButton } from '../components/ui';
+import { BackButton, FileClockIcon, PrimaryButton } from '../components/ui';
 import styles from './TaskUnderReviewScreen.module.css';
 
 type Props = {
+  onBack: () => void;
   onViewMyTasks: () => void;
 };
 
-export default function TaskUnderReviewScreen({ onViewMyTasks }: Props) {
+export default function TaskUnderReviewScreen({ onBack, onViewMyTasks }: Props) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
+        <BackButton onClick={onBack} />
         <div className={styles.iconCircle}>
           <FileClockIcon size={44} color="var(--primary-blue)" />
         </div>

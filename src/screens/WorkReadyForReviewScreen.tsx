@@ -1,4 +1,4 @@
-import { CelebrationCheck, DownloadIcon, FileIcon, PrimaryButton, UserIcon } from '../components/ui';
+import { BackButton, CelebrationCheck, DownloadIcon, FileIcon, PrimaryButton, UserIcon } from '../components/ui';
 import styles from './WorkReadyForReviewScreen.module.css';
 
 export type SubmittedFile = {
@@ -12,6 +12,7 @@ type Props = {
   studentAvatarUrl?: string;
   files: SubmittedFile[];
   onDownloadFile?: (file: SubmittedFile) => void;
+  onBack: () => void;
   onReviewWork: () => void;
 };
 
@@ -21,11 +22,13 @@ export default function WorkReadyForReviewScreen({
   studentAvatarUrl,
   files,
   onDownloadFile,
+  onBack,
   onReviewWork,
 }: Props) {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
+        <BackButton onClick={onBack} />
         <CelebrationCheck />
 
         <p className={styles.title}>Work Ready for Your Review</p>

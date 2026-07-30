@@ -1,4 +1,4 @@
-import { CelebrationCheck, PrimaryButton } from '../components/ui';
+import { BackButton, CelebrationCheck, PrimaryButton } from '../components/ui';
 import styles from './WorkApprovedScreen.module.css';
 
 function formatCurrency(value: number) {
@@ -11,17 +11,19 @@ function formatCurrency(value: number) {
 
 type Props = {
   amount: number;
+  onBack: () => void;
   onReleasePayment: () => void;
 };
 
-export default function WorkApprovedScreen({ amount, onReleasePayment }: Props) {
-  
+export default function WorkApprovedScreen({ amount, onBack, onReleasePayment }: Props) {
+
   const platformFee = amount * 0.05;
   const totalPayment = amount + platformFee;
-  
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
+        <BackButton onClick={onBack} />
         <CelebrationCheck />
 
         <p className={styles.title}>Work Approved</p>

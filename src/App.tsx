@@ -568,6 +568,7 @@ export default function App() {
           path="/client/task-under-review"
           element={
             <TaskUnderReviewScreen
+              onBack={() => navigate('/client/app')}
               onViewMyTasks={() => {
                 setHasTaskNotification(true);
                 navigate('/client/student-assigned');
@@ -581,6 +582,7 @@ export default function App() {
           element={
             <StudentAssignedScreen
               student={assignedStudent}
+              onBack={() => navigate('/client/app')}
               onViewTaskDetails={() => navigate('/client/task-in-progress')}
             />
           }
@@ -629,6 +631,7 @@ export default function App() {
               studentName={assignedStudent.name}
               submittedDate="20 August, 2026"
               files={[{ name: 'Landing_Page_Final.fig', sizeLabel: '1.2 MB' }]}
+              onBack={() => navigate('/client/app')}
               onReviewWork={() => navigate('/client/review-work')}
             />
           }
@@ -639,6 +642,7 @@ export default function App() {
           element={
             <WorkApprovedScreen
               amount={draftTask?.budget ?? 10}
+              onBack={() => navigate('/client/app')}
               onReleasePayment={() => navigate('/client/payment-released')}
             />
           }
@@ -686,6 +690,7 @@ export default function App() {
           element={
             <ClientMyTasksScreen
               clientId={auth.user?.id}
+              onBack={() => navigate('/client/app')}
               onCreateTask={() => navigate('/client/create-task')}
               onTab={goClientTab}
             />
@@ -718,6 +723,7 @@ export default function App() {
               totalFunded={totalFunded}
               totalSpent={totalSpent}
               onHold={onHold}
+              onBack={() => navigate('/client/app')}
               onMyTasks={() => navigate('/client/tasks')}
               onFundWallet={() => navigate('/client/fund-wallet')}
               onLogout={handleLogout}

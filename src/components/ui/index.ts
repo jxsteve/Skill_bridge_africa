@@ -8,6 +8,7 @@ export { SelectField } from './SelectField';
 export { AccountTypeCard } from './AccountTypeCard';
 export type { AccountType } from './AccountTypeCard';
 export { BottomNav } from './BottomNav';
+export { BackButton } from './BackButton';
 export type { MainTab, BottomNavVariant } from './BottomNav';
 export { CelebrationCheck } from './CelebrationCheck';
 export { ConfettiBurst } from './ConfettiBurst';

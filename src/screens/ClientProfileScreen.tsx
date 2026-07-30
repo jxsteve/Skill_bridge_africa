@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import {
   ArrowRightCircleIcon,
+  BackButton,
   BottomNav,
   ChevronRightIcon,
   ClipboardListIcon,
@@ -29,6 +30,7 @@ type Props = {
   totalFunded: number;
   totalSpent: number;
   onHold: number;
+  onBack: () => void;
   onMyTasks: () => void;
   onFundWallet: () => void;
   onLogout: () => void;
@@ -58,6 +60,7 @@ export default function ClientProfileScreen({
   totalFunded,
   totalSpent,
   onHold,
+  onBack,
   onMyTasks,
   onFundWallet,
   onLogout,
@@ -100,6 +103,9 @@ export default function ClientProfileScreen({
   return (
     <div className={styles.container}>
       <div className={styles.scroll}>
+        <div style={{ padding: '10px 16px 0' }}>
+          <BackButton onClick={onBack} />
+        </div>
         {/* Hero */}
         <div className={styles.hero}>
           <div className={styles.avatar}>{initial}</div>
