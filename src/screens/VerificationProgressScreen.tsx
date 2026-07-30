@@ -24,7 +24,8 @@ export default function VerificationProgressScreen({ onDone }: Props) {
       <span className={styles.title}>Verification in progress</span>
       <p className={styles.message}>
         We&rsquo;re verifying your student details and setting up your dedicated
-        wallet. This will only take a moment&hellip;
+        wallet. This usually takes about 5 minutes &mdash; you can keep using the
+        app and we&rsquo;ll notify you as soon as you&rsquo;re approved.
       </p>
     </div>
   );
