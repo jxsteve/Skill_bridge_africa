@@ -20,6 +20,7 @@ import {
   approveSubmission,
   assignTaskToStudent,
   listTaskApplicants,
+  notifyVerificationDecision,
   rejectApplication,
   releasePayment,
   type Applicant,
@@ -202,6 +203,7 @@ export default function AdminPanel({ name, onExit }: Props) {
             onBack={() => setSelectedStudent(null)}
             onDecide={async (v) => {
               await setVerification(selectedStudent.user_id, v);
+              await notifyVerificationDecision(selectedStudent.user_id, v);
               await reload();
               setSelectedStudent(null);
             }}
@@ -262,6 +264,7 @@ export default function AdminPanel({ name, onExit }: Props) {
             onOpen={(v) => setSelectedStudent(v)}
             onQuick={async (v, decision) => {
               await setVerification(v.user_id, decision);
+              await notifyVerificationDecision(v.user_id, decision);
               await reload();
             }}
           />

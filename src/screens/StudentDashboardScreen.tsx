@@ -13,8 +13,9 @@ import {
 } from '../components/ui';
 import logoMark from '../assets/images/logo_mark.png';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { getStudentWallet, listMyBids, listMyProjects } from '../data/marketplace-service';
+import { getStudentWallet, listMyBids, listMyNotifications, listMyProjects } from '../data/marketplace-service';
 import type { Project } from '../data/marketplace';
+import type { AppNotification } from '../data/notifications';
 import styles from './StudentDashboardScreen.module.css';
 
 const money = (n: number) => `$${Number(n || 0).toFixed(2)}`;
@@ -56,6 +57,7 @@ export default function StudentDashboardScreen({
   const [activeProjects, setActiveProjects] = useState<Project[]>([]);
   const [balance, setBalance] = useState(0);
   const [earnings, setEarnings] = useState(0);
+  const [activity, setActivity] = useState<AppNotification[]>([]);
   const displayName = name || email.split('@')[0] || 'Student';
   const initial = displayName.charAt(0).toUpperCase();
 
@@ -72,6 +74,9 @@ export default function StudentDashboardScreen({
         setBalance(w.balance);
         setEarnings(w.totalEarned);
       })
+      .catch(() => {});
+    listMyNotifications(userId, true)
+      .then((n) => setActivity(n.slice(0, 4)))
       .catch(() => {});
   }, [userId]);
 
@@ -185,6 +190,36 @@ export default function StudentDashboardScreen({
               <button className={styles.outlineButton} onClick={onBrowseTasks}>
                 Browse Tasks
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Needs your attention — what just happened across your tasks */}
+        {activity.length > 0 && (
+          <div className={styles.card}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <span className={styles.cardTitle}>Needs your attention</span>
+              <button
+                onClick={onOpenNotifications}
+                style={{ border: 'none', background: 'none', color: 'var(--primary-blue)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              >
+                View all
+              </button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', marginTop: 8 }}>
+              {activity.map((n) => (
+                <div
+                  key={n.id}
+                  style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 0', borderTop: '1px solid #f0f1f3' }}
+                >
+                  <span style={{ width: 8, height: 8, borderRadius: 4, background: violet, marginTop: 6, flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#111827' }}>{n.title}</p>
+                    {n.body && <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6b7280' }}>{n.body}</p>}
+                    <p style={{ margin: '3px 0 0', fontSize: 11, color: '#9ca3af' }}>{n.time}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}

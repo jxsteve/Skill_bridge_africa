@@ -13,8 +13,74 @@
 .content {
   padding: 24px 20px;
 }
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.title {
+  margin: 0;
+  color: var(--title-dark);
+  font-weight: 800;
+  font-size: 22px;
+}
+.findBtn {
+  border: 1px solid var(--primary-blue);
+  background: #fff;
+  color: var(--primary-blue);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tabs {
+  display: flex;
+  gap: 8px;
+  background: #eef1f6;
+  border-radius: 12px;
+  padding: 4px;
+}
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  padding: 9px 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--body-grey);
+  cursor: pointer;
+}
+.tabActive {
+  background: #fff;
+  color: var(--title-dark);
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.08);
+}
+.tabCount {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #d6def0;
+  color: #445168;
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.tabCountOn {
+  background: var(--primary-blue);
+  color: #fff;
+}
 .list {
-  margin-top: 20px;
+  margin-top: 16px;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -74,7 +140,20 @@
 .empty {
   margin-top: 30px;
   text-align: center;
+}
+.emptyText {
   color: var(--body-grey);
   font-weight: 400;
   font-size: 14px;
+  margin-bottom: 14px;
+}
+.emptyBtn {
+  border: none;
+  background: var(--primary-blue);
+  color: #fff;
+  border-radius: 10px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
 }

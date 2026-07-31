@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   BellIcon,
@@ -17,11 +17,15 @@ import {
   WalletIcon,
 } from '../components/ui';
 import logoMark from '../assets/images/logo_mark.png';
+import { isSupabaseConfigured } from '../lib/supabase';
+import { getClientAttention, listMyNotifications } from '../data/marketplace-service';
+import type { AppNotification } from '../data/notifications';
 import styles from './ClientDashboardScreen.module.css';
 
 export type ClientAccountStatus = 'unverified' | 'pending' | 'verified';
 
 type Props = {
+  clientId?: string;
   clientName: string;
   accountStatus: ClientAccountStatus;
   hasTaskNotification: boolean;
@@ -73,6 +77,7 @@ function formatCurrency(value: number) {
 }
 
 export default function ClientDashboardScreen({
+  clientId,
   clientName,
   accountStatus,
   hasTaskNotification,
@@ -94,7 +99,20 @@ export default function ClientDashboardScreen({
   onProjects,
 }: Props) {
   const [balanceHidden, setBalanceHidden] = useState(false);
+  const [activity, setActivity] = useState<AppNotification[]>([]);
+  const [awaitingReview, setAwaitingReview] = useState(0);
   const isVerified = accountStatus === 'verified';
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !clientId) return;
+    listMyNotifications(clientId, true)
+      .then((n) => setActivity(n.slice(0, 4)))
+      .catch(() => {});
+    getClientAttention(clientId)
+      .then((a) => setAwaitingReview(a.awaitingReview))
+      .catch(() => {});
+  }, [clientId]);
+
   const hasFunds = walletBalance > 0;
   const quickActionsEnabled = isVerified && hasFunds;
   const status = STATUS_COPY[accountStatus];
@@ -157,6 +175,62 @@ export default function ClientDashboardScreen({
       <div className={styles.container}>
         <div className={styles.content}>
           {header}
+
+          {/* Needs your attention — action items + what just happened */}
+          {(awaitingReview > 0 || activity.length > 0) && (
+            <section
+              style={{
+                background: '#fff',
+                border: '1px solid #eaecef',
+                borderRadius: 16,
+                padding: 16,
+                marginBottom: 16,
+              }}
+            >
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: 'var(--title-dark)' }}>
+                Needs your attention
+              </p>
+
+              {awaitingReview > 0 && (
+                <button
+                  onClick={onMyTasks}
+                  style={{
+                    marginTop: 12,
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 10,
+                    background: '#ecfdf3',
+                    border: '1px solid #c7f0d8',
+                    borderRadius: 12,
+                    padding: '12px 14px',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                  }}
+                >
+                  <span style={{ fontSize: 14, fontWeight: 600, color: '#107535' }}>
+                    {awaitingReview} task{awaitingReview > 1 ? 's' : ''} ready for your review
+                  </span>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#107535' }}>Review →</span>
+                </button>
+              )}
+
+              {activity.map((n) => (
+                <div
+                  key={n.id}
+                  style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 0', borderTop: '1px solid #f0f1f3', marginTop: 8 }}
+                >
+                  <span style={{ width: 8, height: 8, borderRadius: 4, background: 'var(--primary-blue)', marginTop: 6, flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#111827' }}>{n.title}</p>
+                    {n.body && <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6b7280' }}>{n.body}</p>}
+                    <p style={{ margin: '3px 0 0', fontSize: 11, color: '#9ca3af' }}>{n.time}</p>
+                  </div>
+                </div>
+              ))}
+            </section>
+          )}
 
           <section className={styles.balanceCard}>
             <div className={styles.balanceHeaderRow}>

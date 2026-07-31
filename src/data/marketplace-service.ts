@@ -506,6 +506,17 @@ export async function getStudentWallet(studentId: string): Promise<StudentWallet
   return { balance, totalEarned };
 }
 
+/** How many of a client's tasks are approved by admin and awaiting the client's review. */
+export async function getClientAttention(clientId: string): Promise<{ awaitingReview: number }> {
+  if (!isSupabaseConfigured) return { awaitingReview: 0 };
+  try {
+    const projects = await repo.projects.listByClient(clientId);
+    return { awaitingReview: projects.filter((p) => p.status === 'approved').length };
+  } catch {
+    return { awaitingReview: 0 };
+  }
+}
+
 /** Top up the client's simulated wallet. */
 export async function fundWallet(userId: string, amount: number): Promise<number> {
   if (!isSupabaseConfigured) return amount;
@@ -517,5 +528,53 @@ export async function releasePayment(projectId: string) {
   if (!isSupabaseConfigured) {
     return { amount: 0, fee: 0, total: 0, client_balance: 0, student_balance: 0, already_released: false };
   }
-  return repo.wallets.release(projectId);
+  const result = await repo.wallets.release(projectId);
+  // Tell both parties what just happened (feeds their dashboards + notifications).
+  if (!result.already_released) {
+    try {
+      const project = await repo.projects.get(projectId);
+      if (project) {
+        const task = await repo.tasks.get(project.task_id);
+        const title = task?.title ?? 'the task';
+        await notify(
+          project.student_id,
+          'Payment received',
+          `You’ve been paid $${Number(result.amount).toFixed(2)} for “${title}”. Your task is complete.`,
+          'payment',
+        );
+        await notify(
+          project.client_id,
+          'Payment released',
+          `You released $${Number(result.total).toFixed(2)} for “${title}”. The task is now complete.`,
+          'payment',
+        );
+      }
+    } catch {
+      // Best-effort — never block the payout on a notification write.
+    }
+  }
+  return result;
+}
+
+/** Notify a student of an admin verification decision (impact reaches their feed). */
+export async function notifyVerificationDecision(
+  studentId: string,
+  decision: 'verified' | 'rejected',
+): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  if (decision === 'verified') {
+    await notify(
+      studentId,
+      'You’re verified 🎉',
+      'An admin approved your verification. You can now be assigned to tasks.',
+      'verification',
+    );
+  } else {
+    await notify(
+      studentId,
+      'Verification not approved',
+      'Your verification wasn’t approved this time. Update your details and resubmit.',
+      'verification',
+    );
+  }
 }

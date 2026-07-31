@@ -454,19 +454,31 @@ export default function App() {
               userId={auth.user?.id}
               avatarUri={profile?.avatarUri}
               onImproveProfile={() => navigate('/profile-setup')}
-              onBrowseTasks={() => navigate('/app/tasks')}
+              onBrowseTasks={() => navigate('/app/browse')}
               onOpenNotifications={() => navigate('/app/notifications')}
               onTab={goTab}
             />
           }
         />
+        {/* Tasks tab = the student's own task tracker (All / In Progress / Completed) */}
         <Route
           path="/app/tasks"
           element={
-            <BrowseTasksScreen
+            <MyProjectsScreen
               userId={auth.user?.id}
-              onOpenTask={(id) => navigate(`/app/tasks/${id}`)}
               onOpenProject={(id) => navigate(`/app/projects/${id}/submit`)}
+              onBrowse={() => navigate('/app/browse')}
+              onTab={goTab}
+            />
+          }
+        />
+        {/* Find Work = the open-task marketplace to bid on */}
+        <Route
+          path="/app/browse"
+          element={
+            <BrowseTasksScreen
+              onOpenTask={(id) => navigate(`/app/tasks/${id}`)}
+              onBack={() => navigate('/app')}
               onTab={goTab}
             />
           }
@@ -488,16 +500,8 @@ export default function App() {
           path="/app/bids"
           element={<MyBidsScreen studentId={auth.user?.id} onTab={goTab} />}
         />
-        <Route
-          path="/app/projects"
-          element={
-            <MyProjectsScreen
-              userId={auth.user?.id}
-              onOpenProject={(id) => navigate(`/app/projects/${id}/submit`)}
-              onTab={goTab}
-            />
-          }
-        />
+        {/* Legacy path — the task tracker now lives on the Tasks tab. */}
+        <Route path="/app/projects" element={<Navigate to="/app/tasks" replace />} />
         <Route path="/app/projects/:projectId/submit" element={<SubmitWorkRoute />} />
         <Route
           path="/app/profile"
@@ -527,6 +531,7 @@ export default function App() {
           path="/client/app"
           element={
             <ClientDashboardScreen
+              clientId={auth.user?.id}
               clientName={fullName || 'there'}
               accountStatus={clientAccountStatus}
               hasTaskNotification={hasTaskNotification}
@@ -841,13 +846,13 @@ export default function App() {
     }, [taskId]);
 
     if (task === undefined) return <LoadingView />;
-    if (!task) return <Navigate to="/app/projects" replace />;
+    if (!task) return <Navigate to="/app/tasks" replace />;
 
     return (
       <BidAcceptedScreen
         task={task}
-        onGoToTask={() => navigate('/app/projects')}
-        onViewProjects={() => navigate('/app/projects')}
+        onGoToTask={() => navigate('/app/tasks')}
+        onViewProjects={() => navigate('/app/tasks')}
       />
     );
   }
@@ -869,7 +874,7 @@ export default function App() {
               return;
             }
           }
-          navigate('/app/projects');
+          navigate('/app/tasks');
         }}
       />
     );
