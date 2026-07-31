@@ -103,6 +103,17 @@ export default function MyProjectsScreen({ userId, onOpenProject, onBrowse, onTa
                     </span>
                   </div>
                   <p className={styles.cardBudget}>Budget ${project.budget.toFixed(2)}</p>
+                  {project.rating != null && (
+                    <p className={styles.rating}>
+                      <span className={styles.ratingStars}>
+                        {'★'.repeat(project.rating)}
+                        <span className={styles.ratingStarsEmpty}>
+                          {'★'.repeat(Math.max(0, 5 - project.rating))}
+                        </span>
+                      </span>
+                      <span className={styles.ratingLabel}>Admin rating</span>
+                    </p>
+                  )}
                 </button>
               );
             })}

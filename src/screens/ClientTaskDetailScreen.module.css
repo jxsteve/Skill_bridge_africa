@@ -218,6 +218,30 @@
   text-overflow: ellipsis;
 }
 
+.ratingRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.stars {
+  font-size: 20px;
+  letter-spacing: 2px;
+  color: #f59e0b;
+}
+.starsEmpty {
+  color: #d1d5db;
+}
+.ratingValue {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--title-dark);
+}
+.ratingNote {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
 .action {
   margin-top: 4px;
 }

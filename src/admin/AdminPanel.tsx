@@ -6,7 +6,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { ClipboardListIcon, HomeIcon, ShieldCheckIcon, StarIcon, WalletIcon } from '../components/ui';
+import { ClipboardListIcon, HomeIcon, ShieldCheckIcon, WalletIcon } from '../components/ui';
 import logoMark from '../assets/images/logo_mark.png';
 import { isSupabaseConfigured } from '../lib/supabase';
 import {
@@ -19,8 +19,10 @@ import {
   approveApplication,
   approveSubmission,
   assignTaskToStudent,
+  getProjectRating,
   listTaskApplicants,
   notifyVerificationDecision,
+  rateStudentWork,
   rejectApplication,
   releasePayment,
   type Applicant,
@@ -30,18 +32,15 @@ import {
   computeOverview,
   fetchActivitySignature,
   listEscrows,
-  listReviews,
   listVerifications,
   setEscrowPayment,
-  setReviewStatus,
   setVerification,
   type EscrowRow,
-  type ReviewRow,
   type VerificationRow,
 } from '../data/admin';
 import s from './admin.module.css';
 
-type Screen = 'dashboard' | 'verification' | 'tasks' | 'escrow' | 'ratings';
+type Screen = 'dashboard' | 'verification' | 'tasks' | 'escrow';
 
 type Props = {
   name: string;
@@ -115,7 +114,6 @@ export default function AdminPanel({ name, onExit }: Props) {
 
   const [verifs, setVerifs] = useState<VerificationRow[]>([]);
   const [escrows, setEscrows] = useState<EscrowRow[]>([]);
-  const [reviews, setReviews] = useState<ReviewRow[]>([]);
   const [allTasks, setAllTasks] = useState<TaskWithClient[]>([]);
   const [people, setPeople] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -132,16 +130,14 @@ export default function AdminPanel({ name, onExit }: Props) {
     }
     setLoading(true);
     try {
-      const [v, e, r, t, p] = await Promise.all([
+      const [v, e, t, p] = await Promise.all([
         listVerifications(),
         listEscrows(),
-        listReviews(),
         tasksRepo.listAll(),
         profilesRepo.list(),
       ]);
       setVerifs(v);
       setEscrows(e);
-      setReviews(r);
       setAllTasks(t);
       setPeople(p);
       try {
@@ -201,7 +197,6 @@ export default function AdminPanel({ name, onExit }: Props) {
     { key: 'verification', label: 'Student Verification', Icon: ShieldCheckIcon },
     { key: 'tasks', label: 'Tasks', Icon: ClipboardListIcon },
     { key: 'escrow', label: 'Escrow Monitoring', Icon: WalletIcon },
-    { key: 'ratings', label: 'Ratings & Reviews', Icon: StarIcon },
   ];
 
   return (
@@ -303,6 +298,19 @@ export default function AdminPanel({ name, onExit }: Props) {
               await reload();
               setSelectedEscrow(null);
             }}
+            onRate={async (rating, note) => {
+              await rateStudentWork({
+                projectId: selectedEscrow.id,
+                studentId: selectedEscrow.student_id,
+                clientId: selectedEscrow.client_id,
+                studentName: selectedEscrow.student?.full_name || 'Student',
+                rating,
+                comment: note,
+                taskId: selectedEscrow.task_id,
+                taskTitle: selectedEscrow.task?.title,
+              });
+              await reload();
+            }}
           />
         ) : screen === 'dashboard' ? (
           <Dashboard
@@ -329,10 +337,8 @@ export default function AdminPanel({ name, onExit }: Props) {
           />
         ) : screen === 'tasks' ? (
           <Tasks tasks={allTasks} loading={loading} onManage={(t) => setSelectedTask(t)} />
-        ) : screen === 'escrow' ? (
-          <Escrow overview={overview} escrows={escrows} loading={loading} onOpen={(e) => setSelectedEscrow(e)} />
         ) : (
-          <Ratings reviews={reviews} onModerate={async (id, st) => { await setReviewStatus(id, st); await reload(); }} />
+          <Escrow overview={overview} escrows={escrows} loading={loading} onOpen={(e) => setSelectedEscrow(e)} />
         )}
       </main>
     </div>
@@ -746,6 +752,7 @@ function EscrowDetail({
   onRelease,
   onRefund,
   onFlag,
+  onRate,
 }: {
   escrow: EscrowRow;
   onBack: () => void;
@@ -753,12 +760,47 @@ function EscrowDetail({
   onRelease: () => void;
   onRefund: () => void;
   onFlag: () => void;
+  onRate: (rating: number, note: string) => Promise<void> | void;
 }) {
   const amount = Number(escrow.amount);
   const fee = amount * 0.05;
   const total = amount + fee;
   const released = escrow.payment_status === 'released';
   const awaitingAdmin = escrow.status === 'under_review' || escrow.status === 'submitted';
+  // Rating can be given once the student has delivered work.
+  const canRate = ['submitted', 'under_review', 'approved', 'completed'].includes(escrow.status);
+
+  const [rating, setRating] = useState(0);
+  const [note, setNote] = useState('');
+  const [savedRating, setSavedRating] = useState<number | null>(null);
+  const [ratingBusy, setRatingBusy] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    getProjectRating(escrow.id)
+      .then((r) => {
+        if (!active || !r) return;
+        setSavedRating(r.rating);
+        setRating(r.rating);
+        setNote(r.comment);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [escrow.id]);
+
+  const saveRating = async () => {
+    if (!rating) return;
+    setRatingBusy(true);
+    try {
+      await onRate(rating, note);
+      setSavedRating(rating);
+    } finally {
+      setRatingBusy(false);
+    }
+  };
+
   return (
     <>
       <Topbar title="Escrow Monitoring › Detail" sub="Reviewing a single escrow contract" />
@@ -845,75 +887,56 @@ function EscrowDetail({
                 </>
               )}
             </div>
+
+            <div className={s.cardHead} style={{ borderTop: '1px solid #f0f1f3' }}>
+              <span className={s.cardTitle}>Rate the student’s work</span>
+              {savedRating != null && <Stars n={savedRating} />}
+            </div>
+            <div className={s.section}>
+              {canRate ? (
+                <>
+                  <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onClick={() => setRating(star)}
+                        aria-label={`${star} star${star > 1 ? 's' : ''}`}
+                        style={{
+                          border: 'none',
+                          background: 'none',
+                          cursor: 'pointer',
+                          fontSize: 28,
+                          lineHeight: 1,
+                          color: star <= rating ? '#f59e0b' : '#d1d5db',
+                          padding: 0,
+                        }}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                  <textarea
+                    className={s.noteInput}
+                    placeholder="Optional note about the quality of the work…"
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                  />
+                  <div className={s.btnRow}>
+                    <button className={s.btnPrimary} disabled={!rating || ratingBusy} onClick={saveRating}>
+                      {ratingBusy ? 'Saving…' : savedRating != null ? 'Update rating' : 'Submit rating'}
+                    </button>
+                  </div>
+                  <p className={s.hintText}>
+                    The rating shows on the task for the student and client once the work is submitted or completed.
+                  </p>
+                </>
+              ) : (
+                <p className={s.hintText}>
+                  You can rate the student’s work once they’ve submitted it.
+                </p>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
-    </>
-  );
-}
-
-// ---- Ratings & Reviews ----------------------------------------------------
-
-const REVIEW_TABS = ['All', 'Flagged', 'Published', 'Removed'] as const;
-
-function Ratings({
-  reviews,
-  onModerate,
-}: {
-  reviews: ReviewRow[];
-  onModerate: (id: string, status: ReviewRow['status']) => void;
-}) {
-  const [tab, setTab] = useState<(typeof REVIEW_TABS)[number]>('All');
-  const rows = reviews.filter((r) => tab === 'All' || r.status === tab.toLowerCase());
-  const avg = reviews.length ? (reviews.reduce((s2, r) => s2 + r.rating, 0) / reviews.length).toFixed(1) : '0.0';
-  const flagged = reviews.filter((r) => r.status === 'flagged').length;
-  const removed = reviews.filter((r) => r.status === 'removed').length;
-
-  return (
-    <>
-      <Topbar title="Ratings & Reviews" sub="Moderate feedback across the marketplace" />
-      <div className={s.content}>
-        <div className={s.statGrid}>
-          <Stat label="Total reviews" value={String(reviews.length)} hint="all-time" />
-          <Stat label="Average rating" value={`${avg} ★`} hint="across all students" />
-          <Stat label="Flagged" value={String(flagged)} hint="awaiting moderation" hintCls={flagged ? s.statHintWarn : ''} />
-          <Stat label="Removed" value={String(removed)} hint="policy violations" />
-        </div>
-
-        <div className={s.toolbar}>
-          <div className={s.tabs}>
-            {REVIEW_TABS.map((t) => (
-              <button key={t} className={`${s.tab} ${tab === t ? s.tabActive : ''}`} onClick={() => setTab(t)}>{t}</button>
-            ))}
-          </div>
-        </div>
-
-        <div className={s.card}>
-          {reviews.length === 0 ? (
-            <p className={s.muted}>
-              No reviews yet. Reviews appear here once clients rate students after a completed project.
-            </p>
-          ) : rows.length === 0 ? (
-            <p className={s.muted}>No reviews in “{tab}”.</p>
-          ) : (
-            rows.map((r) => (
-              <div key={r.id} className={s.reviewCard}>
-                <div className={s.reviewTop}>
-                  <div className={s.reviewParties}>{r.reviewer_name || 'Client'} → {r.student_name || 'Student'}</div>
-                  {r.status === 'flagged' ? <span className={`${s.pill} ${s.pillRejected}`}>Flagged</span>
-                    : r.status === 'removed' ? <span className={`${s.pill} ${s.pillNeutral}`}>Removed</span>
-                    : <span className={`${s.pill} ${s.pillVerified}`}>Published</span>}
-                </div>
-                <Stars n={r.rating} />
-                <p className={s.reviewQuote}>“{r.comment}”</p>
-                <div className={s.actions}>
-                  {r.status !== 'removed' && <button className={`${s.act} ${s.actReject}`} onClick={() => onModerate(r.id, 'removed')}>Remove review</button>}
-                  {r.status === 'flagged' && <button className={`${s.act} ${s.actApprove}`} onClick={() => onModerate(r.id, 'published')}>Dismiss flag</button>}
-                  {r.status === 'removed' && <button className={`${s.act} ${s.actApprove}`} onClick={() => onModerate(r.id, 'published')}>Restore</button>}
-                </div>
-              </div>
-            ))
-          )}
         </div>
       </div>
     </>

@@ -114,6 +114,9 @@ export type ProjectRow = {
   status: ProjectStatus;
   payment_status: PaymentStatus;
   escrow_ref: string | null;
+  /** Admin's 1–5 star rating of the delivered work (null until rated). */
+  rating: number | null;
+  rating_note: string | null;
   created_at: string;
   updated_at: string;
 };

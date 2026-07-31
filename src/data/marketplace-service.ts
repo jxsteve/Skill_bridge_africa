@@ -133,6 +133,7 @@ export async function listMyProjects(userId: string): Promise<Project[]> {
     budget: Number(p.amount),
     status: p.status === 'completed' ? 'Completed' : 'In Progress',
     stage: PROJECT_STAGE_LABEL[p.status] ?? 'In Progress',
+    rating: p.rating ?? undefined,
   }));
 }
 
@@ -399,6 +400,7 @@ export type ClientTaskDetail = {
   budget: number;
   taskStatus: string;
   applicantCount: number;
+  rating: number | null;
   project: {
     id: string;
     status: string;
@@ -419,6 +421,7 @@ export async function getClientTaskDetail(taskId: string): Promise<ClientTaskDet
   const project = await repo.projects.getByTask(taskId);
   let studentName = '';
   let submission: ClientTaskDetail['submission'] = null;
+  const rating: number | null = project?.rating ?? null;
 
   if (project) {
     const prof = await repo.profiles.get(project.student_id);
@@ -453,6 +456,7 @@ export async function getClientTaskDetail(taskId: string): Promise<ClientTaskDet
     budget: Number(task.budget),
     taskStatus: task.status,
     applicantCount: bidRows.length,
+    rating,
     project: project
       ? {
           id: project.id,
@@ -484,6 +488,45 @@ export async function approveSubmission(p: {
     'job',
     p.taskId ? `/client/task/${p.taskId}` : undefined,
   );
+}
+
+// ---- Admin rates a student's work (shows on the task) ---------------------
+
+/** Admin gives (or updates) a star rating for the student's work on a project. */
+export async function rateStudentWork(p: {
+  projectId: string;
+  studentId: string;
+  clientId: string;
+  studentName: string;
+  rating: number;
+  comment?: string;
+  taskTitle?: string;
+  taskId?: string;
+}): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  await repo.projects.setRating(p.projectId, p.rating, p.comment);
+  await notify(
+    p.studentId,
+    'You received a rating',
+    `An admin rated your work on “${p.taskTitle ?? 'a task'}” ${p.rating}★.`,
+    'job',
+    '/app/tasks',
+  );
+}
+
+/** The admin's rating for a project's work, if any. */
+export async function getProjectRating(
+  projectId: string,
+): Promise<{ rating: number; comment: string } | null> {
+  if (!isSupabaseConfigured) return null;
+  try {
+    const project = await repo.projects.get(projectId);
+    return project && project.rating != null
+      ? { rating: project.rating, comment: project.rating_note ?? '' }
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 // ---- Wallets (simulated, for the demo) ------------------------------------

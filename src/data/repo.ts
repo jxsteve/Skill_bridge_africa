@@ -326,6 +326,14 @@ export const projects = {
     const { error } = await db().from('projects').update({ status }).eq('id', id);
     if (error) throw error;
   },
+  /** Admin's star rating of the work, stored on the task. */
+  async setRating(id: string, rating: number, note?: string): Promise<void> {
+    const { error } = await db()
+      .from('projects')
+      .update({ rating, rating_note: note ?? '' })
+      .eq('id', id);
+    if (error) throw error;
+  },
   /** Mirror on-chain payment state (called after the backend confirms a tx). */
   async setPaymentStatus(id: string, payment_status: PaymentStatus, escrow_ref?: string): Promise<void> {
     const patch: Partial<ProjectRow> = { payment_status };
