@@ -118,3 +118,42 @@ export async function setReviewStatus(id: string, status: ReviewRow['status']): 
   const { error } = await db().from('reviews').update({ status }).eq('id', id);
   if (error) throw error;
 }
+
+// ---- Live activity detection (so the admin knows to refresh) ---------------
+
+async function tableCount(table: string): Promise<number> {
+  const { count } = await db().from(table).select('*', { count: 'exact', head: true });
+  return count ?? 0;
+}
+
+async function tableMaxUpdated(table: string): Promise<string> {
+  const { data } = await db()
+    .from(table)
+    .select('updated_at')
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return (data as { updated_at?: string } | null)?.updated_at ?? '';
+}
+
+/**
+ * A cheap fingerprint of platform state. Row counts catch new tasks/bids/
+ * submissions; the max updated_at on tasks/projects catches status changes
+ * (assignment, submission, approval, payment). If the signature changes between
+ * polls, something happened that the admin hasn't seen yet.
+ */
+export async function fetchActivitySignature(): Promise<string> {
+  if (!isSupabaseConfigured) return '';
+  const [tasks, projects, bids, submissions] = await Promise.all([
+    tableCount('tasks'),
+    tableCount('projects'),
+    tableCount('bids'),
+    tableCount('submissions'),
+  ]);
+  const [projMax, taskMax, spMax] = await Promise.all([
+    tableMaxUpdated('projects'),
+    tableMaxUpdated('tasks'),
+    tableMaxUpdated('student_profiles'),
+  ]);
+  return `${tasks}|${projects}|${bids}|${submissions}|${projMax}|${taskMax}|${spMax}`;
+}

@@ -4,7 +4,7 @@
  * (+ detail), Ratings & Reviews, and a login gate. Reads/writes real Supabase
  * data. Amounts are the platform token, shown as $ (wireframe ₦ was placeholder).
  */
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ClipboardListIcon, HomeIcon, ShieldCheckIcon, StarIcon, WalletIcon } from '../components/ui';
 import logoMark from '../assets/images/logo_mark.png';
@@ -28,6 +28,7 @@ import {
 import type { Profile } from '../data/db-types';
 import {
   computeOverview,
+  fetchActivitySignature,
   listEscrows,
   listReviews,
   listVerifications,
@@ -50,6 +51,11 @@ type Props = {
 // Demo admin credentials (frontend-only — insecure, for the demo login).
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'password';
+// Keeps the admin logged in across refreshes, but only for this browser session
+// (login is still required once per session).
+const ADMIN_SESSION_KEY = 'sb.adminUnlocked';
+// How often to check for new student/client activity.
+const POLL_MS = 15000;
 
 // ---- helpers --------------------------------------------------------------
 
@@ -96,7 +102,13 @@ function Stars({ n }: { n: number }) {
 
 export default function AdminPanel({ name, onExit }: Props) {
   const [screen, setScreen] = useState<Screen>('dashboard');
-  const [unlocked, setUnlocked] = useState(false);
+  const [unlocked, setUnlocked] = useState(() => {
+    try {
+      return sessionStorage.getItem(ADMIN_SESSION_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
   const [selectedStudent, setSelectedStudent] = useState<VerificationRow | null>(null);
   const [selectedEscrow, setSelectedEscrow] = useState<EscrowRow | null>(null);
   const [selectedTask, setSelectedTask] = useState<TaskWithClient | null>(null);
@@ -107,6 +119,11 @@ export default function AdminPanel({ name, onExit }: Props) {
   const [allTasks, setAllTasks] = useState<TaskWithClient[]>([]);
   const [people, setPeople] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Background activity detection: when a student/client changes something, the
+  // signature drifts from what was last loaded and we surface a refresh banner.
+  const [hasUpdates, setHasUpdates] = useState(false);
+  const sigRef = useRef<string>('');
 
   const reload = useCallback(async () => {
     if (!isSupabaseConfigured) {
@@ -127,6 +144,12 @@ export default function AdminPanel({ name, onExit }: Props) {
       setReviews(r);
       setAllTasks(t);
       setPeople(p);
+      try {
+        sigRef.current = await fetchActivitySignature();
+      } catch {
+        /* signature is best-effort */
+      }
+      setHasUpdates(false);
     } finally {
       setLoading(false);
     }
@@ -137,12 +160,33 @@ export default function AdminPanel({ name, onExit }: Props) {
     if (unlocked) void reload();
   }, [unlocked, reload]);
 
+  // Poll for new student/client activity without disturbing the current view.
+  useEffect(() => {
+    if (!unlocked || !isSupabaseConfigured) return;
+    const id = window.setInterval(async () => {
+      try {
+        const sig = await fetchActivitySignature();
+        if (sigRef.current && sig !== sigRef.current) setHasUpdates(true);
+      } catch {
+        /* ignore transient poll failures */
+      }
+    }, POLL_MS);
+    return () => window.clearInterval(id);
+  }, [unlocked]);
+
   if (!unlocked) {
     return (
       <AdminLogin
         onSubmit={(user, pass) => {
           const ok = user.trim().toLowerCase() === ADMIN_USER && pass === ADMIN_PASS;
-          if (ok) setUnlocked(true);
+          if (ok) {
+            try {
+              sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+            } catch {
+              /* storage may be unavailable */
+            }
+            setUnlocked(true);
+          }
           return ok;
         }}
         onExit={onExit}
@@ -197,6 +241,20 @@ export default function AdminPanel({ name, onExit }: Props) {
       </aside>
 
       <main className={s.main}>
+        {hasUpdates && (
+          <div className={s.updateBanner}>
+            <span className={s.updateDot} />
+            <span className={s.updateText}>
+              New activity from students or clients — the view may be out of date.
+            </span>
+            <button className={s.updateRefresh} onClick={() => void reload()}>
+              Refresh
+            </button>
+            <button className={s.updateDismiss} onClick={() => setHasUpdates(false)} aria-label="Dismiss">
+              ✕
+            </button>
+          </div>
+        )}
         {selectedStudent ? (
           <StudentDetail
             student={selectedStudent}
