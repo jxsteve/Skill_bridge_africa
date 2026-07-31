@@ -103,6 +103,7 @@ export default function ClientDashboardScreen({
   const [balanceHidden, setBalanceHidden] = useState(false);
   const [activity, setActivity] = useState<AppNotification[]>([]);
   const [awaitingReview, setAwaitingReview] = useState(0);
+  const [attentionOpen, setAttentionOpen] = useState(true);
   const isVerified = accountStatus === 'verified';
 
   useEffect(() => {
@@ -178,76 +179,6 @@ export default function ClientDashboardScreen({
         <div className={styles.content}>
           {header}
 
-          {/* Needs your attention — action items + what just happened */}
-          {(awaitingReview > 0 || activity.length > 0) && (
-            <section
-              style={{
-                background: '#fff',
-                border: '1px solid #eaecef',
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 16,
-              }}
-            >
-              <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: 'var(--title-dark)' }}>
-                Needs your attention
-              </p>
-
-              {awaitingReview > 0 && (
-                <button
-                  onClick={onMyTasks}
-                  style={{
-                    marginTop: 12,
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: 10,
-                    background: '#ecfdf3',
-                    border: '1px solid #c7f0d8',
-                    borderRadius: 12,
-                    padding: '12px 14px',
-                    cursor: 'pointer',
-                    textAlign: 'left',
-                  }}
-                >
-                  <span style={{ fontSize: 14, fontWeight: 600, color: '#107535' }}>
-                    {awaitingReview} task{awaitingReview > 1 ? 's' : ''} ready for your review
-                  </span>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: '#107535' }}>Review →</span>
-                </button>
-              )}
-
-              {activity.map((n) => (
-                <button
-                  key={n.id}
-                  onClick={() => onOpenActivity?.(n.link ?? '/client/tasks')}
-                  style={{
-                    display: 'flex',
-                    gap: 10,
-                    alignItems: 'flex-start',
-                    padding: '10px 0',
-                    marginTop: 8,
-                    border: 'none',
-                    borderTop: '1px solid #f0f1f3',
-                    background: 'none',
-                    width: '100%',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <span style={{ width: 8, height: 8, borderRadius: 4, background: 'var(--primary-blue)', marginTop: 6, flexShrink: 0 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#111827' }}>{n.title}</p>
-                    {n.body && <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6b7280' }}>{n.body}</p>}
-                    <p style={{ margin: '3px 0 0', fontSize: 11, color: '#9ca3af' }}>{n.time}</p>
-                  </div>
-                  <span style={{ color: '#c4c9d4', fontSize: 18, alignSelf: 'center' }}>›</span>
-                </button>
-              ))}
-            </section>
-          )}
-
           <section className={styles.balanceCard}>
             <div className={styles.balanceHeaderRow}>
               <span className={styles.balanceLabel}>Wallet Balance</span>
@@ -279,6 +210,117 @@ export default function ClientDashboardScreen({
               Add Funds
             </button>
           </section>
+
+          {/* Needs your attention — collapsible, sits below the wallet */}
+          {(awaitingReview > 0 || activity.length > 0) && (
+            <section
+              style={{
+                background: '#fff',
+                border: '1px solid #eaecef',
+                borderRadius: 16,
+                padding: 16,
+                marginBottom: 16,
+              }}
+            >
+              <button
+                onClick={() => setAttentionOpen((o) => !o)}
+                aria-expanded={attentionOpen}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 10,
+                  border: 'none',
+                  background: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
+                <span style={{ fontWeight: 700, fontSize: 15, color: 'var(--title-dark)' }}>
+                  Needs your attention
+                </span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span
+                    style={{
+                      minWidth: 20,
+                      height: 20,
+                      padding: '0 6px',
+                      borderRadius: 999,
+                      background: 'var(--primary-blue)',
+                      color: '#fff',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {awaitingReview + activity.length}
+                  </span>
+                  <span style={{ color: '#9ca3af', fontSize: 15 }}>{attentionOpen ? '⌃' : '⌄'}</span>
+                </span>
+              </button>
+
+              {attentionOpen && (
+                <>
+                  {awaitingReview > 0 && (
+                    <button
+                      onClick={onMyTasks}
+                      style={{
+                        marginTop: 12,
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 10,
+                        background: '#ecfdf3',
+                        border: '1px solid #c7f0d8',
+                        borderRadius: 12,
+                        padding: '12px 14px',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                      }}
+                    >
+                      <span style={{ fontSize: 14, fontWeight: 600, color: '#107535' }}>
+                        {awaitingReview} task{awaitingReview > 1 ? 's' : ''} ready for your review
+                      </span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#107535' }}>Review →</span>
+                    </button>
+                  )}
+
+                  {activity.map((n) => (
+                    <button
+                      key={n.id}
+                      onClick={() => onOpenActivity?.(n.link ?? '/client/tasks')}
+                      style={{
+                        display: 'flex',
+                        gap: 10,
+                        alignItems: 'flex-start',
+                        padding: '10px 0',
+                        marginTop: 8,
+                        border: 'none',
+                        borderTop: '1px solid #f0f1f3',
+                        background: 'none',
+                        width: '100%',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                      }}
+                    >
+                      <span style={{ width: 8, height: 8, borderRadius: 4, background: 'var(--primary-blue)', marginTop: 6, flexShrink: 0 }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: '#111827' }}>{n.title}</p>
+                        {n.body && <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6b7280' }}>{n.body}</p>}
+                        <p style={{ margin: '3px 0 0', fontSize: 11, color: '#9ca3af' }}>{n.time}</p>
+                      </div>
+                      <span style={{ color: '#c4c9d4', fontSize: 18, alignSelf: 'center' }}>›</span>
+                    </button>
+                  ))}
+                </>
+              )}
+            </section>
+          )}
 
           <section className={styles.addressCard}>
             <p className={styles.addressLabel}>Platform Wallet Address</p>

@@ -17,6 +17,7 @@ import {
   placeBid,
   releasePayment,
   requestTask,
+  submitClientReview,
   submitWork,
   type ClientTaskDetail,
 } from './data/marketplace-service';
@@ -679,7 +680,8 @@ export default function App() {
           element={
             <RateExperienceScreen
               studentName={(activeReview?.studentName ?? 'the student').split(' ')[0]}
-              onSubmit={() => {
+              onSubmit={(rating, review) => {
+                if (activeReview) void submitClientReview(activeReview.projectId, rating, review);
                 setActiveReview(null);
                 navigate('/client/tasks');
               }}

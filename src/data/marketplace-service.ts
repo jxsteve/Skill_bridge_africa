@@ -134,6 +134,7 @@ export async function listMyProjects(userId: string): Promise<Project[]> {
     status: p.status === 'completed' ? 'Completed' : 'In Progress',
     stage: PROJECT_STAGE_LABEL[p.status] ?? 'In Progress',
     rating: p.rating ?? undefined,
+    ratingNote: p.rating_note ?? undefined,
   }));
 }
 
@@ -512,6 +513,31 @@ export async function rateStudentWork(p: {
     'job',
     '/app/tasks',
   );
+}
+
+/** Client leaves a rating + written review on their completed task; the student sees it. */
+export async function submitClientReview(
+  projectId: string,
+  rating: number,
+  comment: string,
+): Promise<void> {
+  if (!isSupabaseConfigured || !rating) return;
+  await repo.projects.setRating(projectId, rating, comment);
+  try {
+    const project = await repo.projects.get(projectId);
+    if (project) {
+      const task = await repo.tasks.get(project.task_id);
+      await notify(
+        project.student_id,
+        'You received a review',
+        `The client rated your work on “${task?.title ?? 'a task'}” ${rating}★.`,
+        'job',
+        '/app/tasks',
+      );
+    }
+  } catch {
+    // Best-effort — the review still shows on the task.
+  }
 }
 
 /** The admin's rating for a project's work, if any. */

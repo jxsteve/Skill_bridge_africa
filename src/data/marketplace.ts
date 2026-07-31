@@ -113,8 +113,10 @@ export type Project = {
   status: 'In Progress' | 'Completed';
   /** Fine-grained lifecycle label for the badge (Submitted, Under Review, …). */
   stage?: string;
-  /** Admin's star rating of the work (1–5), when given. */
+  /** Star rating of the work (1–5), when given. */
   rating?: number;
+  /** Written review/comment left with the rating. */
+  ratingNote?: string;
 };
 
 export const PROJECTS: Project[] = [

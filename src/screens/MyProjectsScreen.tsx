@@ -33,6 +33,7 @@ export default function MyProjectsScreen({ userId, onOpenProject, onBrowse, onTa
   const [active, setActive] = useState<'All' | 'In Progress' | 'Completed'>('All');
   const [allProjects, setAllProjects] = useState<Project[]>(isSupabaseConfigured ? [] : PROJECTS);
   const [loading, setLoading] = useState(true);
+  const [openReview, setOpenReview] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isSupabaseConfigured || !userId) {
@@ -92,8 +93,16 @@ export default function MyProjectsScreen({ userId, onOpenProject, onBrowse, onTa
             {projects.map((project) => {
               const stage = project.stage ?? project.status;
               const style = STAGE_STYLE[stage] ?? STAGE_STYLE['In Progress'];
+              const completed = project.status === 'Completed';
+              const isOpen = openReview === project.id;
               return (
-                <button key={project.id} className={styles.card} onClick={() => onOpenProject(project.id)}>
+                <button
+                  key={project.id}
+                  className={styles.card}
+                  onClick={() =>
+                    completed ? setOpenReview(isOpen ? null : project.id) : onOpenProject(project.id)
+                  }
+                >
                   <div className={styles.cardHead}>
                     <span className={styles.cardTitle}>{project.title}</span>
                     <span className={styles.badge} style={{ background: style.bg }}>
@@ -111,8 +120,41 @@ export default function MyProjectsScreen({ userId, onOpenProject, onBrowse, onTa
                           {'★'.repeat(Math.max(0, 5 - project.rating))}
                         </span>
                       </span>
-                      <span className={styles.ratingLabel}>Admin rating</span>
+                      <span className={styles.ratingLabel}>Client review</span>
                     </p>
+                  )}
+
+                  {completed && (
+                    <span className={styles.reviewToggle}>
+                      {isOpen ? 'Hide review' : 'View review'}
+                      <span className={styles.reviewChevron}>{isOpen ? '⌃' : '⌄'}</span>
+                    </span>
+                  )}
+
+                  {completed && isOpen && (
+                    <div className={styles.reviewPanel}>
+                      {project.rating != null ? (
+                        <>
+                          <div className={styles.reviewStarsRow}>
+                            <span className={styles.ratingStars}>
+                              {'★'.repeat(project.rating)}
+                              <span className={styles.ratingStarsEmpty}>
+                                {'★'.repeat(Math.max(0, 5 - project.rating))}
+                              </span>
+                            </span>
+                            <span className={styles.reviewScore}>{project.rating}.0 / 5</span>
+                          </div>
+                          {project.ratingNote ? (
+                            <p className={styles.reviewComment}>“{project.ratingNote}”</p>
+                          ) : (
+                            <p className={styles.reviewMuted}>No written comment was left.</p>
+                          )}
+                          <p className={styles.reviewFrom}>Review from the client</p>
+                        </>
+                      ) : (
+                        <p className={styles.reviewMuted}>No review has been left yet.</p>
+                      )}
+                    </div>
                   )}
                 </button>
               );
