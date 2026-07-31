@@ -8,6 +8,8 @@ export type AppNotification = {
   title: string;
   body: string;
   time: string;
+  /** In-app route to open when the notification is clicked. */
+  link?: string;
 };
 
 /**

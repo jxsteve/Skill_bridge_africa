@@ -281,6 +281,7 @@ export default function AdminPanel({ name, onExit }: Props) {
               await approveSubmission({
                 projectId: selectedEscrow.id,
                 clientId: selectedEscrow.client_id,
+                taskId: selectedEscrow.task_id,
                 taskTitle: selectedEscrow.task?.title,
               });
               await reload();
@@ -416,24 +417,24 @@ function Dashboard({
           ) : (
             <div className={s.actionList}>
               {needsReview.map((e) => (
-                <div key={e.id} className={s.actionRow}>
+                <button key={e.id} className={s.actionRow} onClick={() => onOpenEscrow(e)}>
                   <span className={`${s.actionTag} ${s.actionTagBlue}`}>Submission</span>
                   <div className={s.actionMain}>
                     <div className={s.name}>{e.task?.title || 'Project'}</div>
                     <div className={s.sub}>{e.student?.full_name || 'Student'} submitted work · {money(Number(e.amount))}</div>
                   </div>
-                  <button className={`${s.act} ${s.actApprove}`} onClick={() => onOpenEscrow(e)}>Review</button>
-                </div>
+                  <span className={`${s.act} ${s.actApprove}`}>Review →</span>
+                </button>
               ))}
               {pendingVerifs.map((v) => (
-                <div key={v.user_id} className={s.actionRow}>
+                <button key={v.user_id} className={s.actionRow} onClick={() => onReview(v)}>
                   <span className={`${s.actionTag} ${s.actionTagAmber}`}>Verification</span>
                   <div className={s.actionMain}>
                     <div className={s.name}>{v.profile?.full_name || 'Unnamed student'}</div>
                     <div className={s.sub}>{v.university || 'Student verification'} · submitted {ago(v.updated_at)}</div>
                   </div>
-                  <button className={`${s.act} ${s.actView}`} onClick={() => onReview(v)}>Review</button>
-                </div>
+                  <span className={`${s.act} ${s.actView}`}>Review →</span>
+                </button>
               ))}
             </div>
           )}

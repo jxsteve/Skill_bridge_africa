@@ -365,7 +365,13 @@ export const notifications = {
     const { error } = await db().from('notifications').update({ read: true }).eq('id', id);
     if (error) throw error;
   },
-  async create(input: { user_id: string; title: string; body?: string; type?: string }): Promise<NotificationRow> {
+  async create(input: {
+    user_id: string;
+    title: string;
+    body?: string;
+    type?: string;
+    link?: string | null;
+  }): Promise<NotificationRow> {
     return unwrap(await db().from('notifications').insert(input).select().single());
   },
 };

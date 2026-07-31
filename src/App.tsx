@@ -456,6 +456,7 @@ export default function App() {
               onImproveProfile={() => navigate('/profile-setup')}
               onBrowseTasks={() => navigate('/app/browse')}
               onOpenNotifications={() => navigate('/app/notifications')}
+              onOpenActivity={(link) => navigate(link)}
               onTab={goTab}
             />
           }
@@ -548,6 +549,7 @@ export default function App() {
                 setHasTaskNotification(false);
                 navigate('/client/notifications');
               }}
+              onOpenActivity={(link) => navigate(link)}
               onProfileClick={() => navigate('/client/profile')}
               onCreateTask={() => navigate('/client/create-task')}
               onMyTasks={() => navigate('/client/tasks')}

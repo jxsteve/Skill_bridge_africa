@@ -41,6 +41,7 @@ type Props = {
   onAddFunds?: () => void;
   onNotificationsClick?: () => void;
   onProfileClick?: () => void;
+  onOpenActivity?: (link: string) => void;
   onCreateTask: () => void;
   onMyTasks: () => void;
   onWallet: () => void;
@@ -93,6 +94,7 @@ export default function ClientDashboardScreen({
   onAddFunds,
   onNotificationsClick,
   onProfileClick,
+  onOpenActivity,
   onCreateTask,
   onMyTasks,
   onWallet,
@@ -217,9 +219,22 @@ export default function ClientDashboardScreen({
               )}
 
               {activity.map((n) => (
-                <div
+                <button
                   key={n.id}
-                  style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 0', borderTop: '1px solid #f0f1f3', marginTop: 8 }}
+                  onClick={() => onOpenActivity?.(n.link ?? '/client/tasks')}
+                  style={{
+                    display: 'flex',
+                    gap: 10,
+                    alignItems: 'flex-start',
+                    padding: '10px 0',
+                    marginTop: 8,
+                    border: 'none',
+                    borderTop: '1px solid #f0f1f3',
+                    background: 'none',
+                    width: '100%',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                  }}
                 >
                   <span style={{ width: 8, height: 8, borderRadius: 4, background: 'var(--primary-blue)', marginTop: 6, flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -227,7 +242,8 @@ export default function ClientDashboardScreen({
                     {n.body && <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6b7280' }}>{n.body}</p>}
                     <p style={{ margin: '3px 0 0', fontSize: 11, color: '#9ca3af' }}>{n.time}</p>
                   </div>
-                </div>
+                  <span style={{ color: '#c4c9d4', fontSize: 18, alignSelf: 'center' }}>›</span>
+                </button>
               ))}
             </section>
           )}

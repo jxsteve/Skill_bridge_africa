@@ -365,10 +365,17 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  width: 100%;
   padding: 14px 20px;
+  border: none;
   border-bottom: 1px solid #f0f1f3;
+  background: none;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
 }
 .actionRow:last-child { border-bottom: none; }
+.actionRow:hover { background: #f8fafc; }
 .activityRow {
   display: flex;
   align-items: center;

@@ -132,6 +132,8 @@ export type NotificationRow = {
   title: string;
   body: string;
   type: string;
+  /** Optional in-app deep link to the task/screen this notification is about. */
+  link: string | null;
   read: boolean;
   created_at: string;
 };

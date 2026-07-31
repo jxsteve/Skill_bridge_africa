@@ -158,6 +158,7 @@ export async function listMyNotifications(userId: string, verified: boolean): Pr
     title: n.title,
     body: n.body,
     time: new Date(n.created_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' }),
+    link: n.link ?? undefined,
   }));
 }
 
@@ -238,11 +239,20 @@ export async function listTaskApplicants(taskId: string): Promise<Applicant[]> {
   }));
 }
 
-async function notify(userId: string, title: string, body: string, type: string) {
+async function notify(userId: string, title: string, body: string, type: string, link?: string) {
+  const base = { user_id: userId, title, body, type };
   try {
-    await repo.notifications.create({ user_id: userId, title, body, type });
+    await repo.notifications.create(link ? { ...base, link } : base);
   } catch {
-    // Best-effort — never block the admin action on a notification write.
+    // If the `link` column isn't present yet (migration 0005 not applied),
+    // retry without it so the notification still lands.
+    if (link) {
+      try {
+        await repo.notifications.create(base);
+      } catch {
+        /* best-effort */
+      }
+    }
   }
 }
 
@@ -255,7 +265,7 @@ export async function approveApplication(p: {
   clientId: string;
   taskTitle?: string;
 }): Promise<void> {
-  await repo.projects.createDirect({
+  const project = await repo.projects.createDirect({
     task_id: p.taskId,
     student_id: p.studentId,
     client_id: p.clientId,
@@ -271,8 +281,9 @@ export async function approveApplication(p: {
   await notify(
     p.studentId,
     'Request approved',
-    `You’ve been assigned “${p.taskTitle ?? 'a task'}”. It’s now in your projects.`,
+    `You’ve been assigned “${p.taskTitle ?? 'a task'}”. Open it to submit your work.`,
     'job',
+    `/app/projects/${project.id}/submit`,
   );
 }
 
@@ -288,6 +299,7 @@ export async function rejectApplication(
       'Request declined',
       `Your request for “${opts.taskTitle ?? 'a task'}” was not approved this time.`,
       'bid',
+      '/app/browse',
     );
   }
 }
@@ -300,7 +312,7 @@ export async function assignTaskToStudent(p: {
   amount: number;
   taskTitle?: string;
 }): Promise<void> {
-  await repo.projects.createDirect({
+  const project = await repo.projects.createDirect({
     task_id: p.taskId,
     student_id: p.studentId,
     client_id: p.clientId,
@@ -309,8 +321,9 @@ export async function assignTaskToStudent(p: {
   await notify(
     p.studentId,
     'Task assigned to you',
-    `An admin assigned you “${p.taskTitle ?? 'a task'}”. Check your projects.`,
+    `An admin assigned you “${p.taskTitle ?? 'a task'}”. Open it to submit your work.`,
     'job',
+    `/app/projects/${project.id}/submit`,
   );
 }
 
@@ -369,6 +382,7 @@ export async function submitWork(
         'Work submitted',
         'A student submitted work on your task. It’s now under review.',
         'job',
+        `/client/task/${project.task_id}`,
       );
     }
     return { ok: true };
@@ -459,6 +473,7 @@ export async function getClientTaskDetail(taskId: string): Promise<ClientTaskDet
 export async function approveSubmission(p: {
   projectId: string;
   clientId: string;
+  taskId?: string;
   taskTitle?: string;
 }): Promise<void> {
   await repo.projects.setStatus(p.projectId, 'approved');
@@ -467,6 +482,7 @@ export async function approveSubmission(p: {
     'Work ready for your review',
     `The submitted work for “${p.taskTitle ?? 'your task'}” passed admin review. Approve it to release payment.`,
     'job',
+    p.taskId ? `/client/task/${p.taskId}` : undefined,
   );
 }
 
@@ -541,12 +557,14 @@ export async function releasePayment(projectId: string) {
           'Payment received',
           `You’ve been paid $${Number(result.amount).toFixed(2)} for “${title}”. Your task is complete.`,
           'payment',
+          '/app/tasks',
         );
         await notify(
           project.client_id,
           'Payment released',
           `You released $${Number(result.total).toFixed(2)} for “${title}”. The task is now complete.`,
           'payment',
+          `/client/task/${project.task_id}`,
         );
       }
     } catch {
@@ -566,8 +584,9 @@ export async function notifyVerificationDecision(
     await notify(
       studentId,
       'You’re verified 🎉',
-      'An admin approved your verification. You can now be assigned to tasks.',
+      'An admin approved your verification. Browse open tasks and start bidding.',
       'verification',
+      '/app/browse',
     );
   } else {
     await notify(
@@ -575,6 +594,7 @@ export async function notifyVerificationDecision(
       'Verification not approved',
       'Your verification wasn’t approved this time. Update your details and resubmit.',
       'verification',
+      '/profile-setup',
     );
   }
 }

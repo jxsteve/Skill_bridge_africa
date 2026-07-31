@@ -31,6 +31,7 @@ type Props = {
   onImproveProfile: () => void;
   onOpenNotifications: () => void;
   onBrowseTasks: () => void;
+  onOpenActivity: (link: string) => void;
   onTab: (tab: MainTab) => void;
 };
 
@@ -50,6 +51,7 @@ export default function StudentDashboardScreen({
   onImproveProfile,
   onOpenNotifications,
   onBrowseTasks,
+  onOpenActivity,
   onTab,
 }: Props) {
   const [balanceHidden, setBalanceHidden] = useState(false);
@@ -208,9 +210,21 @@ export default function StudentDashboardScreen({
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: 8 }}>
               {activity.map((n) => (
-                <div
+                <button
                   key={n.id}
-                  style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '10px 0', borderTop: '1px solid #f0f1f3' }}
+                  onClick={() => onOpenActivity(n.link ?? '/app/tasks')}
+                  style={{
+                    display: 'flex',
+                    gap: 10,
+                    alignItems: 'flex-start',
+                    padding: '10px 0',
+                    border: 'none',
+                    borderTop: '1px solid #f0f1f3',
+                    background: 'none',
+                    width: '100%',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                  }}
                 >
                   <span style={{ width: 8, height: 8, borderRadius: 4, background: violet, marginTop: 6, flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -218,7 +232,8 @@ export default function StudentDashboardScreen({
                     {n.body && <p style={{ margin: '2px 0 0', fontSize: 13, color: '#6b7280' }}>{n.body}</p>}
                     <p style={{ margin: '3px 0 0', fontSize: 11, color: '#9ca3af' }}>{n.time}</p>
                   </div>
-                </div>
+                  <span style={{ color: '#c4c9d4', fontSize: 18, alignSelf: 'center' }}>›</span>
+                </button>
               ))}
             </div>
           </div>
