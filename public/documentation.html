@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SkillBridge Africa — Project Documentation</title>
+<style>
+  :root {
+    --paper:#ffffff; --panel:#f7f9fc; --ink:#0f1728; --muted:#54607a; --faint:#8792aa;
+    --blue:#124cc9; --blue-soft:#e9eefc; --green:#107535; --green-soft:#e7f6ec;
+    --line:#e4e9f2; --line-soft:#eef2f8;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --paper:#0b1120; --panel:#111a2c; --ink:#e9edf6; --muted:#a7b1c6; --faint:#6f7b93;
+      --blue:#7aa2ff; --blue-soft:#16233f; --green:#5cc98d; --green-soft:#10261b;
+      --line:#20293d; --line-soft:#1a2336; }
+  }
+  :root[data-theme="light"]{ --paper:#fff;--panel:#f7f9fc;--ink:#0f1728;--muted:#54607a;--faint:#8792aa;--blue:#124cc9;--blue-soft:#e9eefc;--green:#107535;--green-soft:#e7f6ec;--line:#e4e9f2;--line-soft:#eef2f8; }
+  :root[data-theme="dark"]{ --paper:#0b1120;--panel:#111a2c;--ink:#e9edf6;--muted:#a7b1c6;--faint:#6f7b93;--blue:#7aa2ff;--blue-soft:#16233f;--green:#5cc98d;--green-soft:#10261b;--line:#20293d;--line-soft:#1a2336; }
+
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:var(--panel); color:var(--ink);
+    font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:15.5px; line-height:1.65; -webkit-font-smoothing:antialiased; }
+  .sheet{ max-width:60rem; margin:0 auto; background:var(--paper); }
+  .pad{ padding:0 clamp(22px,5vw,64px); }
+
+  /* Cover */
+  .cover{ background:linear-gradient(135deg,var(--blue),#0e3a9a 60%,var(--green)); color:#fff;
+    padding:clamp(40px,7vw,72px) clamp(22px,5vw,64px); }
+  .kicker{ font-size:12.5px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#c9d8ff; margin:0 0 18px; }
+  .cover h1{ font-size:clamp(32px,6vw,48px); font-weight:800; letter-spacing:-.02em; margin:0 0 8px; line-height:1.05; }
+  .cover .tag{ font-size:clamp(15px,2.3vw,18px); color:#dbe6ff; font-weight:500; margin:0 0 26px; max-width:44ch; }
+  .facts{ display:flex; flex-wrap:wrap; gap:10px 26px; font-size:14px; }
+  .facts a{ color:#fff; text-decoration:underline; text-underline-offset:3px; }
+  .facts b{ color:#bcd0ff; font-weight:600; }
+  .status-pill{ display:inline-block; background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3);
+    border-radius:999px; padding:3px 12px; font-size:12.5px; font-weight:700; }
+
+  section{ padding-top:34px; }
+  h2{ font-size:22px; font-weight:800; letter-spacing:-.01em; margin:0 0 12px;
+    display:flex; align-items:baseline; gap:12px; }
+  h2 .n{ font-size:13px; font-weight:800; color:var(--blue); background:var(--blue-soft);
+    border-radius:7px; padding:3px 9px; letter-spacing:.02em; }
+  h3{ font-size:16px; font-weight:750; margin:22px 0 6px; color:var(--ink); }
+  p{ margin:0 0 14px; color:var(--muted); }
+  p.lead{ color:var(--ink); }
+  strong{ color:var(--ink); font-weight:650; }
+  a{ color:var(--blue); }
+
+  ul{ margin:0 0 14px; padding-left:0; list-style:none; }
+  li{ position:relative; padding-left:22px; margin-bottom:9px; color:var(--muted); }
+  li::before{ content:""; position:absolute; left:3px; top:9px; width:7px; height:7px; border-radius:50%; background:var(--blue); }
+  li strong{ color:var(--ink); }
+
+  .table-wrap{ overflow-x:auto; margin:0 0 16px; border:1px solid var(--line); border-radius:12px; }
+  table{ width:100%; border-collapse:collapse; font-size:14.5px; }
+  th,td{ text-align:left; padding:11px 16px; border-bottom:1px solid var(--line-soft); vertical-align:top; }
+  thead th{ background:var(--panel); color:var(--ink); font-weight:700; font-size:12.5px;
+    text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--line); }
+  tbody tr:last-child td{ border-bottom:none; }
+  td strong{ color:var(--ink); }
+  td:first-child{ color:var(--ink); font-weight:600; white-space:nowrap; }
+  .table-wrap.wide td:first-child{ white-space:normal; }
+
+  .divider{ height:1px; background:var(--line); margin:34px 0 0; }
+  .callout{ background:var(--green-soft); border:1px solid color-mix(in srgb,var(--green) 30%,transparent);
+    border-radius:12px; padding:14px 18px; margin:6px 0 16px; font-size:14.5px; color:var(--ink); }
+  .flow{ counter-reset:step; margin:0 0 14px; padding:0; list-style:none; }
+  .flow li{ padding-left:44px; margin-bottom:12px; }
+  .flow li::before{ counter-increment:step; content:counter(step); position:absolute; left:0; top:-2px;
+    width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff;
+    font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  footer{ margin-top:40px; padding:26px clamp(22px,5vw,64px) 48px; border-top:1px solid var(--line);
+    color:var(--faint); font-size:13.5px; font-style:italic; }
+
+  @media print{
+    body{ background:#fff; font-size:11pt; }
+    .sheet{ max-width:none; }
+    section{ break-inside:avoid; }
+    .table-wrap{ break-inside:avoid; }
+    h2{ break-after:avoid; }
+  }
+  @media print{ :root{ --paper:#fff;--panel:#fff;--ink:#10131a;--muted:#333c4d;--faint:#5f6b80;--blue:#0e3aa0;--blue-soft:#eef2fc;--green:#0c6a2f;--green-soft:#eaf6ee;--line:#d5dce8;--line-soft:#e8edf5; } .cover{ -webkit-print-color-adjust:exact; print-color-adjust:exact; } }
+</style>
+</head><body>
+
+<div class="sheet">
+  <header class="cover">
+    <p class="kicker">Project Documentation</p>
+    <h1>SkillBridge&nbsp;Africa</h1>
+    <p class="tag">A trust-first freelance marketplace connecting verified African university students with real, paid client work — with escrow-backed payments at its core.</p>
+    <div class="facts">
+      <span><b>Live</b> &nbsp;<a href="https://skillbridge-africa-193.netlify.app">skillbridge-africa-193.netlify.app</a></span>
+      <span><b>Tagline</b> &nbsp;Your Skills. Our Bridge.</span>
+      <span class="status-pill">Functional MVP · Live</span>
+    </div>
+  </header>
+
+  <div class="pad">
+    <section>
+      <h2><span class="n">01</span> Executive summary</h2>
+      <p class="lead">SkillBridge Africa is a marketplace where clients post tasks and verified students bid on and deliver them. An admin layer verifies students, oversees assignments, and safeguards payments held in escrow — so both sides can transact with confidence.</p>
+      <p>The product is built as <strong>one shared task lifecycle</strong> feeding <strong>three connected experiences</strong>: a Student app, a Client app, and an Admin console. When one party acts, the others see it immediately — there are no divergent states.</p>
+      <p>The result is a working end-to-end product: a client funds a wallet, an admin assigns a verified student, the student delivers, the work is reviewed and approved, and payment is released — crediting the student and debiting the client automatically, with the task marked complete everywhere at once.</p>
+    </section>
+
+    <section>
+      <h2><span class="n">02</span> The problem</h2>
+      <p>Talent and opportunity exist — but trust and payment don't connect them:</p>
+      <ul>
+        <li><strong>Students can't break in.</strong> Skilled students have no track record, so clients won't risk hiring them — and they can't build a record without work.</li>
+        <li><strong>Clients fear the risk.</strong> Paying an unknown student upfront is risky; there's no guarantee the work lands or meets the brief.</li>
+        <li><strong>There's no safe money rail.</strong> Without escrow or oversight, neither side trusts the payment — so the deal never happens.</li>
+      </ul>
+      <p>The core challenge was therefore not a feature — it was <strong>making strangers comfortable enough to transact</strong>.</p>
+    </section>
+
+    <section>
+      <h2><span class="n">03</span> The solution — four pillars</h2>
+      <div class="table-wrap wide">
+        <table>
+          <thead><tr><th>Pillar</th><th>What it delivers</th></tr></thead>
+          <tbody>
+            <tr><td>Identity</td><td>Students earn a verified badge through an admin-reviewed check, so clients know exactly who they're hiring.</td></tr>
+            <tr><td>Discovery</td><td>Clients find the right student and students find real, relevant tasks — through bids, quick requests and rich search.</td></tr>
+            <tr><td>Escrow</td><td>Funds sit in escrow and are released only when work is approved — visible and legible, never a leap of faith.</td></tr>
+            <tr><td>Trust</td><td>Admin oversight, ratings and shared status make the whole exchange transparent to all three sides at once.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">04</span> Users &amp; roles</h2>
+      <div class="table-wrap wide">
+        <table>
+          <thead><tr><th>Role</th><th>What they do</th></tr></thead>
+          <tbody>
+            <tr><td>Student</td><td>Gets verified, browses and bids on tasks, delivers work, gets paid, and builds a track record (projects, clients, rating, earnings).</td></tr>
+            <tr><td>Client</td><td>Funds a wallet, posts tasks, reviews and approves delivered work, and releases payment from escrow.</td></tr>
+            <tr><td>Admin</td><td>Verifies students, assigns/approves work, monitors escrow, resolves disputes, and rates the quality of each delivery.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>One account can act as both a student and a client; the admin console is a separate, credential-gated experience.</p>
+    </section>
+
+    <section>
+      <h2><span class="n">05</span> Core features</h2>
+
+      <h3>Identity &amp; verification</h3>
+      <ul>
+        <li>Passwordless sign-up and login (email one-time code), with an embedded wallet created automatically on sign-up.</li>
+        <li>A student/client toggle at login routes each user to the right experience.</li>
+        <li>Student verification is an admin-reviewed request; students see a clear "verification in progress" state and are notified on approval. Verified status is what unlocks being assigned to work.</li>
+      </ul>
+
+      <h3>Student profile</h3>
+      <ul>
+        <li>Real, live statistics: completed projects, distinct clients, average rating and review count, active bids, lifetime earnings, and verification status.</li>
+        <li>Details entered at setup (university, department, reg number, skills, bio, LinkedIn, availability) are stored, displayed, and pre-filled in the edit form.</li>
+      </ul>
+
+      <h3>Discovery, search &amp; bidding</h3>
+      <ul>
+        <li>A "Find Work" marketplace of open tasks; each job card shows the client's <strong>company name</strong>.</li>
+        <li><strong>Multi-field search</strong> across title, description, job type, skills, company, budget and due date — matching every term entered.</li>
+        <li>Students <strong>place a bid</strong> (own price, delivery time, pitch) or send a <strong>quick request</strong>. "My Bids" reflects their real bids.</li>
+      </ul>
+
+      <h3>The task lifecycle — synchronized across all three roles</h3>
+      <ol class="flow">
+        <li><strong>Client</strong> posts a task → it awaits admin review.</li>
+        <li><strong>Students</strong> bid on or request the task.</li>
+        <li><strong>Admin</strong> assigns the best-fit student → escrow is marked funded.</li>
+        <li><strong>Student</strong> delivers the work (real file upload with previews).</li>
+        <li><strong>Admin</strong> approves the submission → hands it to the client.</li>
+        <li><strong>Client</strong> reviews and either requests changes (reopens the task, notifies the student) or approves.</li>
+        <li>On approval, <strong>payment releases</strong> — student credited, client debited, task complete everywhere.</li>
+      </ol>
+      <p>While a task still awaits admin review, the client can <strong>edit or delete</strong> it. After submission, the student can <strong>view and edit their submission</strong> rather than starting over.</p>
+
+      <h3>Escrow &amp; wallets</h3>
+      <div class="callout"><strong>Money model:</strong> the client pays the task amount <strong>plus a 5% platform fee</strong>; the platform keeps the fee; the student receives the full task amount.</div>
+      <ul>
+        <li>Clients fund an in-app wallet; the platform wallet address and network are shown.</li>
+        <li>On release, balances move atomically — client debited (amount + fee), student credited (amount), project and task completed, and a ledger entry recorded for both parties.</li>
+        <li>Wallet balances, funded/spent totals and amounts on hold appear on the client dashboard and profile; students see balance and earnings.</li>
+      </ul>
+
+      <h3>Ratings, notifications &amp; dashboards</h3>
+      <ul>
+        <li>The client rates the delivered work (stars + written review); the admin can also rate quality. Ratings attach to the task and are shown to both the student and client.</li>
+        <li>Per-user, <strong>deep-linked</strong> notifications open the exact screen where action is needed.</li>
+        <li>Every dashboard has a <strong>"Needs your attention"</strong> section surfacing the next real action.</li>
+      </ul>
+
+      <h3>Admin console</h3>
+      <ul>
+        <li>Credential-gated login that persists across refreshes for the session.</li>
+        <li>A dashboard with a unified "Needs your attention" queue, a verification queue, task management &amp; assignment, and escrow monitoring with a full payment breakdown, submission approval, release, refund and dispute handling, plus per-task ratings.</li>
+        <li><strong>Live-activity detection:</strong> background polling surfaces a non-blocking "New activity — Refresh" banner when a student or client changes something.</li>
+        <li><strong>Sidebar count badges</strong> for items needing attention (new tasks, pending verifications, submissions to review).</li>
+      </ul>
+
+      <h3>Marketing landing page</h3>
+      <ul>
+        <li>A public landing page with a hero built from the real product dashboard, a statistics band, a photo showcase, testimonials, and tasteful animations.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="n">06</span> Technology stack</h2>
+      <div class="table-wrap wide">
+        <table>
+          <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+          <tbody>
+            <tr><td>Frontend framework</td><td>React 18 + TypeScript</td></tr>
+            <tr><td>Build tool / dev server</td><td>Vite</td></tr>
+            <tr><td>Routing</td><td>React Router</td></tr>
+            <tr><td>Styling</td><td>CSS Modules; brand design tokens (blue, green, violet)</td></tr>
+            <tr><td>Typography</td><td>Manrope</td></tr>
+            <tr><td>Authentication</td><td>Privy — passwordless email one-time-code login + embedded wallets</td></tr>
+            <tr><td>Wallet network</td><td>Solana (embedded wallet addresses)</td></tr>
+            <tr><td>Backend &amp; database</td><td>Supabase — PostgreSQL with the PostgREST auto REST API</td></tr>
+            <tr><td>Access control</td><td>PostgreSQL Row-Level Security</td></tr>
+            <tr><td>File storage</td><td>Supabase Storage (student work submissions)</td></tr>
+            <tr><td>Server-side logic</td><td>PostgreSQL functions / RPC (wallet funding &amp; atomic payment release)</td></tr>
+            <tr><td>Hosting &amp; delivery</td><td>Netlify (static SPA hosting, CLI deployments)</td></tr>
+            <tr><td>Version control</td><td>Git / GitHub</td></tr>
+            <tr><td>Design</td><td>Figma (wireframes, screen flows, product showcase)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="n">07</span> System architecture</h2>
+      <p class="lead">A single-page React application talking directly to Supabase.</p>
+      <ul>
+        <li>The <strong>frontend</strong> (React + Vite) is a static bundle served by Netlify, with client-side routing and a redirect rule so every route resolves to the app.</li>
+        <li><strong>Supabase</strong> provides the database, an auto-generated REST API, file storage and server-side functions, reached through a typed data-access layer so query shapes live in one place.</li>
+        <li><strong>Authentication</strong> is handled by Privy; each user maps to one row in the <em>profiles</em> table.</li>
+        <li><strong>Money movement</strong> runs through two PostgreSQL functions — fund a wallet, and release payment atomically (debit client, credit student, complete task, write ledger) in one transaction.</li>
+        <li><strong>File submissions</strong> are uploaded to a Supabase Storage bucket and referenced by URL for client and admin preview.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="n">08</span> Data model</h2>
+      <div class="table-wrap wide">
+        <table>
+          <thead><tr><th>Table</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td>profiles</td><td>One row per user — email, role, wallet address, simulated wallet balance.</td></tr>
+            <tr><td>student_profiles</td><td>Student details — university, department, skills, portfolio, verification.</td></tr>
+            <tr><td>client_profiles</td><td>Client details — company name, about, verification.</td></tr>
+            <tr><td>tasks</td><td>Posted work — title, category, budget, skills, due date, status.</td></tr>
+            <tr><td>task_attachments</td><td>Files attached to a task brief.</td></tr>
+            <tr><td>bids</td><td>A student's bid or request on a task.</td></tr>
+            <tr><td>projects</td><td>A task assigned to a student — amount, status, payment status, work rating.</td></tr>
+            <tr><td>submissions</td><td>Work delivered on a project (files + note).</td></tr>
+            <tr><td>notifications</td><td>Per-user notifications with deep links.</td></tr>
+            <tr><td>wallet_transactions</td><td>The simulated wallet ledger (funding, payments, earnings).</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Schema changes are managed as ordered SQL migration files (initial schema, access policies, wallets &amp; payment functions, notification links, per-task ratings).</p>
+    </section>
+
+    <section>
+      <h2><span class="n">09</span> Security, deployment &amp; process</h2>
+      <h3>Security &amp; access</h3>
+      <ul>
+        <li>Passwordless authentication (email one-time code) — no stored passwords.</li>
+        <li>Row-Level Security enabled on every table; production intent is to enforce per-user ownership through the identity bridge.</li>
+        <li>The admin console is credential-gated, required once per browser session.</li>
+        <li>Secrets are supplied via environment variables, never committed.</li>
+      </ul>
+      <h3>Deployment &amp; delivery</h3>
+      <ul>
+        <li>Hosted on Netlify as a static SPA and <strong>live</strong> at skillbridge-africa-193.netlify.app.</li>
+        <li>Deployed by building the app and publishing through the Netlify CLI; environment config injected at build time.</li>
+      </ul>
+      <h3>Design process</h3>
+      <ul>
+        <li>Research &amp; framing → wireframes → high-fidelity screens &amp; flows → a reusable design system → a product case study &amp; showcase, all produced in Figma.</li>
+      </ul>
+      <h3>Team &amp; collaboration</h3>
+      <ul>
+        <li>Tracked in a shared Git/GitHub repository with multiple contributors, feature branches and pull requests, and a clear, descriptive commit history.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="n">10</span> Status &amp; roadmap</h2>
+      <div class="callout"><strong>A working product — not just screens.</strong> Student, client and admin experiences are live and function end-to-end, including the complete escrow loop (fund → assign → deliver → approve → release), a real admin console, real file uploads, and attention-first dashboards.</div>
+      <h3>Roadmap</h3>
+      <ul>
+        <li>Move escrow <strong>on-chain</strong> for real, auditable settlement.</li>
+        <li>Feed ratings into <strong>discovery and ranking</strong>.</li>
+        <li>Add <strong>in-app messaging</strong> between clients and students.</li>
+        <li>Add a <strong>dispute-resolution</strong> workflow.</li>
+        <li>Harden <strong>row-level security</strong> for production launch.</li>
+      </ul>
+    </section>
+  </div>
+
+  <footer>
+    SkillBridge Africa — connecting African university talent with the clients who need it, safely.
+  </footer>
+</div>
+</body></html>
