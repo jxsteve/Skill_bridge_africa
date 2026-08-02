@@ -883,14 +883,43 @@ export default function App() {
   function SubmitWorkRoute() {
     const { projectId } = useParams();
     const [submitting, setSubmitting] = useState(false);
+    const [prefill, setPrefill] = useState<
+      { note: string; files: { name: string; url: string; isImage: boolean }[] } | undefined
+    >(undefined);
+
+    useEffect(() => {
+      let active = true;
+      if (!projectId) {
+        setPrefill({ note: '', files: [] });
+        return;
+      }
+      getStudentSubmission(projectId)
+        .then((d) => {
+          if (!active) return;
+          setPrefill(
+            d
+              ? { note: d.note, files: d.files.map((f) => ({ name: f.name, url: f.url, isImage: f.isImage })) }
+              : { note: '', files: [] },
+          );
+        })
+        .catch(() => active && setPrefill({ note: '', files: [] }));
+      return () => {
+        active = false;
+      };
+    }, [projectId]);
+
+    if (prefill === undefined) return <LoadingView />;
+
     return (
       <SubmitWorkScreen
         submitting={submitting}
+        initialNote={prefill.note}
+        initialFiles={prefill.files}
         onBack={() => navigate(-1)}
-        onSubmit={async (files, message) => {
+        onSubmit={async (files, message, keptUrls) => {
           if (projectId) {
             setSubmitting(true);
-            const res = await submitWork(projectId, files, message);
+            const res = await submitWork(projectId, files, message, keptUrls);
             setSubmitting(false);
             if (!res.ok) {
               window.alert('Could not submit your work. Please try again.');

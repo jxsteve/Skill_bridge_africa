@@ -406,10 +406,11 @@ export async function submitWork(
   projectId: string,
   files: File[],
   note = '',
+  keptUrls: string[] = [],
 ): Promise<{ ok: boolean; reason?: string }> {
   if (!isSupabaseConfigured) return { ok: true };
   try {
-    const urls: string[] = [];
+    const urls: string[] = [...keptUrls];
     for (const f of files) {
       const path = `${projectId}/${Date.now()}-${sanitizeName(f.name)}`;
       urls.push(await repo.storage.upload('submissions', path, f));
