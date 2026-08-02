@@ -26,17 +26,22 @@ export type NewTaskDetails = {
 type Props = {
   onBack: () => void;
   onNext: (task: NewTaskDetails) => void;
+  /** Pre-fill the form when editing an existing draft (from the Review page). */
+  initial?: NewTaskDetails | null;
 };
 
-export default function CreateTaskScreen({ onBack, onNext }: Props) {
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState('');
-  const [skills, setSkills] = useState<string[]>(['UI/UX Design', 'Figma', 'Landing Page']);
+export default function CreateTaskScreen({ onBack, onNext, initial }: Props) {
+  const [title, setTitle] = useState(initial?.title ?? '');
+  const [category, setCategory] = useState(initial?.category ?? '');
+  const [skills, setSkills] = useState<string[]>(
+    initial ? initial.skills : ['UI/UX Design', 'Figma', 'Landing Page'],
+  );
   const [addingSkill, setAddingSkill] = useState(false);
   const [skillDraft, setSkillDraft] = useState('');
-  const [budget, setBudget] = useState('');
-  const [deadline, setDeadline] = useState('2026-08-24');
-  const [description, setDescription] = useState('');
+  const [budget, setBudget] = useState(initial ? String(initial.budget) : '');
+  const [deadline, setDeadline] = useState(initial?.deadline || '2026-08-24');
+  const [description, setDescription] = useState(initial?.description ?? '');
+  const heading = initial ? 'Edit Task' : 'Create a New Task';
 
   const removeSkill = (skill: string) => {
     setSkills((prev) => prev.filter((s) => s !== skill));
@@ -78,7 +83,7 @@ export default function CreateTaskScreen({ onBack, onNext }: Props) {
           <button className={styles.backButton} onClick={onBack} aria-label="Back">
             <ChevronLeftIcon size={24} />
           </button>
-          <p className={styles.title}>Create a New Task</p>
+          <p className={styles.title}>{heading}</p>
         </header>
 
         <label className={styles.fieldLabel} htmlFor="taskTitle">

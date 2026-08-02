@@ -552,7 +552,10 @@ export default function App() {
               }}
               onOpenActivity={(link) => navigate(link)}
               onProfileClick={() => navigate('/client/profile')}
-              onCreateTask={() => navigate('/client/create-task')}
+              onCreateTask={() => {
+                setDraftTask(null);
+                navigate('/client/create-task');
+              }}
               onMyTasks={() => navigate('/client/tasks')}
               onWallet={() => navigate('/client/fund-wallet')}
               onProjects={() => navigate('/client/tasks')}
@@ -617,6 +620,7 @@ export default function App() {
           path="/client/create-task"
           element={
             <CreateTaskScreen
+              initial={draftTask}
               onBack={() => navigate('/client/app')}
               onNext={(task) => {
                 setDraftTask(task);
@@ -699,7 +703,10 @@ export default function App() {
             <ClientMyTasksScreen
               clientId={auth.user?.id}
               onBack={() => navigate('/client/app')}
-              onCreateTask={() => navigate('/client/create-task')}
+              onCreateTask={() => {
+                setDraftTask(null);
+                navigate('/client/create-task');
+              }}
               onOpenTask={(taskId) => navigate(`/client/task/${taskId}`)}
               onTab={goClientTab}
             />
