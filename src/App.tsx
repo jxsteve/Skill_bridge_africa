@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 import PhoneFrame from './components/PhoneFrame';
@@ -109,6 +109,9 @@ export default function App() {
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [verified, setVerified] = useState(false);
   const [loginCompleted, setLoginCompleted] = useState(false);
+  // Mirror of loginCompleted read synchronously at routing time (avoids a stale
+  // closure between verifying the code and deciding where to send the user).
+  const loginCompletedRef = useRef(false);
   const [postWelcome, setPostWelcome] = useState<'app' | 'home'>('home');
   const [rememberedEmail, setRememberedEmail] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
@@ -187,6 +190,24 @@ export default function App() {
           const cp = await clientProfiles.get(auth.user.id);
           if (active && (cp?.verification === 'verified' || cp?.verification === 'pending')) {
             setClientAccountStatus(cp.verification);
+          }
+          // Restore the student's saved profile so it shows on their profile page,
+          // prefills the edit form, and marks onboarding complete (no re-prompt).
+          const sp = await studentProfiles.get(auth.user.id);
+          if (active && sp) {
+            setProfile({
+              avatarUri: sp.avatar_url ?? '',
+              bio: sp.bio ?? '',
+              university: sp.university ?? '',
+              department: sp.department ?? '',
+              regNumber: sp.reg_number ?? '',
+              linkedin: sp.linkedin ?? '',
+              studentIdUri: sp.student_id_url ?? '',
+              skills: sp.skills ?? [],
+              portfolio: sp.portfolio ?? [],
+              available: sp.available ?? true,
+            });
+            loginCompletedRef.current = true;
           }
           if (active) void refreshClientWallet();
         } catch {
@@ -270,6 +291,7 @@ export default function App() {
             // Best-effort; fall back to the local flag.
           }
         }
+        loginCompletedRef.current = done !== null;
         setLoginCompleted(done !== null);
         if (done?.name) setFullName(done.name);
       }
@@ -285,7 +307,7 @@ export default function App() {
       navigate('/client/app');
       return;
     }
-    if (intent === 'login' && loginCompleted) {
+    if (intent === 'login' && loginCompletedRef.current) {
       setVerified(true);
       setPostWelcome('app');
     } else {

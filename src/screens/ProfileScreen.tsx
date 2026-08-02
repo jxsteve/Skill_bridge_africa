@@ -5,6 +5,7 @@ import {
   ArrowRightCircleIcon,
   BottomNav,
   ChevronRightIcon,
+  Chip,
   DollarSignIcon,
   EyeIcon,
   StarIcon,
@@ -145,6 +146,43 @@ export default function ProfileScreen({
               </div>
             </div>
           </div>
+
+          {/* Details entered during profile setup */}
+          {profile && (profile.university || profile.department || profile.skills.length > 0 || profile.bio) && (
+            <div
+              style={{
+                background: '#fff',
+                border: '1px solid #eceef2',
+                borderRadius: 14,
+                padding: 16,
+                marginBottom: 14,
+              }}
+            >
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 14, color: 'var(--title-dark)' }}>Details</p>
+              {(profile.university || profile.department) && (
+                <p style={{ margin: '10px 0 0', fontSize: 14, color: '#4b5563' }}>
+                  {[profile.university, profile.department].filter(Boolean).join(' · ')}
+                </p>
+              )}
+              {profile.linkedin && (
+                <p style={{ margin: '6px 0 0', fontSize: 13, color: '#6b7280', wordBreak: 'break-all' }}>
+                  {profile.linkedin}
+                </p>
+              )}
+              {profile.skills.length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
+                  {profile.skills.map((sk) => (
+                    <Chip key={sk} label={sk} selected />
+                  ))}
+                </div>
+              )}
+              {profile.bio && (
+                <p style={{ margin: '12px 0 0', fontSize: 14, lineHeight: 1.5, color: '#374151' }}>
+                  {profile.bio}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Verification */}
           <div className={`${styles.row} ${styles.rowFirst}`}>
