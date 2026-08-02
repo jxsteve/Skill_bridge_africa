@@ -17,6 +17,7 @@ import {
 } from './marketplace';
 import { buildNotifications, type AppNotification, type NotificationKind } from './notifications';
 import type { BidWithTask, TaskWithClient } from './repo';
+import type { StudentProfile } from '../types/profile';
 
 // UI CreateTask categories collapse into the three DB buckets.
 const CATEGORY_MAP: Record<string, TaskCategory> = {
@@ -708,6 +709,25 @@ export async function getStudentWallet(studentId: string): Promise<StudentWallet
   ]);
   const totalEarned = txns.filter((t) => t.kind === 'earning').reduce((s, t) => s + Number(t.amount), 0);
   return { balance, totalEarned };
+}
+
+/** The student's saved profile, mapped to the app's shape (for the profile page + edit form). */
+export async function getStudentProfile(userId: string): Promise<StudentProfile | null> {
+  if (!isSupabaseConfigured) return null;
+  const sp = await repo.studentProfiles.get(userId);
+  if (!sp) return null;
+  return {
+    avatarUri: sp.avatar_url ?? '',
+    bio: sp.bio ?? '',
+    university: sp.university ?? '',
+    department: sp.department ?? '',
+    regNumber: sp.reg_number ?? '',
+    linkedin: sp.linkedin ?? '',
+    studentIdUri: sp.student_id_url ?? '',
+    skills: sp.skills ?? [],
+    portfolio: sp.portfolio ?? [],
+    available: sp.available ?? true,
+  };
 }
 
 export type StudentStats = {

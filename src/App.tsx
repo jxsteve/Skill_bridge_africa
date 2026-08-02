@@ -13,6 +13,7 @@ import {
   fundWallet,
   getClientTaskDetail,
   getClientWallet,
+  getStudentProfile,
   getStudentSubmission,
   getTask,
   getTaskForEdit,
@@ -191,20 +192,9 @@ export default function App() {
           }
           // Restore the student's saved profile so it shows on their profile page,
           // prefills the edit form, and marks onboarding complete (no re-prompt).
-          const sp = await studentProfiles.get(auth.user.id);
+          const sp = await getStudentProfile(auth.user.id);
           if (active && sp) {
-            setProfile({
-              avatarUri: sp.avatar_url ?? '',
-              bio: sp.bio ?? '',
-              university: sp.university ?? '',
-              department: sp.department ?? '',
-              regNumber: sp.reg_number ?? '',
-              linkedin: sp.linkedin ?? '',
-              studentIdUri: sp.student_id_url ?? '',
-              skills: sp.skills ?? [],
-              portfolio: sp.portfolio ?? [],
-              available: sp.available ?? true,
-            });
+            setProfile(sp);
             loginCompletedRef.current = true;
           }
           if (active) void refreshClientWallet();
@@ -449,9 +439,7 @@ export default function App() {
         />
         <Route
           path="/profile-setup"
-          element={
-            <ProfileSetupScreen initialProfile={profile} onComplete={handleProfileComplete} />
-          }
+          element={<ProfileSetupRoute />}
         />
         <Route
           path="/verifying"
@@ -782,6 +770,28 @@ export default function App() {
       </Routes>
     </PhoneFrame>
   );
+
+  // Load the saved profile fresh when opening the editor, so Edit profile always
+  // shows existing details (not a blank form), regardless of load timing.
+  function ProfileSetupRoute() {
+    const [initial, setInitial] = useState<StudentProfile | null | undefined>(undefined);
+    useEffect(() => {
+      let active = true;
+      if (!auth.user || !isSupabaseConfigured) {
+        setInitial(profile ?? null);
+        return;
+      }
+      getStudentProfile(auth.user.id)
+        .then((p) => active && setInitial(p ?? profile ?? null))
+        .catch(() => active && setInitial(profile ?? null));
+      return () => {
+        active = false;
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    if (initial === undefined) return <LoadingView />;
+    return <ProfileSetupScreen initialProfile={initial} onComplete={handleProfileComplete} />;
+  }
 
   function TaskDetailRoute() {
     const { taskId } = useParams();
