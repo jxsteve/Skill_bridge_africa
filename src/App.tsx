@@ -115,7 +115,6 @@ export default function App() {
   const [postWelcome, setPostWelcome] = useState<'app' | 'home'>('home');
   const [rememberedEmail, setRememberedEmail] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   // --- Client-flow specific state ---
   const [clientAccountStatus, setClientAccountStatus] =
@@ -181,7 +180,6 @@ export default function App() {
             full_name: fullName || undefined,
             wallet_address: auth.user.walletAddress ?? null,
           });
-          if (active) setIsAdmin(row.role === 'admin');
           // Restore the saved display name (so returning users and clients see
           // their name instead of a placeholder greeting).
           if (active && !fullName && row.full_name) setFullName(row.full_name);
@@ -368,7 +366,6 @@ export default function App() {
     setProfile(null);
     setVerified(false);
     setFullName('');
-    setIsAdmin(false);
     navigate('/login');
   }, [auth, navigate]);
 
@@ -544,9 +541,7 @@ export default function App() {
               {...common}
               userId={auth.user?.id}
               profile={profile}
-              isAdmin={isAdmin}
               onEditProfile={() => navigate('/profile-setup')}
-              onOpenAdmin={() => navigate('/admin')}
               onLogout={handleLogout}
               onTab={goTab}
             />
