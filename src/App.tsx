@@ -520,6 +520,7 @@ export default function App() {
           element={
             <ProfileScreen
               {...common}
+              userId={auth.user?.id}
               profile={profile}
               isAdmin={isAdmin}
               onEditProfile={() => navigate('/profile-setup')}

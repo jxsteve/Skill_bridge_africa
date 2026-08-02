@@ -710,6 +710,53 @@ export async function getStudentWallet(studentId: string): Promise<StudentWallet
   return { balance, totalEarned };
 }
 
+export type StudentStats = {
+  projects: number; // completed jobs
+  clients: number; // distinct clients hired by
+  rating: number; // average rating
+  reviews: number; // number of rated jobs
+  activeBids: number;
+  earnings: number;
+  verification: string;
+};
+
+/** Everything the student profile needs: projects, clients, rating, bids, earnings. */
+export async function getStudentStats(userId: string): Promise<StudentStats> {
+  const empty: StudentStats = {
+    projects: 0,
+    clients: 0,
+    rating: 0,
+    reviews: 0,
+    activeBids: 0,
+    earnings: 0,
+    verification: 'unverified',
+  };
+  if (!isSupabaseConfigured) return empty;
+  try {
+    const [projects, bids, wallet, sp] = await Promise.all([
+      repo.projects.listByStudent(userId),
+      repo.bids.listByStudent(userId),
+      getStudentWallet(userId),
+      repo.studentProfiles.get(userId).catch(() => null),
+    ]);
+    const rated = projects.filter((p) => p.rating != null);
+    const avg = rated.length
+      ? rated.reduce((s, p) => s + Number(p.rating ?? 0), 0) / rated.length
+      : 0;
+    return {
+      projects: projects.filter((p) => p.status === 'completed').length,
+      clients: new Set(projects.map((p) => p.client_id)).size,
+      rating: Math.round(avg * 10) / 10,
+      reviews: rated.length,
+      activeBids: bids.filter((b) => b.status === 'pending').length,
+      earnings: wallet.totalEarned,
+      verification: sp?.verification ?? 'unverified',
+    };
+  } catch {
+    return empty;
+  }
+}
+
 /** How many of a client's tasks are approved by admin and awaiting the client's review. */
 export async function getClientAttention(clientId: string): Promise<{ awaitingReview: number }> {
   if (!isSupabaseConfigured) return { awaitingReview: 0 };

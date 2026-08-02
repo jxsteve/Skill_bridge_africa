@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import {
   ActivityIcon,
   ArrowRightCircleIcon,
@@ -9,13 +11,25 @@ import {
   type MainTab,
 } from '../components/ui';
 import type { StudentProfile } from '../types/profile';
+import { isSupabaseConfigured } from '../lib/supabase';
+import { getStudentStats, type StudentStats } from '../data/marketplace-service';
 import styles from './ProfileScreen.module.css';
 
 const violet = '#6014E0';
 
+const VERIF_LABEL: Record<string, string> = {
+  verified: 'Verified',
+  pending: 'Pending',
+  rejected: 'Not approved',
+  unverified: 'Pending',
+};
+
+const money = (n: number) => `$${Number(n || 0).toFixed(2)}`;
+
 type Props = {
   name: string;
   email: string;
+  userId?: string;
   profile: StudentProfile | null;
   isAdmin?: boolean;
   onEditProfile: () => void;
@@ -28,9 +42,20 @@ function capitalize(value: string) {
   return value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 }
 
+const EMPTY_STATS: StudentStats = {
+  projects: 0,
+  clients: 0,
+  rating: 0,
+  reviews: 0,
+  activeBids: 0,
+  earnings: 0,
+  verification: 'unverified',
+};
+
 export default function ProfileScreen({
   name,
   email,
+  userId,
   profile,
   isAdmin,
   onEditProfile,
@@ -41,6 +66,14 @@ export default function ProfileScreen({
   const displayName = name || capitalize(email.split('@')[0]) || 'Student';
   const initial = displayName.charAt(0).toUpperCase();
   const role = profile?.skills[0] ?? 'Student';
+
+  const [stats, setStats] = useState<StudentStats>(EMPTY_STATS);
+  useEffect(() => {
+    if (!isSupabaseConfigured || !userId) return;
+    getStudentStats(userId)
+      .then(setStats)
+      .catch(() => {});
+  }, [userId]);
 
   return (
     <div className={styles.container}>
@@ -58,22 +91,24 @@ export default function ProfileScreen({
           <p className={styles.role}>{role}</p>
           <div className={styles.ratingRow}>
             <StarIcon size={15} />
-            <span className={styles.ratingText}>0.0 (0 reviews)</span>
+            <span className={styles.ratingText}>
+              {stats.rating.toFixed(1)} ({stats.reviews} {stats.reviews === 1 ? 'review' : 'reviews'})
+            </span>
           </div>
           <div className={styles.heroStats}>
             <div className={styles.heroStat}>
               <span className={styles.heroStatLabel}>Projects</span>
-              <span className={styles.heroStatValue}>0</span>
+              <span className={styles.heroStatValue}>{stats.projects}</span>
             </div>
             <div className={styles.heroStat}>
               <span className={styles.heroStatLabel}>Clients</span>
-              <span className={styles.heroStatValue}>0</span>
+              <span className={styles.heroStatValue}>{stats.clients}</span>
             </div>
             <div className={styles.heroStat}>
               <span className={styles.heroStatLabel}>Ratings</span>
               <span className={styles.heroStatValueRow}>
                 <StarIcon size={13} />
-                <span className={styles.heroStatValue}>0.0</span>
+                <span className={styles.heroStatValue}>{stats.rating.toFixed(1)}</span>
               </span>
             </div>
           </div>
@@ -85,7 +120,7 @@ export default function ProfileScreen({
             <div className={styles.statTile}>
               <span className={styles.statLabel}>Active Bids</span>
               <div className={styles.statValueRow}>
-                <span className={styles.statValue}>0</span>
+                <span className={styles.statValue}>{stats.activeBids}</span>
                 <span className={styles.statIcon} style={{ background: '#EDE4FC' }}>
                   <ActivityIcon size={12} color={violet} />
                 </span>
@@ -94,7 +129,7 @@ export default function ProfileScreen({
             <div className={styles.statTile}>
               <span className={styles.statLabel}>Earnings</span>
               <div className={styles.statValueRow}>
-                <span className={styles.statValue}>$0.00</span>
+                <span className={styles.statValue}>{money(stats.earnings)}</span>
                 <span className={styles.statIcon} style={{ background: '#DCFCE7' }}>
                   <DollarSignIcon size={12} color="#16A34A" />
                 </span>
@@ -114,7 +149,7 @@ export default function ProfileScreen({
           {/* Verification */}
           <div className={`${styles.row} ${styles.rowFirst}`}>
             <span className={styles.rowLabel}>Verification status</span>
-            <span className={styles.rowStatus}>Successful</span>
+            <span className={styles.rowStatus}>{VERIF_LABEL[stats.verification] ?? 'Pending'}</span>
           </div>
 
           {/* Edit profile */}
