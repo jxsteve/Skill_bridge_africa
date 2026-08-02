@@ -118,6 +118,11 @@ export const clientProfiles = {
       await db().from('client_profiles').upsert(row, { onConflict: 'user_id' }).select().single(),
     );
   },
+  /** Company names for a batch of client ids (for job cards). */
+  async listByUsers(userIds: string[]): Promise<Pick<ClientProfileRow, 'user_id' | 'company_name'>[]> {
+    if (userIds.length === 0) return [];
+    return unwrap(await db().from('client_profiles').select('user_id, company_name').in('user_id', userIds));
+  },
 };
 
 // ---- tasks ----------------------------------------------------------------

@@ -44,11 +44,11 @@ function formatDate(dueDate: string | null): string {
   return d.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
-function toUiTask(row: TaskWithClient): Task {
+function toUiTask(row: TaskWithClient, company?: string): Task {
   return {
     id: row.id,
     title: row.title,
-    client: row.client?.full_name || 'Client',
+    client: company?.trim() || row.client?.full_name || 'Client',
     category: row.category,
     dueInDays: daysUntil(row.due_date),
     dueDate: formatDate(row.due_date),
@@ -77,18 +77,36 @@ function toUiBid(row: BidWithTask): Bid {
   };
 }
 
-/** Open tasks a student can browse. */
+/** Open tasks a student can browse (job cards show the client's company name). */
 export async function listOpenTasks(): Promise<Task[]> {
   if (!isSupabaseConfigured) return TASKS;
   const rows = await repo.tasks.listOpen();
-  return rows.map(toUiTask);
+  let companyById: Record<string, string> = {};
+  try {
+    const ids = [...new Set(rows.map((r) => r.client_id))];
+    const cps = await repo.clientProfiles.listByUsers(ids);
+    companyById = Object.fromEntries(
+      cps.filter((c) => c.company_name?.trim()).map((c) => [c.user_id, c.company_name]),
+    );
+  } catch {
+    // No company names available — fall back to the client's name.
+  }
+  return rows.map((r) => toUiTask(r, companyById[r.client_id]));
 }
 
 /** A single task by id (falls back to mock). */
 export async function getTask(id: string): Promise<Task | null> {
   if (!isSupabaseConfigured) return TASKS.find((t) => t.id === id) ?? null;
   const row = await repo.tasks.get(id);
-  return row ? toUiTask(row) : null;
+  if (!row) return null;
+  let company: string | undefined;
+  try {
+    const cp = await repo.clientProfiles.get(row.client_id);
+    company = cp?.company_name?.trim() || undefined;
+  } catch {
+    company = undefined;
+  }
+  return toUiTask(row, company);
 }
 
 /** Persist a task a client created. Returns the new task id. */
