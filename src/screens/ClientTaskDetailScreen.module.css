@@ -241,6 +241,13 @@
   font-size: 12px;
   color: #9ca3af;
 }
+.reviewComment {
+  margin: 10px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #374151;
+  font-style: italic;
+}
 
 .action {
   margin-top: 4px;

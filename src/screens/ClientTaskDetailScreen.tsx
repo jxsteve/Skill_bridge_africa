@@ -99,10 +99,10 @@ export default function ClientTaskDetailScreen({ detail, onBack, onReview, onTab
           <p className={styles.bannerBody}>{msg.body}</p>
         </div>
 
-        {/* Admin's rating of the delivered work */}
+        {/* Review left on the completed work */}
         {detail.rating != null && (
           <div className={styles.card}>
-            <p className={styles.cardTitle}>Work rating</p>
+            <p className={styles.cardTitle}>Your review</p>
             <div className={styles.ratingRow}>
               <span className={styles.stars}>
                 {'★'.repeat(detail.rating)}
@@ -110,7 +110,11 @@ export default function ClientTaskDetailScreen({ detail, onBack, onReview, onTab
               </span>
               <span className={styles.ratingValue}>{detail.rating}.0 / 5</span>
             </div>
-            <p className={styles.ratingNote}>Rated by our admin team.</p>
+            {detail.ratingNote ? (
+              <p className={styles.reviewComment}>“{detail.ratingNote}”</p>
+            ) : (
+              <p className={styles.ratingNote}>No written comment.</p>
+            )}
           </div>
         )}
 

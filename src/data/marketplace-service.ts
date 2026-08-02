@@ -402,6 +402,7 @@ export type ClientTaskDetail = {
   taskStatus: string;
   applicantCount: number;
   rating: number | null;
+  ratingNote: string | null;
   project: {
     id: string;
     status: string;
@@ -423,6 +424,7 @@ export async function getClientTaskDetail(taskId: string): Promise<ClientTaskDet
   let studentName = '';
   let submission: ClientTaskDetail['submission'] = null;
   const rating: number | null = project?.rating ?? null;
+  const ratingNote: string | null = project?.rating_note ?? null;
 
   if (project) {
     const prof = await repo.profiles.get(project.student_id);
@@ -458,6 +460,7 @@ export async function getClientTaskDetail(taskId: string): Promise<ClientTaskDet
     taskStatus: task.status,
     applicantCount: bidRows.length,
     rating,
+    ratingNote,
     project: project
       ? {
           id: project.id,
