@@ -106,6 +106,45 @@ export async function createTask(clientId: string, details: NewTaskDetails): Pro
   return row.id;
 }
 
+/** Load an existing task in the shape the Create/Edit form expects. */
+export async function getTaskForEdit(taskId: string): Promise<NewTaskDetails | null> {
+  if (!isSupabaseConfigured) return null;
+  const row = await repo.tasks.get(taskId);
+  if (!row) return null;
+  return {
+    title: row.title,
+    category: row.category,
+    skills: row.skills ?? [],
+    budget: Number(row.budget),
+    deadline: row.due_date ?? '',
+    description: row.description ?? '',
+  };
+}
+
+/** Update a task the client already created (only allowed while it's still open). */
+export async function updateTask(taskId: string, details: NewTaskDetails): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  const category =
+    CATEGORY_MAP[details.category] ??
+    (['Design', 'Development', 'Writing'].includes(details.category)
+      ? (details.category as TaskCategory)
+      : 'Development');
+  await repo.tasks.update(taskId, {
+    title: details.title,
+    category,
+    description: details.description,
+    budget: details.budget,
+    skills: details.skills,
+    due_date: details.deadline || null,
+  });
+}
+
+/** Delete a task the client created (only allowed while it's still open). */
+export async function deleteTask(taskId: string): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  await repo.tasks.remove(taskId);
+}
+
 /** A student's bids (falls back to mock). */
 export async function listMyBids(studentId: string): Promise<Bid[]> {
   if (!isSupabaseConfigured) return BIDS;

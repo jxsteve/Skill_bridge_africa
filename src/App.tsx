@@ -8,11 +8,13 @@ import { isSupabaseConfigured, setSupabaseToken } from './lib/supabase';
 import { clientProfiles, profiles, studentProfiles } from './data/repo';
 import {
   createTask,
+  deleteTask,
   deliveryToDays,
   fundWallet,
   getClientTaskDetail,
   getClientWallet,
   getTask,
+  getTaskForEdit,
   hasApplied,
   placeBid,
   releasePayment,
@@ -20,6 +22,7 @@ import {
   requestTask,
   submitClientReview,
   submitWork,
+  updateTask,
   type ClientTaskDetail,
 } from './data/marketplace-service';
 import type { Task } from './data/marketplace';
@@ -118,6 +121,8 @@ export default function App() {
   const [onHold, setOnHold] = useState(0);
   const [clientWalletAddress] = useState('9x4a6vQeUZ9pM2tRwYbN4KcHjD8sXx3kw1');
   const [draftTask, setDraftTask] = useState<NewTaskDetails | null>(null);
+  // When set, the create/review flow is editing this existing task rather than creating one.
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [hasTaskNotification, setHasTaskNotification] = useState(false);
   // The project the client is currently reviewing/approving. Populated from real
   // data when they open an admin-approved task, and consumed by the
@@ -555,6 +560,7 @@ export default function App() {
               onProfileClick={() => navigate('/client/profile')}
               onCreateTask={() => {
                 setDraftTask(null);
+                setEditingTaskId(null);
                 navigate('/client/create-task');
               }}
               onMyTasks={() => navigate('/client/tasks')}
@@ -706,6 +712,7 @@ export default function App() {
               onBack={() => navigate('/client/app')}
               onCreateTask={() => {
                 setDraftTask(null);
+                setEditingTaskId(null);
                 navigate('/client/create-task');
               }}
               onOpenTask={(taskId) => navigate(`/client/task/${taskId}`)}
@@ -900,8 +907,14 @@ export default function App() {
         onBack={() => navigate('/client/create-task')}
         onEdit={() => navigate('/client/create-task')}
         onSubmit={() => {
-          if (auth.user && draftTask) void createTask(auth.user.id, draftTask);
-          navigate('/client/task-under-review');
+          if (editingTaskId && draftTask) {
+            void updateTask(editingTaskId, draftTask);
+            setEditingTaskId(null);
+            navigate('/client/tasks');
+          } else {
+            if (auth.user && draftTask) void createTask(auth.user.id, draftTask);
+            navigate('/client/task-under-review');
+          }
         }}
       />
     );
@@ -944,6 +957,20 @@ export default function App() {
             });
           }
           navigate('/client/review-work');
+        }}
+        onEdit={() => {
+          void getTaskForEdit(detail.taskId).then((t) => {
+            if (t) {
+              setDraftTask(t);
+              setEditingTaskId(detail.taskId);
+              navigate('/client/create-task');
+            }
+          });
+        }}
+        onDelete={() => {
+          if (window.confirm('Delete this task? This cannot be undone.')) {
+            void deleteTask(detail.taskId).then(() => navigate('/client/tasks'));
+          }
         }}
         onTab={goClientTab}
       />

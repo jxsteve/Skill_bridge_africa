@@ -22,6 +22,8 @@ type Props = {
   detail: ClientTaskDetail;
   onBack: () => void;
   onReview: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
   onTab: (tab: MainTab) => void;
 };
 
@@ -78,7 +80,7 @@ function statusMessage(detail: ClientTaskDetail): { title: string; body: string;
   }
 }
 
-export default function ClientTaskDetailScreen({ detail, onBack, onReview, onTab }: Props) {
+export default function ClientTaskDetailScreen({ detail, onBack, onReview, onEdit, onDelete, onTab }: Props) {
   const step = currentStep(detail);
   const msg = statusMessage(detail);
   const project = detail.project;
@@ -188,6 +190,18 @@ export default function ClientTaskDetailScreen({ detail, onBack, onReview, onTab
                 <DownloadIcon size={16} color="var(--primary-blue)" />
               </a>
             ))}
+          </div>
+        )}
+
+        {/* Task not yet assigned — the client can still edit or delete it */}
+        {!project && (
+          <div className={styles.manageRow}>
+            <button className={styles.editBtn} onClick={onEdit}>
+              Edit task
+            </button>
+            <button className={styles.deleteBtn} onClick={onDelete}>
+              Delete task
+            </button>
           </div>
         )}
 

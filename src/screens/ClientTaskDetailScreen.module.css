@@ -252,6 +252,33 @@
 .action {
   margin-top: 4px;
 }
+.manageRow {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+.editBtn {
+  flex: 1;
+  border: 1px solid var(--primary-blue);
+  background: #fff;
+  color: var(--primary-blue);
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.deleteBtn {
+  flex: 1;
+  border: 1px solid #fca5a5;
+  background: #fff;
+  color: #dc2626;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
 .doneRow {
   display: flex;
   align-items: center;
