@@ -13,6 +13,7 @@ import {
   fundWallet,
   getClientTaskDetail,
   getClientWallet,
+  getStudentSubmission,
   getTask,
   getTaskForEdit,
   hasApplied,
@@ -53,6 +54,7 @@ import LandingPage from './landing/LandingPage';
 import StudentDashboardScreen from './screens/StudentDashboardScreen';
 import StudentHomeScreen from './screens/StudentHomeScreen';
 import SubmitWorkScreen from './screens/SubmitWorkScreen';
+import StudentSubmissionScreen from './screens/StudentSubmissionScreen';
 import TaskDetailScreen from './screens/TaskDetailScreen';
 import VerificationProgressScreen from './screens/VerificationProgressScreen';
 import VerificationSuccessScreen from './screens/VerificationSuccessScreen';
@@ -475,6 +477,7 @@ export default function App() {
             <MyProjectsScreen
               userId={auth.user?.id}
               onOpenProject={(id) => navigate(`/app/projects/${id}/submit`)}
+              onViewSubmission={(id) => navigate(`/app/projects/${id}/submission`)}
               onBrowse={() => navigate('/app/browse')}
               onTab={goTab}
             />
@@ -511,6 +514,7 @@ export default function App() {
         {/* Legacy path — the task tracker now lives on the Tasks tab. */}
         <Route path="/app/projects" element={<Navigate to="/app/tasks" replace />} />
         <Route path="/app/projects/:projectId/submit" element={<SubmitWorkRoute />} />
+        <Route path="/app/projects/:projectId/submission" element={<StudentSubmissionRoute />} />
         <Route
           path="/app/profile"
           element={
@@ -895,6 +899,43 @@ export default function App() {
           }
           navigate('/app/tasks');
         }}
+      />
+    );
+  }
+
+  function StudentSubmissionRoute() {
+    const { projectId } = useParams();
+    const [sub, setSub] = useState<Awaited<ReturnType<typeof getStudentSubmission>> | undefined>(
+      undefined,
+    );
+
+    useEffect(() => {
+      let active = true;
+      if (!projectId) {
+        setSub(null);
+        return;
+      }
+      getStudentSubmission(projectId)
+        .then((d) => active && setSub(d))
+        .catch(() => active && setSub(null));
+      return () => {
+        active = false;
+      };
+    }, [projectId]);
+
+    if (sub === undefined) return <LoadingView />;
+    if (!sub) return <Navigate to="/app/tasks" replace />;
+
+    const editable = sub.status === 'under_review' || sub.status === 'submitted';
+    return (
+      <StudentSubmissionScreen
+        status={sub.status}
+        note={sub.note}
+        submittedAt={sub.submittedAt}
+        files={sub.files}
+        editable={editable}
+        onBack={() => navigate('/app/tasks')}
+        onEdit={() => navigate(`/app/projects/${projectId}/submit`)}
       />
     );
   }

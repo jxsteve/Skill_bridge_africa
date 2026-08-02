@@ -15,9 +15,13 @@ import styles from './MyProjectsScreen.module.css';
 type Props = {
   userId?: string;
   onOpenProject: (id: string) => void;
+  onViewSubmission: (id: string) => void;
   onBrowse: () => void;
   onTab: (tab: MainTab) => void;
 };
+
+// Stages where the student has already submitted work (view, don't re-submit).
+const SUBMITTED_STAGES = ['Submitted', 'Under Admin Review', 'Awaiting Client Approval'];
 
 // Colour each fine-grained stage so the student can tell state at a glance.
 const STAGE_STYLE: Record<string, { bg: string; color: string }> = {
@@ -29,7 +33,13 @@ const STAGE_STYLE: Record<string, { bg: string; color: string }> = {
   Cancelled: { bg: '#fee2e2', color: '#dc2626' },
 };
 
-export default function MyProjectsScreen({ userId, onOpenProject, onBrowse, onTab }: Props) {
+export default function MyProjectsScreen({
+  userId,
+  onOpenProject,
+  onViewSubmission,
+  onBrowse,
+  onTab,
+}: Props) {
   const [active, setActive] = useState<'All' | 'In Progress' | 'Completed'>('All');
   const [allProjects, setAllProjects] = useState<Project[]>(isSupabaseConfigured ? [] : PROJECTS);
   const [loading, setLoading] = useState(true);
@@ -95,13 +105,16 @@ export default function MyProjectsScreen({ userId, onOpenProject, onBrowse, onTa
               const style = STAGE_STYLE[stage] ?? STAGE_STYLE['In Progress'];
               const completed = project.status === 'Completed';
               const isOpen = openReview === project.id;
+              const submitted = SUBMITTED_STAGES.includes(stage);
               return (
                 <button
                   key={project.id}
                   className={styles.card}
-                  onClick={() =>
-                    completed ? setOpenReview(isOpen ? null : project.id) : onOpenProject(project.id)
-                  }
+                  onClick={() => {
+                    if (completed) setOpenReview(isOpen ? null : project.id);
+                    else if (submitted) onViewSubmission(project.id);
+                    else onOpenProject(project.id);
+                  }}
                 >
                   <div className={styles.cardHead}>
                     <span className={styles.cardTitle}>{project.title}</span>

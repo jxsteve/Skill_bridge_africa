@@ -432,6 +432,39 @@ export async function submitWork(
   }
 }
 
+/** The student's latest submission for a project, for the read/edit view. */
+export async function getStudentSubmission(projectId: string): Promise<{
+  status: string;
+  note: string;
+  submittedAt: string;
+  files: SubmissionFile[];
+} | null> {
+  if (!isSupabaseConfigured) return null;
+  const project = await repo.projects.get(projectId);
+  if (!project) return null;
+  const subs = await repo.submissions.listByProject(projectId);
+  const latest = subs[0];
+  return {
+    status: project.status,
+    note: latest?.note ?? '',
+    submittedAt: latest
+      ? new Date(latest.created_at).toLocaleString('en-US', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: '2-digit',
+        })
+      : '',
+    files: (latest?.files ?? []).map((url) => ({
+      name: fileNameFromUrl(url),
+      sizeLabel: 'File',
+      url,
+      isImage: isImageUrl(url),
+    })),
+  };
+}
+
 // ---- Client task detail (drives the client review flow off real data) -----
 
 export type ClientTaskDetail = {
