@@ -42,13 +42,33 @@ export default function BrowseTasksScreen({ onOpenTask, onBack, onTab }: Props) 
       .catch(() => {});
   }, []);
 
-  const matchesQuery = (title: string) =>
-    query.trim() === '' || title.toLowerCase().includes(query.trim().toLowerCase());
+  // Match the query against every searchable field — title, description,
+  // job type, skills, company, budget and due date. Every whitespace-separated
+  // term must appear somewhere, so "design 200" matches a $200 design task.
+  const matchesQuery = (t: Task) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    const haystack = [
+      t.title,
+      t.description,
+      t.category,
+      t.client,
+      ...(t.skills ?? []),
+      String(t.budget),
+      `$${t.budget}`,
+      t.dueDate,
+      `${t.dueInDays} days`,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return q.split(/\s+/).every((term) => haystack.includes(term));
+  };
 
   const tasks = useMemo(
     () =>
       allTasks.filter(
-        (t) => (category === 'All categories' || t.category === category) && matchesQuery(t.title),
+        (t) => (category === 'All categories' || t.category === category) && matchesQuery(t),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [query, category, allTasks],
@@ -71,7 +91,7 @@ export default function BrowseTasksScreen({ onOpenTask, onBack, onTab }: Props) 
             <SearchIcon size={18} color="#9CA3AF" />
             <input
               className={styles.searchInput}
-              placeholder="Search tasks....."
+              placeholder="Search title, skill, company, budget…"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
