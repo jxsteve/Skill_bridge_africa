@@ -191,12 +191,15 @@ export default function AdminPanel({ name, onExit }: Props) {
   }
 
   const overview = computeOverview(verifs, escrows);
+  // Newly-created (unassigned) tasks the admin still needs to act on.
+  const openTasks = allTasks.filter((t) => t.status === 'open').length;
 
-  const nav: { key: Screen; label: string; Icon: typeof HomeIcon }[] = [
-    { key: 'dashboard', label: 'Dashboard', Icon: HomeIcon },
-    { key: 'verification', label: 'Student Verification', Icon: ShieldCheckIcon },
-    { key: 'tasks', label: 'Tasks', Icon: ClipboardListIcon },
-    { key: 'escrow', label: 'Escrow Monitoring', Icon: WalletIcon },
+  // Count badges: how many items in each section need the admin's attention.
+  const nav: { key: Screen; label: string; Icon: typeof HomeIcon; count: number }[] = [
+    { key: 'dashboard', label: 'Dashboard', Icon: HomeIcon, count: overview.pendingVerifications + overview.needsReview + openTasks },
+    { key: 'verification', label: 'Student Verification', Icon: ShieldCheckIcon, count: overview.pendingVerifications },
+    { key: 'tasks', label: 'Tasks', Icon: ClipboardListIcon, count: openTasks },
+    { key: 'escrow', label: 'Escrow Monitoring', Icon: WalletIcon, count: overview.needsReview },
   ];
 
   return (
@@ -222,6 +225,7 @@ export default function AdminPanel({ name, onExit }: Props) {
               >
                 <n.Icon size={19} color={active ? '#124cc9' : '#b0c6f8'} />
                 <span className={s.navLabel}>{n.label}</span>
+                {n.count > 0 && <span className={s.navBadge}>{n.count}</span>}
               </button>
             );
           })}
