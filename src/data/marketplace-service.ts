@@ -494,6 +494,31 @@ export async function approveSubmission(p: {
   );
 }
 
+/** Client sends the work back for revision: reopens the task and notifies the student. */
+export async function requestChanges(projectId: string, feedback: string): Promise<void> {
+  if (!isSupabaseConfigured) return;
+  await repo.projects.setStatus(projectId, 'in_progress');
+  try {
+    const project = await repo.projects.get(projectId);
+    if (project) {
+      await repo.tasks.setStatus(project.task_id, 'in_progress');
+      const task = await repo.tasks.get(project.task_id);
+      const note = feedback.trim();
+      await notify(
+        project.student_id,
+        'Changes requested',
+        note
+          ? `The client requested changes: “${note}”`
+          : `The client requested changes on “${task?.title ?? 'your task'}”. Please review and resubmit.`,
+        'job',
+        `/app/projects/${projectId}/submit`,
+      );
+    }
+  } catch {
+    // Best-effort — the status change already went through.
+  }
+}
+
 // ---- Admin rates a student's work (shows on the task) ---------------------
 
 /** Admin gives (or updates) a star rating for the student's work on a project. */

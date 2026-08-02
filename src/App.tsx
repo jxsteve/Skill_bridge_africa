@@ -16,6 +16,7 @@ import {
   hasApplied,
   placeBid,
   releasePayment,
+  requestChanges,
   requestTask,
   submitClientReview,
   submitWork,
@@ -957,7 +958,11 @@ export default function App() {
         studentName={activeReview.studentName}
         files={activeReview.files}
         onBack={() => navigate('/client/tasks')}
-        onRequestChanges={() => navigate('/client/tasks')}
+        onRequestChanges={(feedback) => {
+          if (activeReview) void requestChanges(activeReview.projectId, feedback);
+          setActiveReview(null);
+          navigate('/client/tasks');
+        }}
         onApproveWork={() => navigate('/client/work-approved')}
       />
     );
