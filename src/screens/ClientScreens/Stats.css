@@ -1,0 +1,64 @@
+.stats{
+
+    width:90%;
+    max-width:900px;
+
+    margin:80px auto;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    background:#EEF4FF;
+
+    border-radius:18px;
+
+    padding:30px;
+
+}
+
+.stat{
+
+    text-align:center;
+
+    flex:1;
+
+}
+
+.stat h2{
+
+    color:#2450CF;
+
+    font-size:34px;
+
+    margin-bottom:10px;
+
+}
+
+.stat p{
+
+    color:#444;
+
+    line-height:1.5;
+
+}
+
+@media(max-width:768px){
+
+.stats{
+
+flex-direction:column;
+
+gap:30px;
+
+}
+
+}
+
+.stats{
+
+background:#EEF4FF;
+
+box-shadow:0 8px 20px rgba(0,0,0,.06);
+
+}

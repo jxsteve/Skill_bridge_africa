@@ -1,0 +1,50 @@
+.cta-section {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 70px 0;
+}
+
+.cta-button {
+  width: 90%;
+  max-width: 450px;
+  height: 60px;
+
+  background: #2450CF;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 12px;
+
+  font-size: 20px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 12px;
+
+  cursor: pointer;
+
+  transition: .3s;
+}
+
+.cta-button:hover{
+
+background:#1B43B6;
+
+transform:translateY(-3px);
+
+box-shadow:0 15px 35px rgba(36,80,207,.3);
+
+}
+
+.cta-button svg{
+
+font-size:22px;
+
+}

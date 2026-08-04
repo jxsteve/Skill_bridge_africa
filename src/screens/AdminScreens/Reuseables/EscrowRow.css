@@ -1,0 +1,63 @@
+.escrow-row{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:18px 20px;
+
+border-top:1px solid #ECECEC;
+
+}
+
+.escrow-row h4{
+
+font-size:17px;
+
+margin-bottom:6px;
+
+}
+
+.escrow-row p{
+
+font-size:15px;
+
+color:#6B7280;
+
+}
+
+.badge{
+
+padding:7px 15px;
+
+border-radius:30px;
+
+font-size:14px;
+
+}
+
+.funded{
+
+background:#EEE2FF;
+
+color:#7C3AED;
+
+}
+
+.released{
+
+background:#DDF7E7;
+
+color:#169B47;
+
+}
+
+.disputed{
+
+background:#FFE5E5;
+
+color:#EF4444;
+
+}

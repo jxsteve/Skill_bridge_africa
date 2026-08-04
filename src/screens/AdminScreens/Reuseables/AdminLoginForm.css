@@ -1,0 +1,111 @@
+.login-form{
+
+    width:90%;
+    max-width:420px;
+
+    margin:70px auto 0;
+}
+
+.login-form h1{
+
+    text-align:center;
+
+    font-size:54px;
+
+    color:#1E2430;
+
+    margin-bottom:18px;
+}
+
+.subtitle{
+
+    text-align:center;
+
+    color:#737881;
+
+    font-size:22px;
+
+    line-height:1.4;
+
+    margin-bottom:45px;
+}
+
+.warning{
+
+    text-align:center;
+
+    color:#F59E0B;
+
+    font-size:14px;
+
+    margin:-8px 0 22px;
+}
+
+.remember{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+}
+
+.remember input{
+
+    width:24px;
+
+    height:24px;
+
+    cursor:pointer;
+}
+
+.remember label{
+
+    font-size:18px;
+
+    color:#4B5563;
+
+    cursor:pointer;
+}
+
+@media(max-width:768px){
+
+.login-form{
+
+margin-top:40px;
+
+}
+
+.login-form h1{
+
+font-size:42px;
+
+}
+
+.subtitle{
+
+font-size:18px;
+
+margin-bottom:35px;
+
+}
+
+.remember label{
+
+font-size:16px;
+
+}
+
+}
+
+.checkbox{
+
+width:24px;
+
+height:24px;
+
+cursor:pointer;
+
+accent-color:#6D28D9;
+
+}

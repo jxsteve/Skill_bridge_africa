@@ -1,0 +1,88 @@
+.input-field{
+    display:flex;
+    align-items:center;
+
+    width:100%;
+    height:60px;
+
+    border:1px solid #D6D9E0;
+    border-radius:14px;
+
+    padding:0 18px;
+
+    margin-bottom:24px;
+
+    background:#fff;
+}
+
+.left-icon{
+
+    color:#7A7F8A;
+
+    font-size:22px;
+
+    display:flex;
+    align-items:center;
+}
+
+.input-field input{
+
+    flex:1;
+
+    border:none;
+
+    outline:none;
+
+    margin-left:14px;
+
+    font-size:17px;
+
+    color:#222;
+
+    background:transparent;
+}
+
+.input-field input::placeholder{
+
+    color:#8A8F99;
+}
+
+.right-icon{
+
+    color:#7A7F8A;
+
+    font-size:22px;
+
+    display:flex;
+    align-items:center;
+
+    cursor:pointer;
+}
+
+.eye-btn{
+
+background:none;
+
+border:none;
+
+cursor:pointer;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:22px;
+
+color:#7A7F8A;
+
+transition:.3s;
+
+}
+
+.eye-btn:hover{
+
+color:#2450CF;
+
+}

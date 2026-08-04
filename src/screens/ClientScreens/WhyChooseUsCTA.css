@@ -1,0 +1,55 @@
+.cta {
+
+  display: flex;
+
+  justify-content: center;
+
+  margin: 60px 0;
+}
+
+.cta-btn {
+
+  width: 90%;
+
+  max-width: 500px;
+
+  height: 60px;
+
+  background: #2450CF;
+
+  color: white;
+
+  border: none;
+
+  border-radius: 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  font-size: 20px;
+
+  cursor: pointer;
+
+  transition: .3s;
+}
+
+.cta-btn:hover {
+
+  background: #1C43B4;
+
+  transform: translateY(-3px);
+
+  box-shadow: 0 12px 25px rgba(36,80,207,.35);
+
+}
+
+.cta-btn svg{
+
+font-size:22px;
+
+}
